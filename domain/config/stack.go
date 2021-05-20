@@ -3,12 +3,9 @@ package config
 import (
 	`encoding/json`
 	`io/ioutil`
-	`strconv`
 	`time`
 	
-	`github.com/go-playground/validator`
 	`github.com/pkg/errors`
-	`github.com/sirupsen/logrus`
 )
 
 /*
@@ -22,32 +19,6 @@ import (
 // global constants for file
 const ()
 
-// global variables (not cool) for this file
-var (
-	validate = validator.New()
-)
-
-// Adding custom validator operators for our usecase
-func init() {
-	// register custom validation: rfe(Required if Field is Equal to some value).
-	err := validate.RegisterValidation(
-		`port`, func(fl validator.FieldLevel) bool {
-			
-			value := fl.Field().String()
-			my, err := strconv.Atoi(value)
-			if err != nil {
-				return false
-			}
-			if my <= 1024 || my >= 65336 {
-				return false
-			}
-			return true
-		},
-	)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-}
 
 // ApiStackResponse is what we usually get from user api as response when we try to retrieve an agent's
 // stack config.
