@@ -52,15 +52,22 @@ func init() {
 	err = validate.RegisterValidation(
 		`semver`, func(fl validator.FieldLevel) bool {
 			
-			value := fl.Field().String()
+			version := fl.Field().String()
 			rex, err := regexp.Compile(semVerRegExp)
 			if err != nil {
 				logrus.Fatal(err)
 			}
 			
+			// temporary edge case handling
+			if version == "staging" || version == "latest" {
+				return true
+			}
+			
 			// return true if field is a semantic version
-			value = strings.TrimPrefix(value, "v")
-			pass := rex.MatchString(value)
+			version = strings.TrimPrefix(version, "v")
+			pass := rex.MatchString(version)
+			
+			
 			return pass
 		},
 	)
