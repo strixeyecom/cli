@@ -19,7 +19,6 @@ import (
 // global constants for file
 const ()
 
-
 // ApiStackResponse is what we usually get from user api as response when we try to retrieve an agent's
 // stack config.
 // there are two main cases. We get stack information,
@@ -99,6 +98,20 @@ func (config stackConfig) Save(filePath string) error {
 func (config stackConfig) Validate() error {
 	var err error
 	err = config.Broker.validate()
+	if err != nil {
+		return err
+	}
+	err = config.Intervals.validate()
+	if err != nil {
+		return err
+	}
+	
+	err = config.Scheduler.validate()
+	if err != nil {
+		return err
+	}
+	
+	err = config.Profiler.validate()
 	if err != nil {
 		return err
 	}
@@ -182,9 +195,13 @@ type scheduler struct {
 	SchedulerListen string `json:"scheduler_listen" validate:"port"`
 }
 
+func (s scheduler) validate() error {
+	return validate.Struct(s)
+}
+
 type engine struct {
-	Address      string `json:"address"`
-	EngineListen string `json:"engine_listen"`
+	Address      string `json:"address" validate:"hostname"`
+	EngineListen string `json:"engine_listen" validate:"port"`
 }
 
 // validate checks for the fields of given instance.
@@ -211,8 +228,12 @@ type profiler struct {
 	ProfilerListen string `json:"profiler_listen" validate:"port"`
 }
 
+func (p profiler) validate() error {
+	return validate.Struct(p)
+}
+
 type intervals struct {
-	SystemStatsIntervalSecond int `json:"system_stats_interval_second" validate:"gte=0"`
+	SystemStatsIntervalSecond int `json:"system_stats_interval_second" validate:"gt=0"`
 }
 
 // validate checks for the fields of given instance.
