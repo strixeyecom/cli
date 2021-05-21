@@ -1,8 +1,8 @@
 package config
 
 import (
-	`encoding/json`
-	`testing`
+	"encoding/json"
+	"testing"
 )
 
 /*
@@ -56,14 +56,16 @@ func TestCli_UnmarshalJSON(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
+
 		t.Run(
 			tt.name, func(t *testing.T) {
 				c := &Cli{}
 				if err := json.Unmarshal(tt.args.bytes, c); (err != nil) != tt.wantErr {
 					t.Errorf("UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 				}
-				
+
 			},
 		)
 	}
@@ -85,17 +87,67 @@ func TestCli_Validate(t *testing.T) {
 				userAPIToken: "blah",
 			},
 			wantErr: true,
+		}, {
+			name: "Good object",
+			fields: fields{
+				userAPIToken:   "blah",
+				currentAgentId: "blah",
+			},
+			wantErr: false,
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
+
 		t.Run(
 			tt.name, func(t *testing.T) {
 				c := &Cli{
 					UserAPIToken:   tt.fields.userAPIToken,
-					CurrentAgentId: tt.fields.currentAgentId,
+					CurrentAgentID: tt.fields.currentAgentId,
 				}
 				if err := c.Validate(); (err != nil) != tt.wantErr {
 					t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+				}
+			},
+		)
+	}
+}
+
+func TestCli_Save(t *testing.T) {
+	type fields struct {
+		UserAPIToken   string
+		CurrentAgentId string
+	}
+	type args struct {
+		filePath string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "empty stack config",
+			args:    args{filePath: "/tmp/stack-config-tmp.json"},
+			wantErr: false,
+		}, {
+			name:    "bad path",
+			args:    args{filePath: "/root/bad/"},
+			wantErr: true,
+		},
+	}
+	for i := range tests {
+		tt := tests[i]
+
+		t.Run(
+			tt.name, func(t *testing.T) {
+				c := &Cli{
+					UserAPIToken:   tt.fields.UserAPIToken,
+					CurrentAgentID: tt.fields.CurrentAgentId,
+				}
+				if err := c.Save(tt.args.filePath); (err != nil) != tt.wantErr {
+					t.Errorf("Save() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			},
 		)

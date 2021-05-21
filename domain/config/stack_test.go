@@ -1,32 +1,38 @@
+// nolint: testpackage
 package config
 
 import (
-	`encoding/json`
-	`testing`
-	`time`
+	"encoding/json"
+	"testing"
+	"time"
 )
 
 func TestStackConfig_Marshall(t *testing.T) {
-	a := stackConfig{
-	
-	}
+	t.Parallel()
+
+	var a stackConfig
 	_, err := json.MarshalIndent(a, "", "  ")
-	
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestStackConfig_UnMarshall(t *testing.T) {
-	a := ApiStackResponse{}
-	b := ApiErrorResponse{}
+	t.Parallel()
+
+	var (
+		a ApiStackResponse
+
+		b ApiErrorResponse
+	)
+
 	err := json.Unmarshal(
 		[]byte(_goldenStackConfig), &a,
 	)
 	if err != nil {
 		t.Error(err)
 	}
-	
+
 	err = json.Unmarshal(
 		[]byte(`{
     "status": "error",
@@ -43,13 +49,14 @@ func TestStackConfig_UnMarshall(t *testing.T) {
 }
 
 func Test_addresses_Validate(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		ConnectorScheme  string
 		ConnectorAddress string
 		ConnectorPort    string
 		SchedulerAddr    string
-		ManagerPort      string
 	}
+
 	tests := []struct {
 		name    string
 		fields  fields
@@ -63,12 +70,15 @@ func Test_addresses_Validate(t *testing.T) {
 				ConnectorPort:    "2118",
 				SchedulerAddr:    "2141",
 			},
-			
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
+
 		t.Run(
 			tt.name, func(t *testing.T) {
+				t.Parallel()
+
 				a := addresses{
 					ConnectorScheme:  tt.fields.ConnectorScheme,
 					ConnectorAddress: tt.fields.ConnectorAddress,
@@ -82,10 +92,12 @@ func Test_addresses_Validate(t *testing.T) {
 	}
 }
 
+//nolint:funlen
 func Test_stackConfig_Validate(t *testing.T) {
 	type fields struct {
 		data []byte
 	}
+
 	tests := []struct {
 		name    string
 		wantErr bool
@@ -147,14 +159,18 @@ func Test_stackConfig_Validate(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
+
+	for i := range tests {
+		tt := tests[i]
 		t.Run(
 			tt.name, func(t *testing.T) {
-				stackResponse := ApiStackResponse{}
+				t.Parallel()
+				var stackResponse ApiStackResponse
+
 				if err := json.Unmarshal(tt.fields.data, &stackResponse); err != nil {
 					t.Error(err)
 				}
-				
+
 				config := stackResponse.Stack.Config
 				if err := config.Validate(); (err != nil) != tt.wantErr {
 					t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
@@ -186,18 +202,18 @@ const (
             "deployment": "docker",
             "database": {
                 "db_addr": "database",
-                "db_user": "aaaaaaaa",
-                "db_pass": "aaaaaaaa",
-                "db_root_pass": "aaaaaaaa",
+                "db_user": "database",
+                "db_pass": "database",
+                "db_root_pass": "database",
                 "db_name": "strixeye",
                 "db_port": "4354"
             },
             "broker": {
                 "broker_addr": "",
                 "broker_hostname": "abc.com",
-                "broker_username": "aaaaaaaa",
+                "broker_username": "broker",
                 "broker_prefix": "amqp",
-                "broker_password": "aaaaaaaa",
+                "broker_password": "broker",
                 "broker_port": "32121"
             },
             "scheduler": {
@@ -272,18 +288,18 @@ const (
             "deployment": "docker",
             "database": {
                 "db_addr": "database",
-                "db_user": "aaaaaaaa",
-                "db_pass": "aaaaaaaa",
-                "db_root_pass": "aaaaaaaa",
+                "db_user": "strixeye",
+                "db_pass": "strixeye",
+                "db_root_pass": "strixeye",
                 "db_name": "strixeye",
                 "db_port": "4354"
             },
             "broker": {
                 "broker_addr": "",
                 "broker_hostname": "abc.com",
-                "broker_username": "aaaaaaaa",
+                "broker_username": "strixeye",
                 "broker_prefix": "amqp",
-                "broker_password": "aaaaaaaa",
+                "broker_password": "strixeye",
                 "broker_port": "32121"
             },
             "scheduler": {
@@ -358,18 +374,18 @@ const (
             "deployment": "docker",
             "database": {
                 "db_addr": "database",
-                "db_user": "aaaaaaaa",
-                "db_pass": "aaaaaaaa",
-                "db_root_pass": "aaaaaaaa",
+                "db_user": "strixeye",
+                "db_pass": "strixeye",
+                "db_root_pass": "strixeye",
                 "db_name": "strixeye",
                 "db_port": "4354"
             },
             "broker": {
                 "broker_addr": "",
                 "broker_hostname": "abc.com",
-                "broker_username": "aaaaaaaa",
+                "broker_username": "strixeye",
                 "broker_prefix": "amqp",
-                "broker_password": "aaaaaaaa",
+                "broker_password": "strixeye",
                 "broker_port": "32121"
             },
             "scheduler": {
@@ -444,18 +460,18 @@ const (
             "deployment": "docker",
             "database": {
                 "db_addr": "database",
-                "db_user": "aaaaaaaa",
-                "db_pass": "aaaaaaaa",
-                "db_root_pass": "aaaaaaaa",
+                "db_user": "strixeye",
+                "db_pass": "strixeye",
+                "db_root_pass": "strixeye",
                 "db_name": "strixeye",
                 "db_port": "4354"
             },
             "broker": {
                 "broker_addr": "",
                 "broker_hostname": "abc.com",
-                "broker_username": "aaaaaaaa",
+                "broker_username": "strixeye",
                 "broker_prefix": "amqp",
-                "broker_password": "aaaaaaaa",
+                "broker_password": "strixeye",
                 "broker_port": "32121"
             },
             "scheduler": {
@@ -530,18 +546,18 @@ const (
             "deployment": "docker",
             "database": {
                 "db_addr": "database",
-                "db_user": "aaaaaaaa",
-                "db_pass": "aaaaaaaa",
-                "db_root_pass": "aaaaaaaa",
+                "db_user": "strixeye",
+                "db_pass": "strixeye",
+                "db_root_pass": "strixeye",
                 "db_name": "strixeye",
                 "db_port": "4354"
             },
             "broker": {
                 "broker_addr": "",
                 "broker_hostname": "abc.com",
-                "broker_username": "aaaaaaaa",
+                "broker_username": "strixeye",
                 "broker_prefix": "amqp",
-                "broker_password": "aaaaaaaa",
+                "broker_password": "strixeye",
                 "broker_port": "32121"
             },
             "scheduler": {
@@ -616,18 +632,18 @@ const (
             "deployment": "docker",
             "database": {
                 "db_addr": "database",
-                "db_user": "aaaaaaaa",
-                "db_pass": "aaaaaaaa",
-                "db_root_pass": "aaaaaaaa",
+                "db_user": "strixeye",
+                "db_pass": "strixeye",
+                "db_root_pass": "strixeye",
                 "db_name": "strixeye",
                 "db_port": "4354"
             },
             "broker": {
                 "broker_addr": "",
                 "broker_hostname": "abc.com",
-                "broker_username": "aaaaaaaa",
+                "broker_username": "strixeye",
                 "broker_prefix": "amqp",
-                "broker_password": "aaaaaaaa",
+                "broker_password": "strixeye",
                 "broker_port": "32121"
             },
             "scheduler": {
@@ -702,18 +718,18 @@ const (
             "deployment": "docker",
             "database": {
                 "db_addr": "database",
-                "db_user": "aaaaaaaa",
-                "db_pass": "aaaaaaaa",
-                "db_root_pass": "aaaaaaaa",
+                "db_user": "strixeye",
+                "db_pass": "strixeye",
+                "db_root_pass": "strixeye",
                 "db_name": "strixeye",
                 "db_port": "4354"
             },
             "broker": {
                 "broker_addr": "",
                 "broker_hostname": "abc.com",
-                "broker_username": "aaaaaaaa",
+                "broker_username": "strixeye",
                 "broker_prefix": "amqp",
-                "broker_password": "aaaaaaaa",
+                "broker_password": "strixeye",
                 "broker_port": "32121"
             },
             "scheduler": {
@@ -788,18 +804,18 @@ const (
             "deployment": "docker",
             "database": {
                 "db_addr": "database",
-                "db_user": "aaaaaaaa",
-                "db_pass": "aaaaaaaa",
-                "db_root_pass": "aaaaaaaa",
+                "db_user": "strixeye",
+                "db_pass": "strixeye",
+                "db_root_pass": "strixeye",
                 "db_name": "strixeye",
-                "db_port": "bbbbb"
+                "db_port": "strixeye"
             },
             "broker": {
                 "broker_addr": "",
                 "broker_hostname": "abc.com",
-                "broker_username": "aaaaaaaa",
+                "broker_username": "strixeye",
                 "broker_prefix": "amqp",
-                "broker_password": "aaaaaaaa",
+                "broker_password": "strixeye",
                 "broker_port": "32121"
             },
             "scheduler": {
@@ -874,17 +890,17 @@ const (
             "deployment": "docker",
             "database": {
                 "db_addr": "database",
-                "db_user": "aaaaaaaa",
-                "db_pass": "aaaaaaaa",
-                "db_root_pass": "aaaaaaaa",
+                "db_user": "strixeye",
+                "db_pass": "strixeye",
+                "db_root_pass": "strixeye",
                 "db_name": "strixeye",
                 "db_port": "4354"
             },
             "broker": {
                 "broker_addr": "",
                 "broker_hostname": "abc.com",
-                "broker_username": "aaaaaaaa",
-                "broker_prefix": "asdf",
+                "broker_username": "strixeye",
+                "broker_prefix": "strixeye",
                 "broker_password": "",
                 "broker_port": "bbb"
             },
@@ -943,6 +959,7 @@ const (
 }`
 )
 
+//nolint:funlen
 func Test_stackConfig_Save(t *testing.T) {
 	type fields struct {
 		Addresses  addresses
@@ -959,9 +976,11 @@ func Test_stackConfig_Save(t *testing.T) {
 		Intervals  intervals
 		Paths      paths
 	}
+
 	type args struct {
 		filePath string
 	}
+
 	tests := []struct {
 		name    string
 		fields  fields
@@ -972,15 +991,20 @@ func Test_stackConfig_Save(t *testing.T) {
 			name:    "empty stack config",
 			args:    args{filePath: "/tmp/stack-config-tmp.json"},
 			wantErr: false,
-		},	{
+		}, {
 			name:    "bad path",
 			args:    args{filePath: "/root/bad/"},
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
+
+	for i := range tests {
+		tt := tests[i]
+
 		t.Run(
 			tt.name, func(t *testing.T) {
+				t.Parallel()
+
 				config := stackConfig{
 					Addresses:  tt.fields.Addresses,
 					UseHTTPS:   tt.fields.UseHTTPS,
