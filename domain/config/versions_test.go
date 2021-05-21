@@ -1,6 +1,6 @@
 package config
 
-import `testing`
+import "testing"
 
 /*
 	Created by aomerk at 5/20/21 for project strixeye
@@ -51,7 +51,9 @@ func TestVersions_Validate(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
+
 		t.Run(
 			tt.name, func(t *testing.T) {
 				m := Versions{
@@ -99,7 +101,9 @@ func TestVersions_FromRawAPIResponse(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
+
 		t.Run(
 			tt.name, func(t *testing.T) {
 				v := Versions{}

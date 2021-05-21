@@ -1,9 +1,9 @@
 package config
 
 import (
-	`encoding/json`
-	
-	`github.com/pkg/errors`
+	"encoding/json"
+
+	"github.com/pkg/errors"
 )
 
 /*
@@ -14,52 +14,45 @@ import (
 	versions.go stores structural data for version messages.
 */
 
-// global constants for file
+// global constants for file.
 const ()
 
-// global variables (not cool) for this file
+// global variables (not cool) for this file.
 var ()
 
-// FromApiResponse is a tricky pattern. Using a single Unmarshal method for both Versions itself and
+// FromAPIResponse is a tricky pattern. Using a single Unmarshal method for both Versions itself and
 // versionsJSON sounded good but had a bad implementation.
 func (v *Versions) FromAPIResponse(apiVersions versionsJSON) error {
 	var (
 		err error
 	)
-	
+
 	// Iterate over fields and try to find something we need as version
 	for _, datum := range apiVersions.Data {
 		switch datum.Key {
 		case "sensor_version":
 			v.SensorVersion = datum.Value
-			break
 		case "queue_version":
 			v.QueueVersion = datum.Value
-			break
 		case "profiler_version":
 			v.ProfilerVersion = datum.Value
-			break
 		case "scheduler_version":
 			v.SchedulerVersion = datum.Value
-			break
 		case "engine_version":
 			v.EngineVersion = datum.Value
-			break
 		case "manager_version":
 			v.ManagerVersion = datum.Value
-			break
 		case "database_version":
 			v.DatabaseVersion = datum.Value
-			break
 		}
 	}
-	
+
 	// it is more than a unmarshaler, it is also a validator!!
 	err = v.Validate()
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -70,14 +63,14 @@ func (v Versions) FromRawAPIResponse(rawData []byte) error {
 		apiVersions versionsJSON
 		err         error
 	)
-	
+
 	// 	unmarshal to api response. It can have hundreds of different versions,
 	// 	even the version of linux kernel version of build machine.
 	err = json.Unmarshal(rawData, &apiVersions)
 	if err != nil {
 		return err
 	}
-	
+
 	err = v.FromAPIResponse(apiVersions)
 	if err != nil {
 		return errors.Wrap(err, "can not parse user api response")
@@ -100,6 +93,8 @@ type Versions struct {
 	SensorVersion    string `json:"sensor_version" validate:"semver"`
 }
 
+// Validate returns error if there is a problem with validation.
+// Check struct type definition of Versions for more information
 func (v Versions) Validate() error {
 	err := validate.Struct(v)
 	return err
