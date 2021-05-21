@@ -3,6 +3,7 @@ package suspicion
 import (
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/usestrix/cli/cli/commands/repository"
 	"github.com/usestrix/cli/domain/config"
@@ -42,6 +43,9 @@ func Get(dbConfig config.Database, args QueryArgs) ([]Suspicion, error) {
 		args.Limit = 10
 	}
 	tx := db.Limit(args.Limit)
+
+	// preload only first level for now
+	tx = tx.Preload(clause.Associations)
 
 	// filter by suspicion ids
 	if args.SuspicionIds != nil {

@@ -20,7 +20,7 @@ type Suspicion struct {
 	// but agent obviously doesn't think everybody is suspect, there are visitors who arent suspect.
 	//
 	// Suspects are a subset of visitors.
-	ProfileId string
+	ProfileID string `gorm:"profile_id;size:36"`
 
 	// What is the associated trip(request-response pair)'s id.
 	TripId string
@@ -32,6 +32,31 @@ type Suspicion struct {
 	CreatedAt uint64
 }
 
+type Ip struct {
+	ID string
+	Ip string
+	// To whom this ip belongs.
+	ProfileID string `gorm:"profile_id;size:36"`
+}
+
+func (i Ip) TableName() string {
+	return "ips"
+}
+
 func (Suspicion) TableName() string {
 	return "anomalies"
+}
+
+type QueryArgs struct {
+	// how many results do you want to retrieve
+	Limit int
+
+	// list of suspicion ids to return
+	SuspicionIds []string
+
+	// List of suspects, that you want the resulting suspicions belong to.
+	SuspectIds []string
+
+	// Request-Response Pair ids the suspicions must relate to
+	TripsIds []string
 }
