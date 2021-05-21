@@ -81,9 +81,6 @@ type QueryArgs struct {
 	// how many results do you want to retrieve
 	Limit int
 
-	// list of suspicion ids to return
-	SuspicionIds []string
-
 	// get only profiles who has detected since given epoch "millisecond" timestamp
 	SinceTime int64
 
