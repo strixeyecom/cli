@@ -31,13 +31,18 @@ type Cli struct {
 	// This api is open to all our customers and feel free to check out the documentation.
 	//
 	// UserAPIToken is generally sent as Authentication Bearer token over https.
-	UserAPIToken string
+	UserAPIToken string `mapstructure:"USER_API_TOKEN"`
 
 	// strixeye cli is usually designed to be used for a single agent instance at once,
 	// while not necessary, this field can be use to save user preference.
 	//
 	// However, most functions are agent id dependent.
-	CurrentAgentID string
+	CurrentAgentID string `mapstructure:"CURRENT_AGENT_ID"`
+
+	// DO NOT EDIT
+	// APIUrl is almost always dashboard.strixeye.com or api.strixeye.com. However,
+	// this is needed for testing purposes
+	APIUrl string `mapstructure:"API_URL"`
 }
 
 // Save stores current cli config to given file in json format.
@@ -55,7 +60,7 @@ func (c *Cli) Save(filePath string) error {
 func (c *Cli) Validate() error {
 	// TODO add validation support
 	if c.UserAPIToken == "" || c.CurrentAgentID == "" {
-		return errors.New("has empty field")
+		return errors.New("cli config has empty field")
 	}
 
 	return nil
