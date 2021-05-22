@@ -19,7 +19,7 @@ import (
 // global constants for file
 const ()
 
-// ApiStackResponse is what we usually get from user api as response when we try to retrieve an agent's
+// APIStackResponse is what we usually get from user api as response when we try to retrieve an agent's
 // stack config.
 // there are two main cases. We get stack information,
 // or we get an error. If we get stack information, it means that the status is "ok", if not "ok",
@@ -28,7 +28,7 @@ const ()
 // We can't simply print out. Two types of responses are just not compatible!
 //
 // 200 and >300 response codes must be handled differently.
-type ApiStackResponse struct {
+type APIStackResponse struct {
 	// Status is usually "ok" or "failed"
 	Status string `json:"status"`
 
@@ -36,26 +36,16 @@ type ApiStackResponse struct {
 	Stack AgentInformation `json:"data"`
 }
 
-// ApiErrorResponse is usually how user api returns error responses. Of course,
+// APIErrorResponse is usually how user api returns error responses. Of course,
 // saying it is a map[string]interface{} is not "how it returns"
 //
 // But it is as close as we can get with static typing.
-type ApiErrorResponse struct {
+type APIErrorResponse struct {
 	// Status is usually "ok" or "failed"
 	Status string `json:"status"`
 
 	// Data is usually keeps the error message or out stack config
 	Stack map[string]interface{} `json:"data"`
-}
-
-// AgentInformation keeps all information relevant to an agent instance.
-type AgentInformation struct {
-	ID        string      `json:"id"`
-	CompanyID string      `json:"company_id"`
-	Name      string      `json:"name"`
-	IPAddress string      `json:"ip_address"`
-	Config    stackConfig `json:"config"`
-	Domains   []domains   `json:"domains"`
 }
 
 // stackConfig is THE most important config in all strixeye universe. This is how agents self-update,
