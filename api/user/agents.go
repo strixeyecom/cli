@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 
 	"github.com/pkg/errors"
 
+	"github.com/usestrix/cli/api/user/repository"
 	"github.com/usestrix/cli/domain/config"
 )
 
@@ -23,10 +23,7 @@ import (
 // global constants for file
 
 // global constants for file
-const (
-	APIUrl       = "https://dashboard.***REMOVED***"
-	APITokenName = "Authorization"
-)
+const ()
 
 // global variables (not cool) for this file
 var ()
@@ -39,9 +36,9 @@ type agentsResponse struct {
 }
 
 // GetAgents returns list of agents from user api, parses and validates information.
-func GetAgents(apiToken string) ([]config.AgentInformation, error) {
-	var (
-		err error
+func GetAgents(cliConfig config.Cli) ([]config.AgentInformation, error) {
+	return getAgents(cliConfig.UserAPIToken, cliConfig.APIUrl)
+}
 
 		url string
 
