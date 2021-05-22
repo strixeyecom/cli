@@ -40,37 +40,17 @@ func GetAgents(cliConfig config.Cli) ([]config.AgentInformation, error) {
 	return getAgents(cliConfig.UserAPIToken, cliConfig.APIUrl)
 }
 
-		url string
-
-		req  *http.Request
+// getAgents returns list of agents from user api, parses and validates information.
+func getAgents(apiToken, apiURL string) ([]config.AgentInformation, error) {
+	var (
+		err  error
 		resp *http.Response
 	)
 
-	// create url
-	url = fmt.Sprintf("%s/api/agents", APIUrl)
-
-	// create request
-	req, err = http.NewRequest(http.MethodGet, url, nil)
+	resp, err = repository.UserAPIRequest(http.MethodGet, "/agents", nil, apiToken, apiURL)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to complete user api request to agents")
 	}
-
-	// authentication is made via bearer token over http headers.
-	tokenHeader := fmt.Sprintf("Bearer %s", apiToken)
-	req.Header.Add(APITokenName, tokenHeader)
-	req.Header.Add("accept", "application/json")
-
-	// create client to do the request
-	client := http.Client{
-		Timeout: time.Second * 5,
-	}
-
-	// fetch information
-	resp, err = client.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to send request to user api")
-	}
-
 	// read response body
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
