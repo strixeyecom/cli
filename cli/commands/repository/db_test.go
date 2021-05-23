@@ -1,13 +1,11 @@
 package repository
 
 import (
-	"os"
 	"testing"
-
-	"github.com/joho/godotenv"
-	"github.com/sirupsen/logrus"
+	
+	`github.com/spf13/viper`
 	"gorm.io/gorm"
-
+	
 	"github.com/usestrix/cli/domain/config"
 )
 
@@ -22,40 +20,24 @@ import (
 // global constants for file
 const ()
 
-// global variables (not cool) for this file
-var (
-	dbConfig_ config.Database
-)
 
-func TestMain(m *testing.M) {
-	var (
-		err error
-	)
-
-	// initialize test environment
-	err = godotenv.Load(".env")
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	// create a real database instance
-	dbConfig_ = config.Database{
-		DBName: os.Getenv("DB_NAME"),
-		DBPort: os.Getenv("DB_PORT"),
-		DBAddr: os.Getenv("DB_ADDR"),
-		DBPass: os.Getenv("DB_PASS"),
-		DBUser: os.Getenv("DB_USER"),
-	}
-
-	err = dbConfig_.Validate()
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	// 	run tests
-	os.Exit(m.Run())
-}
 func TestConnectToAgentDB(t *testing.T) {
+	var (
+		cliConfig config.Cli
+	)
+	
+	// get good keys
+	viper.SetConfigFile("../../../cli.json")
+	if err := viper.ReadInConfig(); err != nil {
+		t.Fatalf("Error reading config file, %s", err)
+	}
+	
+	err := viper.Unmarshal(&cliConfig)
+	
+	if err != nil {
+		t.Fatalf("unable to decode into map, %v", err)
+	}
+	
 	type args struct {
 		dbConfig config.Database
 	}
@@ -67,7 +49,7 @@ func TestConnectToAgentDB(t *testing.T) {
 	}{
 		{
 			name:    "good credentials",
-			args:    args{dbConfig: dbConfig_},
+			args:    args{dbConfig: cliConfig.Database},
 			wantErr: false,
 		},
 	}
