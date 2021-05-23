@@ -2,7 +2,9 @@ package main
 
 import (
 	"os"
-
+	
+	`github.com/spf13/cobra`
+	
 	"github.com/usestrix/cli/cli/commands/commands"
 )
 
@@ -13,9 +15,12 @@ import (
 // Usually, configuration initialization takes place in here,
 // main package. But I wanted to make that happen in commands package too,
 // for the sake of better testability.
+
+var rootCmd *cobra.Command
+
 func main() {
-	cmd := commands.NewStrixeyeCommand()
-	if err := cmd.Execute(); err != nil {
+	rootCmd = commands.NewStrixeyeCommand()
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }

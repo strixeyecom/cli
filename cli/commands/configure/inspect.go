@@ -1,6 +1,8 @@
 package configure
 
 import (
+	`encoding/json`
+	
 	`github.com/k0kubun/pp`
 	"github.com/spf13/cobra"
 	`github.com/spf13/viper`
@@ -79,10 +81,12 @@ func inspectCmd(cmd *cobra.Command, args []string) error {
 				return err
 			}
 		}
-		_, err = pp.Print(AgentInformations)
+		data, err := json.MarshalIndent(AgentInformations, "", "\t")
 		if err != nil {
 			return err
 		}
+		
+		cmd.Println(string(data))
 	}
 	
 	return nil
