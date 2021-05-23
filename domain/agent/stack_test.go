@@ -1,16 +1,18 @@
 // nolint: testpackage
-package config
+package agent
 
 import (
 	"encoding/json"
 	"testing"
 	"time"
+	
+	`github.com/usestrix/cli/domain/repository`
 )
 
 func TestStackConfig_Marshall(t *testing.T) {
 	t.Parallel()
 
-	var a stackConfig
+	var a StackConfig
 	_, err := json.MarshalIndent(a, "", "  ")
 	if err != nil {
 		t.Error(err)
@@ -967,7 +969,7 @@ func Test_stackConfig_Save(t *testing.T) {
 		CreatedAt  time.Time
 		UpdatedAt  time.Time
 		Deployment string
-		Database   Database
+		Database   repository.Database
 		Broker     broker
 		Scheduler  scheduler
 		Engine     engine
@@ -1005,7 +1007,7 @@ func Test_stackConfig_Save(t *testing.T) {
 			tt.name, func(t *testing.T) {
 				t.Parallel()
 
-				config := stackConfig{
+				config := StackConfig{
 					Addresses:  tt.fields.Addresses,
 					UseHTTPS:   tt.fields.UseHTTPS,
 					CreatedAt:  tt.fields.CreatedAt,

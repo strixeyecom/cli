@@ -6,7 +6,8 @@ import (
 	
 	"github.com/spf13/viper"
 	
-	"github.com/usestrix/cli/domain/config"
+	`github.com/usestrix/cli/domain/agent`
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -26,9 +27,9 @@ var ()
 func TestGetAgents(t *testing.T) {
 	var (
 		err       error
-		cliConfig config.Cli
+		cliConfig cli.Cli
 	)
-	viper.SetConfigFile("../../.env")
+	viper.SetConfigFile("../../../.env")
 	// Try to read from file, but use env variables if non exists. it's fine
 	err = viper.ReadInConfig()
 	if err != nil {
@@ -42,12 +43,12 @@ func TestGetAgents(t *testing.T) {
 		fmt.Printf("Unable to decode into map, %v", err)
 	}
 	type args struct {
-		cliConfig config.Cli
+		cliConfig cli.Cli
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    []config.AgentInformation
+		want    []agent.AgentInformation
 		wantErr bool
 	}{
 		{
@@ -59,13 +60,13 @@ func TestGetAgents(t *testing.T) {
 		}, {
 			name: "Authentication failure",
 			args: args{
-				cliConfig: config.Cli{UserAPIToken: "fake-token", APIUrl: cliConfig.APIUrl},
+				cliConfig: cli.Cli{UserAPIToken: "fake-token", APIUrl: cliConfig.APIUrl},
 			},
 			wantErr: true,
 		}, {
 			name: "Bad Request",
 			args: args{
-				cliConfig: config.Cli{},
+				cliConfig: cli.Cli{},
 			},
 			wantErr: true,
 		},

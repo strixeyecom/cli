@@ -4,10 +4,10 @@ import (
 	"io"
 	"net/http"
 	"testing"
-
+	
 	"github.com/spf13/viper"
-
-	"github.com/usestrix/cli/domain/config"
+	
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -26,8 +26,8 @@ var ()
 
 func TestUserAPIRequest(t *testing.T) {
 	var (
-		err error
-		cliConfig config.Cli
+		err       error
+		cliConfig cli.Cli
 	)
 	viper.SetConfigFile("../../../.env")
 	// Try to read from file, but use env variables if non exists. it's fine

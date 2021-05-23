@@ -6,7 +6,8 @@ import (
 	`github.com/spf13/viper`
 	
 	`github.com/usestrix/cli/api/user/agent`
-	"github.com/usestrix/cli/domain/config"
+	agent2 `github.com/usestrix/cli/domain/agent`
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -52,8 +53,8 @@ Passing Agent ID as parameters show agent configurations
 func inspectCmd(cmd *cobra.Command, args []string) error {
 	var (
 		err               error
-		AgentInformations = make([]config.AgentInformation, len(args))
-		cliConfig         config.Cli
+		AgentInformations = make([]agent2.AgentInformation, len(args))
+		cliConfig         cli.Cli
 	)
 	
 	// get cli config

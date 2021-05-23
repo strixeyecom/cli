@@ -1,10 +1,12 @@
-package config
+package cli
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	
 	"github.com/pkg/errors"
+	
+	`github.com/usestrix/cli/domain/repository`
 )
 
 /*
@@ -48,7 +50,7 @@ type Cli struct {
 	// 	I'm not sure if this will cause a vuln for now, however even I need this for myself. Because:
 	// normally, database host is known only inside stack network like docker-compose network or kubernetes
 	// network, but StrixEye CLI is not part of that network, and won't be.
-	Database `mapstructure:"DATABASE"`
+	repository.Database `mapstructure:"DATABASE"`
 }
 
 // Save stores current cli config to given file in json format.

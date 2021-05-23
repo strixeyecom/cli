@@ -6,7 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	`github.com/spf13/viper`
 	
-	"github.com/usestrix/cli/domain/config"
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -24,7 +24,7 @@ const ()
 func TestGet(t *testing.T) {
 	var (
 		err       error
-		cliConfig config.Cli
+		cliConfig cli.Cli
 	)
 	
 	// get good keys
@@ -43,7 +43,7 @@ func TestGet(t *testing.T) {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
 	type args struct {
-		cliConfig config.Cli
+		cliConfig cli.Cli
 		args      QueryArgs
 	}
 	tests := []struct {

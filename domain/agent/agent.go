@@ -1,6 +1,10 @@
-package config
+package agent
 
-import "fmt"
+import (
+	`fmt`
+	
+	`github.com/usestrix/cli/domain/repository`
+)
 
 /*
 	Created by aomerk at 5/20/21 for project strixeye
@@ -23,9 +27,9 @@ var ()
 //
 // We don't see this struct being used too often.
 type Agent struct {
-	Versions  Versions  `json:"versions"`
-	Auth      auth      `json:"auth"`
-	Addresses addresses `json:"addresses"`
+	Versions  repository.Versions `json:"versions"`
+	Auth      auth                `json:"auth"`
+	Addresses addresses    `json:"addresses"`
 }
 
 type auth struct {
@@ -51,8 +55,8 @@ type AgentInformation struct {
 	CompanyID string      `json:"company_id"`
 	Name      string      `json:"name"`
 	IPAddress string      `json:"ip_address"`
-	Config    stackConfig `json:"config"`
-	Domains   []domains   `json:"domains"`
+	Config    StackConfig `json:"config"`
+	Domains   []Domains   `json:"domains"`
 }
 
 func (a AgentInformation) String() string {

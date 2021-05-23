@@ -4,12 +4,12 @@ import (
 	"log"
 	"os"
 	"time"
-
+	
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-
-	"github.com/usestrix/cli/domain/config"
+	
+	`github.com/usestrix/cli/domain/repository`
 )
 
 /*
@@ -29,7 +29,7 @@ var ()
 // ConnectToAgentDB establishes a live connection to your agents database.
 // Make sure to have permissions and network configurations so that use can connect to database. Usually,
 // database ports and hosts are not public in enterprise networks. So, that part is on you to check.
-func ConnectToAgentDB(dbConfig config.Database) (*gorm.DB, error) {
+func ConnectToAgentDB(dbConfig repository.Database) (*gorm.DB, error) {
 	// orm logger config
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
