@@ -118,17 +118,34 @@ func handleConfig(cmd *cobra.Command) error {
 	if err == nil {
 		return nil
 	}
+	if cmd.Parent().Use != "configure" {
+		
+		// 	cli config not found or no permission to read.
+		color.Red(
+			`Please authenticate yourself with
+$ strixeye configure user
+
+Then, you can select an agent with
+$ strixeye configure agent
+
+You can also create a config file yourself under /path/to/your/home/.strixeye/cli.json
+See documentation for more information.
+`,
+		)
+	}
 	
-	// 	cli config not found or no permission to read.
-	color.Red("Please create a config file.")
 	return nil
 }
 
 func initializeConfig(cmd *cobra.Command) error {
+	var (
+	// err error
+	)
+	
 	// Set the base name of the config file, without the file extension.
 	viper.SetConfigName(defaultConfigFilename)
 	
-	// viper.SetDefault("API_URL", "api.strixeye.com")
+	viper.SetDefault("API_URL", "https://***REMOVED***")
 	
 	// Set as many paths as you like where viper should look for the
 	// config file. We are only looking in the current working directory.
@@ -145,7 +162,6 @@ func initializeConfig(cmd *cobra.Command) error {
 		viper.AddConfigPath(home + "/.strixeye")
 		viper.AddConfigPath(".")
 		viper.AddConfigPath("/etc/strixeye")
-		
 	}
 	
 	// Attempt to read the config file, gracefully ignoring errors
