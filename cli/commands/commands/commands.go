@@ -2,6 +2,8 @@ package commands
 
 import (
 	"fmt"
+	`io`
+	`os`
 	"strings"
 	
 	"github.com/fatih/color"
@@ -80,10 +82,8 @@ func NewStrixeyeCommand() *cobra.Command {
 			
 			return nil
 		},
-		Run: func(cmd *cobra.Command, args []string) {
-			// Working with OutOrStdout/OutOrStderr allows us to unit test our command easier
-			// out := cmd.OutOrStdout()
-		},
+		RunE: ShowHelp(os.Stdout),
+
 	}
 	
 	// Here you will define your flags and configuration settings.
@@ -190,4 +190,13 @@ func bindFlags(cmd *cobra.Command, v *viper.Viper) {
 			}
 		},
 	)
+}
+
+// ShowHelp shows the command help.
+func ShowHelp(err io.Writer) func(*cobra.Command, []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		cmd.SetOut(err)
+		cmd.HelpFunc()(cmd, args)
+		return nil
+	}
 }
