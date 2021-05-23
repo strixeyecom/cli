@@ -6,7 +6,6 @@ import (
 	`os`
 	"strings"
 	
-	"github.com/fatih/color"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -121,11 +120,11 @@ func handleConfig(cmd *cobra.Command) error {
 	if cmd.Parent() != nil {
 		if cmd.Parent().Use != "configure" {
 			// 	cli config not found or no permission to read.
-			color.Red(err.Error())
+			return err
 		}
 	} else {
 		// 	cli config not found or no permission to read.
-		color.Red(err.Error())
+		return err
 	}
 	
 	return nil
@@ -157,7 +156,7 @@ func initializeConfig(cmd *cobra.Command) error {
 		viper.AddConfigPath(".")
 		viper.AddConfigPath("/etc/strixeye")
 		
-		cfgFile = home + "/.strixeye/cli.json"
+		cfgFile = home + "/.strixeye/" + defaultConfigFilename
 		
 		// create default config directory since we are going to use this anyway.
 		_, statErr := os.Stat(home + "/.strixeye")
@@ -169,6 +168,10 @@ func initializeConfig(cmd *cobra.Command) error {
 		}
 	}
 	
+	// after creating file, we can start using default config file.
+	viper.SetConfigFile(cfgFile)
+	
+	
 	// seems like viper doesn't like writing to a config file if it doesn't exist. lol.
 	_, statErr := os.Stat(cfgFile)
 	if os.IsNotExist(statErr) {
@@ -176,16 +179,15 @@ func initializeConfig(cmd *cobra.Command) error {
 			// handle failed create
 			return err
 		}
-	}
-	
-	// after creating file, we can start using default config file.
-	viper.SetConfigFile(cfgFile)
-	
-	
-	// and store it as default
-	if err := viper.WriteConfig(); err != nil {
-		// handle failed write
-		return err
+		
+		// after creating file, we can start using default config file.
+		viper.SetConfigFile(cfgFile)
+		
+		// and store it as default
+		if err := viper.SafeWriteConfig(); err != nil {
+			// handle failed write
+			return err
+		}
 	}
 	
 	// Attempt to read the config file, gracefully ignoring errors
@@ -214,7 +216,7 @@ func initializeConfig(cmd *cobra.Command) error {
 	bindFlags(cmd, viper.GetViper())
 	
 	// check for valid api key
-	if token := viper.GetString("USER_API_KEY"); token == "" {
+	if token := viper.GetString("USER_API_TOKEN"); token == "" {
 		return fmt.Errorf(
 			`you are not authorized. Please login with command:
 strixeye configure user`,
