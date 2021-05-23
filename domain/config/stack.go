@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"time"
 
@@ -58,7 +59,7 @@ type stackConfig struct {
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 	Deployment string    `json:"deployment"`
-	Database   database  `json:"database"`
+	Database   Database  `json:"database"`
 	Broker     broker    `json:"broker"`
 	Scheduler  scheduler `json:"scheduler"`
 	Engine     engine    `json:"engine"`
@@ -75,8 +76,8 @@ func (config stackConfig) Save(filePath string) error {
 		return err
 	}
 
-	// using default file permission, rw|rw|rw
-	err = ioutil.WriteFile(filePath, data, 0666)
+	// using default file permission and writing to path
+	err = ioutil.WriteFile(filePath, data, 0600)
 	if err != nil {
 		return err
 	}
@@ -91,6 +92,7 @@ func (config stackConfig) Validate() error {
 	if err != nil {
 		return err
 	}
+
 	err = config.Intervals.validate()
 	if err != nil {
 		return err
@@ -105,10 +107,12 @@ func (config stackConfig) Validate() error {
 	if err != nil {
 		return err
 	}
+
 	err = config.Engine.validate()
 	if err != nil {
 		return err
 	}
+
 	err = config.Sensor.validate()
 	if err != nil {
 		return err
@@ -118,7 +122,8 @@ func (config stackConfig) Validate() error {
 	if err != nil {
 		return err
 	}
-	err = config.Database.validate()
+
+	err = config.Database.Validate()
 	if err != nil {
 		return err
 	}
@@ -147,20 +152,33 @@ func (a addresses) validate() error {
 	if a.ConnectorScheme != "wss" && a.ConnectorScheme != "ws" {
 		return errors.New("bad connector scheme")
 	}
+
 	return validate.Struct(a)
 }
 
-type database struct {
-	DBAddr string `json:"db_addr" validate:"hostname"`
-	DBUser string `json:"db_user" validate:"omitempty"`
-	DBPass string `json:"db_pass" validate:"omitempty"`
-	DBName string `json:"db_name" validate:"omitempty"`
-	DBPort string `json:"db_port" validate:"port"`
+// Database stores credentials and configurations about strixeye agent database.
+type Database struct {
+	DBAddr string `mapstructure:"DB_ADDR" json:"db_addr" validate:"hostname"`
+	DBUser string `mapstructure:"DB_USER" json:"db_user" validate:"omitempty"`
+	DBPass string `mapstructure:"DB_PASS" json:"db_pass" validate:"omitempty"`
+	DBName string `mapstructure:"DB_NAME" json:"db_name" validate:"omitempty"`
+	DBPort string `mapstructure:"DB_PORT" json:"db_port" validate:"port"`
 }
 
-// validate checks for the fields of given instance.
+// DSN creates a dsn url from database config. DSN is used to connect to servers,
+// this function creates one specific for gorm.
+//
+// See https://gorm.io/docs/connecting_to_the_database.html
+func (d Database) DSN() string {
+	return fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", d.DBUser,
+		d.DBPass, d.DBAddr, d.DBPort, d.DBName,
+	)
+}
+
+// Validate checks for the fields of given instance.
 // check for struct type definition for more documentation about fields and their validation functions.
-func (d database) validate() error {
+func (d Database) Validate() error {
 	return validate.Struct(d)
 }
 
