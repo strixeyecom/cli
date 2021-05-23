@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	
+	`github.com/usestrix/cli/cli/commands/agent`
 	"github.com/usestrix/cli/cli/commands/configure"
 	`github.com/usestrix/cli/cli/commands/suspicion`
 	"github.com/usestrix/cli/cli/commands/trip"
@@ -100,6 +101,7 @@ func NewStrixeyeCommand() *cobra.Command {
 		trip.NewTripCommand(),
 		configure.NewConfigureCommand(),
 		suspicion.NewSuspicionCommand(),
+		agent.NewAgentCommand(),
 	)
 	
 	// Add flags
