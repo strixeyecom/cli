@@ -1,6 +1,10 @@
 package suspect
 
-import "github.com/usestrix/cli/cli/commands/suspicion"
+import (
+	`fmt`
+	
+	`github.com/usestrix/cli/cli/commands/suspicion`
+)
 
 /*
 	Created by aomerk at 5/21/21 for project cli
@@ -23,7 +27,7 @@ type Suspect struct {
 	ID         string
 	Suspicions []*suspicion.Suspicion `gorm:"anomalies;foreignKey:profile_id"`
 	Ips        []*suspicion.Ip        `gorm:"ips;foreignKey:profile_id"`
-	Score      uint64
+	Score      int64
 }
 
 // TableName as I explained in type definition, agent knows suspects as profiles.
@@ -36,12 +40,37 @@ func (suspect Suspect) TableName() string {
 type QueryArgs struct {
 	Limit      int
 	SuspectIds []string
-	Score      float64
-
+	
+	// Minimum risk score of queried suspects. Higher means they are more likely to attack.
+	MinScore int64
+	
 	// get only profiles who has detected since given epoch "millisecond" timestamp
 	SinceTime int64
-
+	
 	// 	most fields are kept in different tables, bound via foreign keys and have nested relations
 	// 	to get which fields you want to load other than the default, set it via fields argument
-	Fields []string
+	Fields  []string
+	Verbose bool
+	
+}
+
+func (q QueryArgs) String() string {
+	var query string
+	
+	query = fmt.Sprintf("%s\nDisplaying maximum %d rows", query, q.Limit)
+	
+	if q.SuspectIds != nil && len(q.SuspectIds) != 0 {
+		query = fmt.Sprintf(
+			"%s\nQuerying %d suspects with ids: %s", query, len(q.SuspectIds), q.SuspectIds,
+		)
+	}
+	if q.SinceTime > 0 {
+		query = fmt.Sprintf("%s\nQuerying only suspects that came after: %d", query, q.SinceTime)
+	}
+	
+	if q.MinScore > 0 {
+		query = fmt.Sprintf("%s\nQuerying only suspects with score higher than: %d", query, q.MinScore)
+	}
+	
+	return query
 }
