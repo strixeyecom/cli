@@ -1,10 +1,12 @@
-package config
+package cli
 
 import (
 	"encoding/json"
 	"testing"
 	
 	`github.com/spf13/viper`
+	
+	`github.com/usestrix/cli/domain/repository`
 )
 
 /*
@@ -51,7 +53,7 @@ func TestCli_UnmarshalJSON(t *testing.T) {
 	type fields struct {
 		userAPIToken   string
 		currentAgentID string
-		DBConfig       Database
+		DBConfig       repository.Database
 	}
 	type args struct {
 		bytes []byte
@@ -67,7 +69,7 @@ func TestCli_UnmarshalJSON(t *testing.T) {
 			fields: fields{
 				userAPIToken:   "bad_token",
 				currentAgentID: "bad_id",
-				DBConfig:       Database{},
+				DBConfig:       repository.Database{},
 			},
 			args: args{
 				bytes: []byte(`{"user_api_token": "bad_token", "current_agent_id": "bad_id"}`),

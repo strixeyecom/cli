@@ -6,9 +6,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
+	
 	"github.com/usestrix/cli/api/user/authenticate"
-	"github.com/usestrix/cli/domain/config"
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -79,7 +79,7 @@ func selectUser(cmd *cobra.Command, args []string) error {
 	var (
 		err        error
 		userAPIKey string
-		cliConfig  config.Cli
+		cliConfig  cli.Cli
 	)
 
 	// try to get from flags.

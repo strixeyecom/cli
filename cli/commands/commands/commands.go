@@ -15,9 +15,10 @@ import (
 	
 	`github.com/usestrix/cli/cli/commands/agent`
 	"github.com/usestrix/cli/cli/commands/configure"
+	`github.com/usestrix/cli/cli/commands/suspect`
 	`github.com/usestrix/cli/cli/commands/suspicion`
 	"github.com/usestrix/cli/cli/commands/trip"
-	"github.com/usestrix/cli/domain/config"
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -51,10 +52,10 @@ func NewStrixeyeCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "strixeye",
 		Short: "The StrixEye Command Line Interface",
-		Long:  `Inspect and Manage your agents with strixeye cli from anywhere.`,
+		Long:  `Inspect and Manage your agents with StrixEye CLI from anywhere.`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			var (
-				cliConfig config.Cli
+				cliConfig cli.Cli
 				err       error
 			)
 			
@@ -85,7 +86,7 @@ func NewStrixeyeCommand() *cobra.Command {
 			return nil
 		},
 		RunE: ShowHelp(os.Stdout),
-
+		
 	}
 	
 	// Here you will define your flags and configuration settings.
@@ -93,7 +94,7 @@ func NewStrixeyeCommand() *cobra.Command {
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(
 		&cfgFile, "config", "", "config file (default is $HOME/.strixeye/."+
-			"config.yaml)",
+			"cli.json)",
 	)
 	
 	// Add subcommands
@@ -101,6 +102,7 @@ func NewStrixeyeCommand() *cobra.Command {
 		trip.NewTripCommand(),
 		configure.NewConfigureCommand(),
 		suspicion.NewSuspicionCommand(),
+		suspect.NewSuspectCommand(),
 		agent.NewAgentCommand(),
 	)
 	
@@ -116,17 +118,34 @@ func handleConfig(cmd *cobra.Command) error {
 	if err == nil {
 		return nil
 	}
+	if cmd.Parent().Use != "configure" {
+		
+		// 	cli config not found or no permission to read.
+		color.Red(
+			`Please authenticate yourself with
+$ strixeye configure user
+
+Then, you can select an agent with
+$ strixeye configure agent
+
+You can also create a config file yourself under /path/to/your/home/.strixeye/cli.json
+See documentation for more information.
+`,
+		)
+	}
 	
-	// 	cli config not found or no permission to read.
-	color.Red("Please create a config file.")
 	return nil
 }
 
 func initializeConfig(cmd *cobra.Command) error {
+	var (
+	// err error
+	)
+	
 	// Set the base name of the config file, without the file extension.
 	viper.SetConfigName(defaultConfigFilename)
 	
-	// viper.SetDefault("API_URL", "api.strixeye.com")
+	viper.SetDefault("API_URL", "https://***REMOVED***")
 	
 	// Set as many paths as you like where viper should look for the
 	// config file. We are only looking in the current working directory.
@@ -143,7 +162,6 @@ func initializeConfig(cmd *cobra.Command) error {
 		viper.AddConfigPath(home + "/.strixeye")
 		viper.AddConfigPath(".")
 		viper.AddConfigPath("/etc/strixeye")
-		
 	}
 	
 	// Attempt to read the config file, gracefully ignoring errors

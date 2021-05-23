@@ -1,8 +1,8 @@
-package config
+package repository
 
 import (
 	"encoding/json"
-
+	
 	"github.com/pkg/errors"
 )
 

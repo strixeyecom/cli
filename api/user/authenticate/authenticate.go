@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
+	
 	"github.com/pkg/errors"
-
+	
 	"github.com/usestrix/cli/api/user/repository"
-	"github.com/usestrix/cli/domain/config"
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -27,7 +27,7 @@ var ()
 
 // Authenticate checks if given user api key and url is valid.
 // it returns error for status codes other than 200.
-func Authenticate(cliConfig config.Cli) error {
+func Authenticate(cliConfig cli.Cli) error {
 	return authenticate(cliConfig.UserAPIToken, cliConfig.APIUrl)
 }
 
