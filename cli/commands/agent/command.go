@@ -33,6 +33,7 @@ func NewAgentCommand() *cobra.Command {
 	
 	agentCommands.AddCommand(
 		CheckCommand(),
+		InstallCommand(),
 	)
 	return agentCommands
 }
