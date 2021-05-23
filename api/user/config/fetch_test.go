@@ -2,9 +2,9 @@ package config
 
 import (
 	"testing"
-
+	
 	"github.com/spf13/viper"
-
+	
 	"github.com/usestrix/cli/domain/config"
 )
 
@@ -18,17 +18,17 @@ const ()
 func TestGetAgent(t *testing.T) {
 	// get good keys
 	var cliConfig config.Cli
-	viper.SetConfigFile(".env")
+	viper.SetConfigFile("../../../cli.json")
 	if err := viper.ReadInConfig(); err != nil {
-		t.Errorf("Error reading config file, %s", err)
+		t.Fatalf("Error reading config file, %s", err)
 	}
-
+	
 	err := viper.Unmarshal(&cliConfig)
-
+	
 	if err != nil {
-		t.Errorf("unable to decode into map, %v", err)
+		t.Fatalf("unable to decode into map, %v", err)
 	}
-
+	
 	type args struct {
 		userAPIToken string
 		agentID      string
@@ -75,8 +75,10 @@ func TestGetAgent(t *testing.T) {
 					t.Errorf("FetchAgentById() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}
-
-				_ = got
+				if err == nil {
+					_ = got.String()
+					_ = got
+				}
 			},
 		)
 	}
