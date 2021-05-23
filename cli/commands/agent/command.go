@@ -26,7 +26,7 @@ var ()
 func NewAgentCommand() *cobra.Command {
 	var agentCommands = &cobra.Command{
 		Use:   "agent",
-		Short: "Control and manage agent",
+		Short: "Control and manage agent on your host machine",
 		Long:  `Install, Uninstall, Reset selected agent on current host machine`,
 		RunE:  ShowHelp(os.Stdout),
 	}

@@ -15,6 +15,7 @@ import (
 	
 	`github.com/usestrix/cli/cli/commands/agent`
 	"github.com/usestrix/cli/cli/commands/configure"
+	`github.com/usestrix/cli/cli/commands/suspect`
 	`github.com/usestrix/cli/cli/commands/suspicion`
 	"github.com/usestrix/cli/cli/commands/trip"
 	"github.com/usestrix/cli/domain/config"
@@ -51,7 +52,7 @@ func NewStrixeyeCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "strixeye",
 		Short: "The StrixEye Command Line Interface",
-		Long:  `Inspect and Manage your agents with strixeye cli from anywhere.`,
+		Long:  `Inspect and Manage your agents with StrixEye CLI from anywhere.`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			var (
 				cliConfig config.Cli
@@ -85,7 +86,7 @@ func NewStrixeyeCommand() *cobra.Command {
 			return nil
 		},
 		RunE: ShowHelp(os.Stdout),
-
+		
 	}
 	
 	// Here you will define your flags and configuration settings.
@@ -93,7 +94,7 @@ func NewStrixeyeCommand() *cobra.Command {
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(
 		&cfgFile, "config", "", "config file (default is $HOME/.strixeye/."+
-			"config.yaml)",
+			"cli.json)",
 	)
 	
 	// Add subcommands
@@ -101,6 +102,7 @@ func NewStrixeyeCommand() *cobra.Command {
 		trip.NewTripCommand(),
 		configure.NewConfigureCommand(),
 		suspicion.NewSuspicionCommand(),
+		suspect.NewSuspectCommand(),
 		agent.NewAgentCommand(),
 	)
 	
