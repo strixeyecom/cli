@@ -5,7 +5,7 @@ import (
 	
 	"github.com/spf13/viper"
 	
-	"github.com/usestrix/cli/domain/config"
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -25,7 +25,7 @@ var ()
 func TestAuthenticate(t *testing.T) {
 	var (
 		err  error
-		conf config.Cli
+		conf cli.Cli
 	)
 	
 	viper.SetConfigFile("../../../.env")
@@ -42,7 +42,7 @@ func TestAuthenticate(t *testing.T) {
 	}
 	
 	type args struct {
-		cliConfig config.Cli
+		cliConfig cli.Cli
 	}
 	tests := []struct {
 		name    string
@@ -56,7 +56,7 @@ func TestAuthenticate(t *testing.T) {
 		},
 		{
 			name:    "Bad authenticate",
-			args:    args{cliConfig: config.Cli{}},
+			args:    args{cliConfig: cli.Cli{}},
 			wantErr: true,
 		},
 	}

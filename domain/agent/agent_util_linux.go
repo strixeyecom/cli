@@ -1,6 +1,6 @@
 // +build linux
 
-package config
+package agent
 
 import (
 	`bytes`

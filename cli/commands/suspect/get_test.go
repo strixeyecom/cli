@@ -6,7 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	
-	"github.com/usestrix/cli/domain/config"
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -23,8 +23,8 @@ const ()
 func TestGet(t *testing.T) {
 	var (
 		err       error
-		dbConfig  config.Database
-		cliConfig config.Cli
+		dbConfig  cli.Cli
+		cliConfig cli.Cli
 	)
 	// get good keys
 	
@@ -43,16 +43,15 @@ func TestGet(t *testing.T) {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
 	
-	dbConfig = cliConfig.Database
+	dbConfig = cliConfig
 	
-
 	err = dbConfig.Validate()
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	
 	type args struct {
-		dbConfig config.Database
+		dbConfig cli.Cli
 		args     QueryArgs
 	}
 	tests := []struct {
@@ -70,7 +69,7 @@ func TestGet(t *testing.T) {
 			args: args{
 				dbConfig: dbConfig,
 				args: QueryArgs{
-					Score: 5,
+					MinScore: 5,
 				},
 			},
 			wantErr: false,

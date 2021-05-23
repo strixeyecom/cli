@@ -1,12 +1,18 @@
-package config
+package agent
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	`regexp`
+	`strconv`
+	`strings`
 	"time"
 	
+	`github.com/go-playground/validator`
 	"github.com/pkg/errors"
+	`github.com/sirupsen/logrus`
+	
+	`github.com/usestrix/cli/domain/repository`
 )
 
 /*
@@ -16,10 +22,60 @@ import (
 /*
 	stack.go handles how we interact with stack config.
 */
+var (
+	validate = validator.New()
+)
+// Adding custom validator operators for our usecase
+func init() {
+	// register custom validation: rfe(Required if Field is Equal to some value).
+	err := validate.RegisterValidation(
+		`port`, func(fl validator.FieldLevel) bool {
+			value := fl.Field().String()
+			my, err := strconv.Atoi(value)
+			if err != nil {
+				return false
+			}
+			if my <= 1024 || my >= 65336 {
+				return false
+			}
+			return true
+		},
+	)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	
+	// register custom validation: semantic version
+	err = validate.RegisterValidation(
+		`semver`, func(fl validator.FieldLevel) bool {
+			version := fl.Field().String()
+			rex, err := regexp.Compile(semVerRegExp)
+			if err != nil {
+				logrus.Fatal(err)
+			}
+			
+			// temporary edge case handling
+			if version == "staging" || version == "latest" {
+				return true
+			}
+			
+			// return true if field is a semantic version
+			version = strings.TrimPrefix(version, "v")
+			pass := rex.MatchString(version)
+			
+			return pass
+		},
+	)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+}
+
 
 // global constants for file
-const ()
-
+const (
+	semVerRegExp = `^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`
+)
 // APIStackResponse is what we usually get from user api as response when we try to retrieve an agent's
 // stack config.
 // there are two main cases. We get stack information,
@@ -49,17 +105,17 @@ type APIErrorResponse struct {
 	Stack map[string]interface{} `json:"data"`
 }
 
-// stackConfig is THE most important config in all strixeye universe. This is how agents self-update,
+// StackConfig is THE most important config in all strixeye universe. This is how agents self-update,
 // self-deploy themselves, switch from kubernetes to docker, change database user,
 // send data more frequently, send data less frequently, use nginx, use apache, use http,
 // use https and all those stuff. fun.
-type stackConfig struct {
+type StackConfig struct {
 	Addresses  addresses `json:"addresses"`
 	UseHTTPS   bool      `json:"use_https"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 	Deployment string    `json:"deployment"`
-	Database   Database  `json:"database"`
+	Database   repository.Database  `json:"database"`
 	Broker     broker    `json:"broker"`
 	Scheduler  scheduler `json:"scheduler"`
 	Engine     engine    `json:"engine"`
@@ -70,7 +126,7 @@ type stackConfig struct {
 }
 
 // Save stores stackConfig as json to a given path.
-func (config stackConfig) Save(filePath string) error {
+func (config StackConfig) Save(filePath string) error {
 	data, err := json.Marshal(config)
 	if err != nil {
 		return err
@@ -86,7 +142,7 @@ func (config stackConfig) Save(filePath string) error {
 }
 
 // Validate validates incoming stack config, returns error if unexpected
-func (config stackConfig) Validate() error {
+func (config StackConfig) Validate() error {
 	var err error
 	err = config.Broker.validate()
 	if err != nil {
@@ -154,33 +210,6 @@ func (a addresses) validate() error {
 	}
 	
 	return validate.Struct(a)
-}
-
-// Database stores credentials and configurations about strixeye agent database.
-type Database struct {
-	DBAddr               string `mapstructure:"DB_ADDR" json:"db_addr" validate:"hostname"`
-	DBUser               string `mapstructure:"DB_USER" json:"db_user" validate:"omitempty"`
-	DBPass               string `mapstructure:"DB_PASS" json:"db_pass" validate:"omitempty"`
-	DBName               string `mapstructure:"DB_NAME" json:"db_name" validate:"omitempty"`
-	DBPort               string `mapstructure:"DB_PORT" json:"db_port" validate:"port"`
-	OverrideRemoteConfig bool   `mapstructure:"DB_OVERRIDE" json:"override_remote_config"`
-}
-
-// DSN creates a dsn url from database config. DSN is used to connect to servers,
-// this function creates one specific for gorm.
-//
-// See https://gorm.io/docs/connecting_to_the_database.html
-func (d Database) DSN() string {
-	return fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", d.DBUser,
-		d.DBPass, d.DBAddr, d.DBPort, d.DBName,
-	)
-}
-
-// Validate checks for the fields of given instance.
-// check for struct type definition for more documentation about fields and their validation functions.
-func (d Database) Validate() error {
-	return validate.Struct(d)
 }
 
 type broker struct {
@@ -266,7 +295,7 @@ type pivot struct {
 	DomainID string `json:"domain_id"`
 }
 
-type domains struct {
+type Domains struct {
 	ID        string      `json:"id"`
 	CompanyID string      `json:"company_id"`
 	Domain    string      `json:"domain"`

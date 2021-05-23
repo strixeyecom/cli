@@ -8,7 +8,8 @@ import (
 	"github.com/spf13/viper"
 	
 	`github.com/usestrix/cli/api/user/agent`
-	"github.com/usestrix/cli/domain/config"
+	agent2 `github.com/usestrix/cli/domain/agent`
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -38,8 +39,8 @@ with a single StrixEye Agent at a time. `,
 			// setting local variable definitions
 			var (
 				err           error
-				cliConfig     config.Cli
-				selectedAgent config.AgentInformation
+				cliConfig     cli.Cli
+				selectedAgent agent2.AgentInformation
 				selectedID    string
 			)
 
@@ -93,17 +94,17 @@ with a single StrixEye Agent at a time. `,
 }
 
 // selectAgent displays a select list of agents retrieved from user api.
-func selectAgent(cliConfig config.Cli) (config.AgentInformation, error) {
+func selectAgent(cliConfig cli.Cli) (agent2.AgentInformation, error) {
 	var (
 		err           error
-		agents        []config.AgentInformation
-		selectedAgent config.AgentInformation
+		agents        []agent2.AgentInformation
+		selectedAgent agent2.AgentInformation
 	)
 
 	// fetch agents from user api
 	agents, err = agent.GetAgents(cliConfig)
 	if err != nil {
-		return config.AgentInformation{}, err
+		return agent2.AgentInformation{}, err
 	}
 
 	// prepare inputs. create a string slice of agents.
@@ -127,7 +128,7 @@ func selectAgent(cliConfig config.Cli) (config.AgentInformation, error) {
 	// perform the questions
 	err = survey.Ask(question, &selectedIndex)
 	if err != nil {
-		return config.AgentInformation{}, err
+		return agent2.AgentInformation{}, err
 	}
 
 	selectedAgent = agents[selectedIndex]
