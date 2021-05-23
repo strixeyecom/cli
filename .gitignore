@@ -23,3 +23,5 @@ strixeye
 dist/
 
 bin/
+
+cli.json
