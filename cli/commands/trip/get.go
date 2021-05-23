@@ -2,7 +2,7 @@ package trip
 
 import (
 	"github.com/fatih/color"
-	"github.com/hokaccha/go-prettyjson"
+	"github.com/k0kubun/pp"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -55,6 +55,12 @@ trips on your agent, without leaking any sensitive data outside of your network`
 		"suspects", "s", nil, "Comma separated values of suspect uuids. "+
 			"--suspects suspect-id,suspect-id2",
 	)
+	
+	// declaring local flags used by get trip commands.
+	getCmd.Flags().StringSliceP(
+		"ids", "t", nil, "Comma separated values of trip uuids. "+
+			"--ids trip-id,trip-id2",
+	)
 	getCmd.Flags().StringSliceP(
 		"endpoints", "e", nil,
 		"Endpoints that you want to display. Comma separated list of endpoints. "+
@@ -62,6 +68,14 @@ trips on your agent, without leaking any sensitive data outside of your network`
 	)
 	getCmd.Flags().IntP("limit", "l", 5, "Max number of trips you want to be displayed --limit 5")
 	
+	getCmd.Flags().BoolP(
+		"verbose", "v", true, "To hide field values like headers, say --verbose=false",
+	)
+	getCmd.Flags().IntP(
+		"since", "i", 0,
+		"Queries only suspicions after given time --since [epoch in seconds]  You can get current"+
+			" timestamp with date +%s",
+	)
 	return getCmd
 }
 
@@ -92,9 +106,16 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 	endpoints, err := cmd.Flags().GetStringSlice("endpoints")
 	if err != nil {
 		return err
-		
 	} else if len(endpoints) > 0 {
 		queryArgs.Endpoints = endpoints
+	}
+	
+	// parse and set list of suspicions to be queried
+	tripIds, err := cmd.Flags().GetStringSlice("ids")
+	if err != nil {
+		return err
+	} else if len(tripIds) > 0 {
+		queryArgs.TripsIds = tripIds
 	}
 	
 	// parse max limit of rows displayed.
@@ -106,15 +127,25 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 		queryArgs.Limit = limit
 	}
 	
-	// get trips with parsed query arguments for this subcommand
-	trips, err := Get(cliConfig, queryArgs)
+	// parse verboseness flag.
+	verbose, err := cmd.Flags().GetBool("verbose")
+	if err != nil {
+		return err
+	} else if limit > 0 {
+		queryArgs.Verbose = verbose
+	}
+	
+	// parse oldest timestamp to be queries
+	sinceTime, err := cmd.Flags().GetInt("since")
 	if err != nil {
 		return err
 		
+	} else if sinceTime > 0 {
+		queryArgs.SinceTime = int64(sinceTime)
 	}
 	
-	// marshal result with colors
-	data, err := prettyjson.Marshal(trips)
+	// get trips with parsed query arguments for this subcommand
+	trips, err := Get(cliConfig, queryArgs)
 	if err != nil {
 		return err
 		
@@ -124,7 +155,10 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 	color.Blue(queryArgs.String())
 	
 	// print out result
-	color.Blue("%s", string(data))
+	_, err = pp.Print(trips)
+	if err != nil {
+		return err
+	}
 	
 	return nil
 }
@@ -171,6 +205,9 @@ func get(dbConfig config.Database, args QueryArgs) ([]Trip, error) {
 	}
 	tx := db.Limit(args.Limit)
 	
+	if args.Verbose {
+		tx = tx.Preload("Request.Header")
+	}
 	// filter by endpoints
 	if args.Endpoints != nil {
 		tx = tx.Joins("Request").Where("raw_uri IN ? ", args.Endpoints)
@@ -191,7 +228,9 @@ func get(dbConfig config.Database, args QueryArgs) ([]Trip, error) {
 	
 	// filter by created after
 	if args.SinceTime != 0 {
-		tx = tx.Where("created_at > ?", args.SinceTime)
+		// convert seconds to milliseconds
+		milliseconds := args.SinceTime * 1e3
+		tx = tx.Where("created_at > ?", milliseconds)
 	}
 	
 	// find all suspects that matches args criteria

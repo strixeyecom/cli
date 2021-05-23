@@ -57,6 +57,10 @@ func TestGet(t *testing.T) {
 			name:    "good credentials",
 			args:    args{cliConfig: cliConfig, args: QueryArgs{Limit: 6}},
 			wantErr: false,
+		},{
+			name:    "verbose output",
+			args:    args{cliConfig: cliConfig, args: QueryArgs{Limit: 6,Verbose: true}},
+			wantErr: false,
 		}, {
 			name: "filter trips by suspect ids",
 			args: args{
