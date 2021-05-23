@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 	
 	"github.com/usestrix/cli/cli/commands/configure"
+	`github.com/usestrix/cli/cli/commands/suspicion`
 	"github.com/usestrix/cli/cli/commands/trip"
 	"github.com/usestrix/cli/domain/config"
 )
@@ -98,6 +99,7 @@ func NewStrixeyeCommand() *cobra.Command {
 	rootCmd.AddCommand(
 		trip.NewTripCommand(),
 		configure.NewConfigureCommand(),
+		suspicion.NewSuspicionCommand(),
 	)
 	
 	// Add flags
