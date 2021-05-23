@@ -3,7 +3,7 @@ package configure
 import (
 	"io"
 	"os"
-
+	
 	"github.com/spf13/cobra"
 )
 
@@ -32,11 +32,12 @@ func NewConfigureCommand() *cobra.Command {
 At bare, you will need a User API Key from StrixEye and a chosen StrixEye Agent's id.`,
 		RunE: ShowHelp(os.Stdout),
 	}
-
+	
 	// Add subcommands
 	configureCommand.AddCommand(
 		NewConfigureAgentCommand(),
 		NewConfigureUserCommand(),
+		NewInspectCommand(),
 	)
 	return configureCommand
 }
