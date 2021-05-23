@@ -20,3 +20,8 @@
 .env
 
 strixeye
+dist/
+
+bin/
+
+cli.json
