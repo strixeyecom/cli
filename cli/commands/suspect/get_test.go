@@ -2,10 +2,10 @@ package suspect
 
 import (
 	"testing"
-
+	
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-
+	
 	"github.com/usestrix/cli/domain/config"
 )
 
@@ -14,7 +14,7 @@ import (
 */
 
 /*
-
+ 
  */
 
 // global constants for file
@@ -22,24 +22,25 @@ const ()
 
 func TestGet(t *testing.T) {
 	var (
-		err      error
-		dbConfig config.Database
+		err       error
+		cliConfig config.Cli
+		dbConfig  config.Database
 	)
 	// get good keys
-
-	viper.SetConfigFile("cli.json")
+	
+	viper.SetConfigFile("../../../cli.json")
 	if err := viper.ReadInConfig(); err != nil {
 		t.Fatalf("Error reading config file, %s", err)
 	}
-
-	err = viper.Unmarshal(&dbConfig)
-
+	
+	err = viper.Unmarshal(&cliConfig)
+	
 	if err != nil {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
-
+	
 	// // initialize test environment
-	// err = godotenv.Load("cli.json")
+	// err = godotenv.Load(../../../cli.json")
 	// if err != nil {
 	// 	logrus.Fatal(err)
 	// }
@@ -52,12 +53,12 @@ func TestGet(t *testing.T) {
 	// 	DBPass: os.Getenv("DB_PASS"),
 	// 	DBUser: os.Getenv("DB_USER"),
 	// }
-
-	err = dbConfig.Validate()
+	dbConfig = cliConfig.Database
+	err = cliConfig.Database.Validate()
 	if err != nil {
 		logrus.Fatal(err)
 	}
-
+	
 	type args struct {
 		dbConfig config.Database
 		args     QueryArgs
@@ -111,7 +112,7 @@ func TestGet(t *testing.T) {
 					t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}
-
+				
 				_ = got
 			},
 		)

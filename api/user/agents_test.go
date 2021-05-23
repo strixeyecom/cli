@@ -3,9 +3,9 @@ package user
 import (
 	"fmt"
 	"testing"
-
+	
 	"github.com/spf13/viper"
-
+	
 	"github.com/usestrix/cli/domain/config"
 )
 
@@ -25,19 +25,18 @@ var ()
 
 func TestGetAgents(t *testing.T) {
 	var cliConfig config.Cli
-	viper.SetConfigFile("cli.json")
+	viper.SetConfigFile("../../cli.json")
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf("Error reading config file, %s", err)
 	}
-
+	
 	err := viper.Unmarshal(&cliConfig)
-
+	
 	if err != nil {
 		fmt.Printf("Unable to decode into map, %v", err)
 	}
 	type args struct {
-		apiToken string
-		apiURL   string
+		cliConfig config.Cli
 	}
 	tests := []struct {
 		name    string
@@ -48,14 +47,19 @@ func TestGetAgents(t *testing.T) {
 		{
 			name: "Get all agents",
 			args: args{
-				apiToken: cliConfig.UserAPIToken,
-				apiURL:   cliConfig.APIUrl,
+				cliConfig: cliConfig,
 			},
 			wantErr: false,
 		}, {
 			name: "Authentication failure",
 			args: args{
-				apiToken: "fake-token",
+				cliConfig: config.Cli{UserAPIToken: "fake-token", APIUrl: cliConfig.APIUrl},
+			},
+			wantErr: true,
+		}, {
+			name: "Bad Request",
+			args: args{
+				cliConfig: config.Cli{},
 			},
 			wantErr: true,
 		},
@@ -63,7 +67,7 @@ func TestGetAgents(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(
 			tt.name, func(t *testing.T) {
-				got, err := getAgents(tt.args.apiToken, tt.args.apiURL)
+				got, err := GetAgents(tt.args.cliConfig)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("GetAgents() error = %v, wantErr %v", err, tt.wantErr)
 					return
