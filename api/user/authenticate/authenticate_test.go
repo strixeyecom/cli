@@ -23,14 +23,20 @@ const ()
 var ()
 
 func TestAuthenticate(t *testing.T) {
-	var conf config.Cli
-
-	viper.SetConfigFile("../../../cli.json")
-	if err := viper.ReadInConfig(); err != nil {
-		t.Fatalf("Error reading config file, %s", err.Error())
-	}
+	var (
+		err  error
+		conf config.Cli
+	)
 	
-	err := viper.Unmarshal(&conf)
+	viper.SetConfigFile("../../../.env")
+	// Try to read from file, but use env variables if non exists. it's fine
+	err = viper.ReadInConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	viper.AutomaticEnv()
+	
+	err = viper.Unmarshal(&conf)
 	if err != nil {
 		t.Fatal(err)
 	}
