@@ -21,9 +21,9 @@ func TestStackConfig_UnMarshall(t *testing.T) {
 	t.Parallel()
 
 	var (
-		a ApiStackResponse
+		a APIStackResponse
 
-		b ApiErrorResponse
+		b APIErrorResponse
 	)
 
 	err := json.Unmarshal(
@@ -165,7 +165,7 @@ func Test_stackConfig_Validate(t *testing.T) {
 		t.Run(
 			tt.name, func(t *testing.T) {
 				t.Parallel()
-				var stackResponse ApiStackResponse
+				var stackResponse APIStackResponse
 
 				if err := json.Unmarshal(tt.fields.data, &stackResponse); err != nil {
 					t.Error(err)
@@ -967,7 +967,7 @@ func Test_stackConfig_Save(t *testing.T) {
 		CreatedAt  time.Time
 		UpdatedAt  time.Time
 		Deployment string
-		Database   database
+		Database   Database
 		Broker     broker
 		Scheduler  scheduler
 		Engine     engine
