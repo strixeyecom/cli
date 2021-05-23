@@ -47,6 +47,8 @@ func (Suspicion) TableName() string {
 	return "anomalies"
 }
 
+// QueryArgs are arguments you can use to customize your queries. Multiple fields can be used at once,
+// also empty query args is not a problem.
 type QueryArgs struct {
 	// how many results do you want to retrieve
 	Limit int
