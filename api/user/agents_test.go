@@ -24,13 +24,19 @@ const ()
 var ()
 
 func TestGetAgents(t *testing.T) {
-	var cliConfig config.Cli
-	viper.SetConfigFile("../../cli.json")
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("Error reading config file, %s", err)
+	var (
+		err       error
+		cliConfig config.Cli
+	)
+	viper.SetConfigFile("../../.env")
+	// Try to read from file, but use env variables if non exists. it's fine
+	err = viper.ReadInConfig()
+	if err != nil {
+		t.Fatal(err)
 	}
+	viper.AutomaticEnv()
 	
-	err := viper.Unmarshal(&cliConfig)
+	err = viper.Unmarshal(&cliConfig)
 	
 	if err != nil {
 		fmt.Printf("Unable to decode into map, %v", err)

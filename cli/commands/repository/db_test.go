@@ -3,6 +3,7 @@ package repository
 import (
 	"testing"
 	
+	"github.com/sirupsen/logrus"
 	`github.com/spf13/viper`
 	"gorm.io/gorm"
 	
@@ -20,19 +21,23 @@ import (
 // global constants for file
 const ()
 
-
 func TestConnectToAgentDB(t *testing.T) {
 	var (
+		err       error
 		cliConfig config.Cli
 	)
 	
 	// get good keys
-	viper.SetConfigFile("../../../cli.json")
-	if err := viper.ReadInConfig(); err != nil {
-		t.Fatalf("Error reading config file, %s", err)
+	viper.SetConfigFile("../../../.env")
+	// Try to read from file, but use env variables if non exists. it's fine
+	err = viper.ReadInConfig()
+	if err != nil {
+		logrus.Fatal(err)
 	}
 	
-	err := viper.Unmarshal(&cliConfig)
+	viper.AutomaticEnv()
+	
+	err = viper.Unmarshal(&cliConfig)
 	
 	if err != nil {
 		t.Fatalf("unable to decode into map, %v", err)

@@ -5,7 +5,6 @@ import (
 	"testing"
 	
 	`github.com/spf13/viper`
-	_ `github.com/spf13/viper/remote`
 )
 
 /*
@@ -25,23 +24,23 @@ var ()
 func TestCli_Load(t *testing.T) {
 	var (
 		cliConfig2 Cli
-		err       error
+		err        error
 	)
 	
 	// get good keys
+	viper.SetConfigFile("../../.env")
+	viper.AutomaticEnv()
 	
-	viper.SetConfigFile("../../cli.json")
+	// Try to read from file, but use env variables if non exists. it's fine
 	err = viper.ReadInConfig()
 	if err != nil {
-		t.Fatalf("Error reading config file, %s", err)
+		t.Fatal(err)
 	}
-	
 	err = viper.Unmarshal(&cliConfig2)
 	if err != nil {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
-	// var d Database
-	// viper.UnmarshalKey("database",&d)
+	
 	err = cliConfig2.Validate()
 	if err != nil {
 		t.Fatalf("test failed while validating cli config %s", err)
