@@ -1,8 +1,10 @@
 // +build linux
 
-package config
+package agent
 
-import `testing`
+import (
+	`testing`
+)
 
 /*
 	Created by aomerk at 5/23/21 for project cli
@@ -24,8 +26,8 @@ func TestAgentInformation_CheckIfHostSupports(t *testing.T) {
 		CompanyID string
 		Name      string
 		IPAddress string
-		Config    stackConfig
-		Domains   []domains
+		Config    StackConfig
+		Domains   []Domains
 	}
 	tests := []struct {
 		name    string
@@ -35,7 +37,7 @@ func TestAgentInformation_CheckIfHostSupports(t *testing.T) {
 		{
 			name: "Linux Docker Compose",
 			fields: fields{
-				Config: stackConfig{Deployment: "docker"},
+				Config: StackConfig{Deployment: "docker"},
 			},
 			wantErr: false,
 		},

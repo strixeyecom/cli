@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
+	
 	"github.com/pkg/errors"
-
+	
 	"github.com/usestrix/cli/api/user/repository"
-	"github.com/usestrix/cli/domain/config"
+	`github.com/usestrix/cli/domain/agent`
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -30,18 +31,18 @@ var ()
 
 // agentsResponse what user api returns in case of error
 type agentsResponse struct {
-	Data   []config.AgentInformation `json:"data"`
-	Meta   config.Meta               `json:"meta"`
-	Status string                    `json:"status"`
+	Data   []agent.AgentInformation `json:"data"`
+	Meta   agent.Meta               `json:"meta"`
+	Status string                   `json:"status"`
 }
 
 // GetAgents returns list of agents from user api, parses and validates information.
-func GetAgents(cliConfig config.Cli) ([]config.AgentInformation, error) {
+func GetAgents(cliConfig cli.Cli) ([]agent.AgentInformation, error) {
 	return getAgents(cliConfig.UserAPIToken, cliConfig.APIUrl)
 }
 
 // getAgents returns list of agents from user api, parses and validates information.
-func getAgents(apiToken, apiURL string) ([]config.AgentInformation, error) {
+func getAgents(apiToken, apiURL string) ([]agent.AgentInformation, error) {
 	var (
 		err  error
 		resp *http.Response

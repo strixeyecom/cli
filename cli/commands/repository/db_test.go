@@ -7,7 +7,8 @@ import (
 	`github.com/spf13/viper`
 	"gorm.io/gorm"
 	
-	"github.com/usestrix/cli/domain/config"
+	`github.com/usestrix/cli/domain/cli`
+	`github.com/usestrix/cli/domain/repository`
 )
 
 /*
@@ -24,7 +25,7 @@ const ()
 func TestConnectToAgentDB(t *testing.T) {
 	var (
 		err       error
-		cliConfig config.Cli
+		cliConfig cli.Cli
 	)
 	
 	// get good keys
@@ -44,7 +45,7 @@ func TestConnectToAgentDB(t *testing.T) {
 	}
 	
 	type args struct {
-		dbConfig config.Database
+		dbConfig repository.Database
 	}
 	tests := []struct {
 		name    string

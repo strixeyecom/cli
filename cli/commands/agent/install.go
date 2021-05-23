@@ -12,7 +12,7 @@ import (
 	`github.com/spf13/viper`
 	
 	`github.com/usestrix/cli/api/user/agent`
-	`github.com/usestrix/cli/domain/config`
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -53,7 +53,7 @@ strixeye configure agent
 // installAgentCmd implements GetCommand logic.
 func installAgentCmd(cmd *cobra.Command, _ []string) error {
 	var (
-		cliConfig config.Cli
+		cliConfig cli.Cli
 		err       error
 	)
 	

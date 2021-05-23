@@ -9,8 +9,9 @@ import (
 	"gorm.io/gorm"
 	
 	userconfig `github.com/usestrix/cli/api/user/agent`
-	"github.com/usestrix/cli/cli/commands/repository"
-	"github.com/usestrix/cli/domain/config"
+	`github.com/usestrix/cli/cli/commands/repository`
+	`github.com/usestrix/cli/domain/cli`
+	models `github.com/usestrix/cli/domain/repository`
 )
 
 /*
@@ -78,7 +79,7 @@ suspicions on your agent, without leaking any sensitive data outside of your net
 // getSuspicionCmd implements get suspicion logic.
 func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 	var (
-		cliConfig config.Cli
+		cliConfig cli.Cli
 		err       error
 	)
 	
@@ -156,9 +157,9 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 }
 
 // Get is a temporary method to satisfy the authentication process.
-func Get(cliConfig config.Cli, args QueryArgs) ([]Suspicion, error) {
+func Get(cliConfig cli.Cli, args QueryArgs) ([]Suspicion, error) {
 	var (
-		dbConfig config.Database
+		dbConfig models.Database
 	)
 	
 	// If user wants to override db config with local information, use that.
@@ -178,7 +179,7 @@ func Get(cliConfig config.Cli, args QueryArgs) ([]Suspicion, error) {
 
 // Get retrieves all suspicions that matches given query args. Check out suspicions.
 // QueryArgs for more information about existing filters.
-func get(dbConfig config.Database, args QueryArgs) ([]Suspicion, error) {
+func get(dbConfig models.Database, args QueryArgs) ([]Suspicion, error) {
 	var (
 		err    error
 		db     *gorm.DB

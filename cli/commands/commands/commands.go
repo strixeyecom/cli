@@ -18,7 +18,7 @@ import (
 	`github.com/usestrix/cli/cli/commands/suspect`
 	`github.com/usestrix/cli/cli/commands/suspicion`
 	"github.com/usestrix/cli/cli/commands/trip"
-	"github.com/usestrix/cli/domain/config"
+	`github.com/usestrix/cli/domain/cli`
 )
 
 /*
@@ -55,7 +55,7 @@ func NewStrixeyeCommand() *cobra.Command {
 		Long:  `Inspect and Manage your agents with StrixEye CLI from anywhere.`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			var (
-				cliConfig config.Cli
+				cliConfig cli.Cli
 				err       error
 			)
 			
