@@ -30,7 +30,7 @@ func TestCli_Load(t *testing.T) {
 	
 	// get good keys
 	
-	viper.SetConfigFile("cli.json")
+	viper.SetConfigFile("../../cli.json")
 	err = viper.ReadInConfig()
 	if err != nil {
 		t.Fatalf("Error reading config file, %s", err)

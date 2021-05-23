@@ -2,9 +2,9 @@ package authenticate
 
 import (
 	"testing"
-
+	
 	"github.com/spf13/viper"
-
+	
 	"github.com/usestrix/cli/domain/config"
 )
 
@@ -24,16 +24,17 @@ var ()
 
 func TestAuthenticate(t *testing.T) {
 	var conf config.Cli
-	viper.SetConfigFile("cli.json")
+
+	viper.SetConfigFile("../../../cli.json")
 	if err := viper.ReadInConfig(); err != nil {
 		t.Fatalf("Error reading config file, %s", err.Error())
 	}
-
+	
 	err := viper.Unmarshal(&conf)
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	
 	type args struct {
 		cliConfig config.Cli
 	}

@@ -26,7 +26,7 @@ var ()
 
 func TestUserAPIRequest(t *testing.T) {
 	var cliConfig config.Cli
-	viper.SetConfigFile("cli.json")
+	viper.SetConfigFile("../../../cli.json")
 	if err := viper.ReadInConfig(); err != nil {
 		t.Errorf("Error reading config file, %s", err)
 	}
