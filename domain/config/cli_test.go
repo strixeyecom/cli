@@ -24,24 +24,25 @@ var ()
 
 func TestCli_Load(t *testing.T) {
 	var (
-		cliConfig Cli
+		cliConfig2 Cli
 		err       error
 	)
 	
 	// get good keys
-	viper.SetConfigFile(".env")
 	
+	viper.SetConfigFile("cli.json")
 	err = viper.ReadInConfig()
 	if err != nil {
 		t.Fatalf("Error reading config file, %s", err)
 	}
 	
-	err = viper.Unmarshal(&cliConfig)
+	err = viper.Unmarshal(&cliConfig2)
 	if err != nil {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
-	
-	err = cliConfig.Validate()
+	// var d Database
+	// viper.UnmarshalKey("database",&d)
+	err = cliConfig2.Validate()
 	if err != nil {
 		t.Fatalf("test failed while validating cli config %s", err)
 	}

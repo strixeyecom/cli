@@ -27,7 +27,7 @@ func TestGet(t *testing.T) {
 	)
 	// get good keys
 
-	viper.SetConfigFile(".env")
+	viper.SetConfigFile("cli.json")
 	if err := viper.ReadInConfig(); err != nil {
 		t.Fatalf("Error reading config file, %s", err)
 	}
@@ -39,7 +39,7 @@ func TestGet(t *testing.T) {
 	}
 
 	// // initialize test environment
-	// err = godotenv.Load(".env")
+	// err = godotenv.Load("cli.json")
 	// if err != nil {
 	// 	logrus.Fatal(err)
 	// }

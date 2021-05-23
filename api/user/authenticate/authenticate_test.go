@@ -24,7 +24,7 @@ var ()
 
 func TestAuthenticate(t *testing.T) {
 	var conf config.Cli
-	viper.SetConfigFile(".env")
+	viper.SetConfigFile("cli.json")
 	if err := viper.ReadInConfig(); err != nil {
 		t.Fatalf("Error reading config file, %s", err.Error())
 	}

@@ -18,7 +18,7 @@ const ()
 func TestGetAgent(t *testing.T) {
 	// get good keys
 	var cliConfig config.Cli
-	viper.SetConfigFile(".env")
+	viper.SetConfigFile("cli.json")
 	if err := viper.ReadInConfig(); err != nil {
 		t.Fatalf("Error reading config file, %s", err)
 	}
