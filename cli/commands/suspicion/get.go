@@ -8,7 +8,7 @@ import (
 	`github.com/spf13/viper`
 	"gorm.io/gorm"
 	
-	userconfig `github.com/usestrix/cli/api/user/config`
+	userconfig `github.com/usestrix/cli/api/user/agent`
 	"github.com/usestrix/cli/cli/commands/repository"
 	"github.com/usestrix/cli/domain/config"
 )
