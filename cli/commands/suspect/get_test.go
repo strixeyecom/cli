@@ -23,15 +23,19 @@ const ()
 func TestGet(t *testing.T) {
 	var (
 		err       error
-		cliConfig config.Cli
 		dbConfig  config.Database
+		cliConfig config.Cli
 	)
 	// get good keys
 	
-	viper.SetConfigFile("../../../cli.json")
-	if err := viper.ReadInConfig(); err != nil {
-		t.Fatalf("Error reading config file, %s", err)
+	viper.SetConfigFile("../../../.env")
+	// Try to read from file, but use env variables if non exists. it's fine
+	err = viper.ReadInConfig()
+	if err != nil {
+		t.Fatal(err)
 	}
+	
+	viper.AutomaticEnv()
 	
 	err = viper.Unmarshal(&cliConfig)
 	
@@ -39,22 +43,10 @@ func TestGet(t *testing.T) {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
 	
-	// // initialize test environment
-	// err = godotenv.Load(../../../cli.json")
-	// if err != nil {
-	// 	logrus.Fatal(err)
-	// }
-	//
-	// // create a real database instance
-	// dbConfig_ = config.Database{
-	// 	DBName: os.Getenv("DB_NAME"),
-	// 	DBPort: os.Getenv("DB_PORT"),
-	// 	DBAddr: os.Getenv("DB_ADDR"),
-	// 	DBPass: os.Getenv("DB_PASS"),
-	// 	DBUser: os.Getenv("DB_USER"),
-	// }
 	dbConfig = cliConfig.Database
-	err = cliConfig.Database.Validate()
+	
+
+	err = dbConfig.Validate()
 	if err != nil {
 		logrus.Fatal(err)
 	}
