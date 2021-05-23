@@ -16,3 +16,7 @@
 
 # ide workspace configs
 .idea/
+
+.env
+
+strixeye

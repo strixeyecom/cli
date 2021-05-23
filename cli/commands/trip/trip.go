@@ -1,5 +1,7 @@
 package trip
 
+import "fmt"
+
 /*
 	Created by aomerk at 5/21/21 for project cli
 */
@@ -92,4 +94,29 @@ type QueryArgs struct {
 
 	// Get trip that are only requested to given endpoints
 	Endpoints []string
+}
+
+func (q QueryArgs) String() string {
+	var query string
+
+	query = fmt.Sprintf("%s\nDisplaying total of %d rows", query, q.Limit)
+
+	if q.SuspectIds != nil && len(q.SuspectIds) != 0 {
+		query = fmt.Sprintf(
+			"%s\nQuerying %d suspects with ids: %s", query, len(q.SuspectIds), q.SuspectIds,
+		)
+	}
+	if q.Endpoints != nil && len(q.Endpoints) != 0 {
+		query = fmt.Sprintf("%s\nQuerying only %d endpoints: %s", query, len(q.Endpoints), q.Endpoints)
+	}
+
+	if q.TripsIds != nil && len(q.TripsIds) != 0 {
+		query = fmt.Sprintf("%s\nQuerying only %d trips with ids: %s", query, len(q.TripsIds), q.TripsIds)
+	}
+
+	if q.SinceTime > 0 {
+		query = fmt.Sprintf("%s\nQuerying only trips that came after: %d", query, q.SinceTime)
+	}
+
+	return query
 }

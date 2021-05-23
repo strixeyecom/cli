@@ -28,7 +28,6 @@ func init() {
 	// register custom validation: rfe(Required if Field is Equal to some value).
 	err := validate.RegisterValidation(
 		`port`, func(fl validator.FieldLevel) bool {
-
 			value := fl.Field().String()
 			my, err := strconv.Atoi(value)
 			if err != nil {
@@ -47,7 +46,6 @@ func init() {
 	// register custom validation: semantic version
 	err = validate.RegisterValidation(
 		`semver`, func(fl validator.FieldLevel) bool {
-
 			version := fl.Field().String()
 			rex, err := regexp.Compile(semVerRegExp)
 			if err != nil {
