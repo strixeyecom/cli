@@ -32,7 +32,7 @@ import (
 // global constants for file
 const (
 	// The name of our config file, without the file extension because viper supports many different config file languages.
-	defaultConfigFilename = "cli"
+	defaultConfigFilename = "cli.json"
 	
 	// The environment variable prefix of all environment variables bound to our command line flags.
 	// For example, --number is bound to STING_NUMBER.
@@ -118,20 +118,14 @@ func handleConfig(cmd *cobra.Command) error {
 	if err == nil {
 		return nil
 	}
-	if cmd.Parent().Use != "configure" {
-		
+	if cmd.Parent() != nil {
+		if cmd.Parent().Use != "configure" {
+			// 	cli config not found or no permission to read.
+			color.Red(err.Error())
+		}
+	} else {
 		// 	cli config not found or no permission to read.
-		color.Red(
-			`Please authenticate yourself with
-$ strixeye configure user
-
-Then, you can select an agent with
-$ strixeye configure agent
-
-You can also create a config file yourself under /path/to/your/home/.strixeye/cli.json
-See documentation for more information.
-`,
-		)
+		color.Red(err.Error())
 	}
 	
 	return nil
@@ -162,6 +156,36 @@ func initializeConfig(cmd *cobra.Command) error {
 		viper.AddConfigPath(home + "/.strixeye")
 		viper.AddConfigPath(".")
 		viper.AddConfigPath("/etc/strixeye")
+		
+		cfgFile = home + "/.strixeye/cli.json"
+		
+		// create default config directory since we are going to use this anyway.
+		_, statErr := os.Stat(home + "/.strixeye")
+		if os.IsNotExist(statErr) {
+			err = os.Mkdir(home+"/.strixeye", 0777)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	
+	// seems like viper doesn't like writing to a config file if it doesn't exist. lol.
+	_, statErr := os.Stat(cfgFile)
+	if os.IsNotExist(statErr) {
+		if _, err := os.Create(cfgFile); err != nil { // perm 0666
+			// handle failed create
+			return err
+		}
+	}
+	
+	// after creating file, we can start using default config file.
+	viper.SetConfigFile(cfgFile)
+	
+	
+	// and store it as default
+	if err := viper.WriteConfig(); err != nil {
+		// handle failed write
+		return err
 	}
 	
 	// Attempt to read the config file, gracefully ignoring errors
@@ -188,6 +212,23 @@ func initializeConfig(cmd *cobra.Command) error {
 	
 	// Bind the current command's flags to viper
 	bindFlags(cmd, viper.GetViper())
+	
+	// check for valid api key
+	if token := viper.GetString("USER_API_KEY"); token == "" {
+		return fmt.Errorf(
+			`you are not authorized. Please login with command:
+strixeye configure user`,
+		)
+	}
+	
+	// check for valid selected agent
+	if agentID := viper.GetString("CURRENT_AGENT_ID"); agentID == "" {
+		return fmt.Errorf(
+			`you have no selected agent. Please select agent with command:
+strixeye configure agent
+`,
+		)
+	}
 	
 	return nil
 }
