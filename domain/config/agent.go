@@ -1,5 +1,7 @@
 package config
 
+import "fmt"
+
 /*
 	Created by aomerk at 5/20/21 for project strixeye
 */
@@ -32,6 +34,7 @@ type auth struct {
 	AgentID      string `json:"agent_id"`
 }
 
+// Meta keeps meta information about a companies all agents. Not very important.
 type Meta struct {
 	Total       int         `json:"total"`
 	Count       int         `json:"count"`
@@ -50,4 +53,11 @@ type AgentInformation struct {
 	IPAddress string      `json:"ip_address"`
 	Config    stackConfig `json:"config"`
 	Domains   []domains   `json:"domains"`
+}
+
+func (a AgentInformation) String() string {
+	return fmt.Sprintf(
+		"Name: %s,  Id : %s , IP : %s", a.Name, a.ID,
+		a.IPAddress,
+	)
 }
