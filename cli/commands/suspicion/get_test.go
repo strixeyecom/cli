@@ -32,7 +32,7 @@ func TestMain(m *testing.M) {
 	)
 
 	// initialize test environment
-	err = godotenv.Load(".env")
+	err = godotenv.Load("cli.json")
 	if err != nil {
 		logrus.Fatal(err)
 	}
