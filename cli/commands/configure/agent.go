@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	
-	"github.com/usestrix/cli/api/user"
+	`github.com/usestrix/cli/api/user/agent`
 	"github.com/usestrix/cli/domain/config"
 )
 
@@ -101,7 +101,7 @@ func selectAgent(cliConfig config.Cli) (config.AgentInformation, error) {
 	)
 
 	// fetch agents from user api
-	agents, err = user.GetAgents(cliConfig)
+	agents, err = agent.GetAgents(cliConfig)
 	if err != nil {
 		return config.AgentInformation{}, err
 	}
