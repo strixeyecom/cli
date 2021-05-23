@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"time"
-
+	
 	"github.com/pkg/errors"
 )
 
@@ -32,7 +32,7 @@ const ()
 type APIStackResponse struct {
 	// Status is usually "ok" or "failed"
 	Status string `json:"status"`
-
+	
 	// Data is usually keeps the error message or out stack config
 	Stack AgentInformation `json:"data"`
 }
@@ -44,7 +44,7 @@ type APIStackResponse struct {
 type APIErrorResponse struct {
 	// Status is usually "ok" or "failed"
 	Status string `json:"status"`
-
+	
 	// Data is usually keeps the error message or out stack config
 	Stack map[string]interface{} `json:"data"`
 }
@@ -75,13 +75,13 @@ func (config stackConfig) Save(filePath string) error {
 	if err != nil {
 		return err
 	}
-
+	
 	// using default file permission and writing to path
 	err = ioutil.WriteFile(filePath, data, 0600)
 	if err != nil {
 		return err
 	}
-
+	
 	return nil
 }
 
@@ -92,42 +92,42 @@ func (config stackConfig) Validate() error {
 	if err != nil {
 		return err
 	}
-
+	
 	err = config.Intervals.validate()
 	if err != nil {
 		return err
 	}
-
+	
 	err = config.Scheduler.validate()
 	if err != nil {
 		return err
 	}
-
+	
 	err = config.Profiler.validate()
 	if err != nil {
 		return err
 	}
-
+	
 	err = config.Engine.validate()
 	if err != nil {
 		return err
 	}
-
+	
 	err = config.Sensor.validate()
 	if err != nil {
 		return err
 	}
-
+	
 	err = config.Addresses.validate()
 	if err != nil {
 		return err
 	}
-
+	
 	err = config.Database.Validate()
 	if err != nil {
 		return err
 	}
-
+	
 	return err
 }
 
@@ -136,12 +136,12 @@ type addresses struct {
 	// Scheme means here that whether it is a websocket connection, and therefore "ws" or "wss"
 	// or a normal http connection, "http" or "https"
 	ConnectorScheme string `json:"connector_scheme"`
-
+	
 	// ConnectorAddress keeps connector's location.
 	// This is usually fixed since strixeye has a cloud management panel and it is on a predefined domain.
 	// But still, it has a hostname validation
 	ConnectorAddress string `json:"connector_address" validate:"hostname"`
-
+	
 	// ConnectorPort has same explanation with ConnectorAddress field of the same struct.
 	ConnectorPort string `json:"connector_port" validate:"port"`
 }
@@ -152,17 +152,18 @@ func (a addresses) validate() error {
 	if a.ConnectorScheme != "wss" && a.ConnectorScheme != "ws" {
 		return errors.New("bad connector scheme")
 	}
-
+	
 	return validate.Struct(a)
 }
 
 // Database stores credentials and configurations about strixeye agent database.
 type Database struct {
-	DBAddr string `mapstructure:"DB_ADDR" json:"db_addr" validate:"hostname"`
-	DBUser string `mapstructure:"DB_USER" json:"db_user" validate:"omitempty"`
-	DBPass string `mapstructure:"DB_PASS" json:"db_pass" validate:"omitempty"`
-	DBName string `mapstructure:"DB_NAME" json:"db_name" validate:"omitempty"`
-	DBPort string `mapstructure:"DB_PORT" json:"db_port" validate:"port"`
+	DBAddr               string `mapstructure:"DB_ADDR" json:"db_addr" validate:"hostname"`
+	DBUser               string `mapstructure:"DB_USER" json:"db_user" validate:"omitempty"`
+	DBPass               string `mapstructure:"DB_PASS" json:"db_pass" validate:"omitempty"`
+	DBName               string `mapstructure:"DB_NAME" json:"db_name" validate:"omitempty"`
+	DBPort               string `mapstructure:"DB_PORT" json:"db_port" validate:"port"`
+	OverrideRemoteConfig bool   `mapstructure:"DB_OVERRIDE" json:"override_remote_config"`
 }
 
 // DSN creates a dsn url from database config. DSN is used to connect to servers,

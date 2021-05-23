@@ -20,13 +20,13 @@ func TestGetAgent(t *testing.T) {
 	var cliConfig config.Cli
 	viper.SetConfigFile(".env")
 	if err := viper.ReadInConfig(); err != nil {
-		t.Errorf("Error reading config file, %s", err)
+		t.Fatalf("Error reading config file, %s", err)
 	}
 
 	err := viper.Unmarshal(&cliConfig)
 
 	if err != nil {
-		t.Errorf("unable to decode into map, %v", err)
+		t.Fatalf("unable to decode into map, %v", err)
 	}
 
 	type args struct {

@@ -3,6 +3,9 @@ package config
 import (
 	"encoding/json"
 	"testing"
+	
+	`github.com/spf13/viper`
+	_ `github.com/spf13/viper/remote`
 )
 
 /*
@@ -19,10 +22,36 @@ const ()
 // global variables (not cool) for this file
 var ()
 
+func TestCli_Load(t *testing.T) {
+	var (
+		cliConfig Cli
+		err       error
+	)
+	
+	// get good keys
+	viper.SetConfigFile(".env")
+	
+	err = viper.ReadInConfig()
+	if err != nil {
+		t.Fatalf("Error reading config file, %s", err)
+	}
+	
+	err = viper.Unmarshal(&cliConfig)
+	if err != nil {
+		t.Fatalf("unable to decode into map, %v", err)
+	}
+	
+	err = cliConfig.Validate()
+	if err != nil {
+		t.Fatalf("test failed while validating cli config %s", err)
+	}
+}
+
 func TestCli_UnmarshalJSON(t *testing.T) {
 	type fields struct {
 		userAPIToken   string
-		currentAgentId string
+		currentAgentID string
+		DBConfig       Database
 	}
 	type args struct {
 		bytes []byte
@@ -37,7 +66,8 @@ func TestCli_UnmarshalJSON(t *testing.T) {
 			name: "testing bad cli object",
 			fields: fields{
 				userAPIToken:   "bad_token",
-				currentAgentId: "bad_id",
+				currentAgentID: "bad_id",
+				DBConfig:       Database{},
 			},
 			args: args{
 				bytes: []byte(`{"user_api_token": "bad_token", "current_agent_id": "bad_id"}`),
@@ -48,7 +78,7 @@ func TestCli_UnmarshalJSON(t *testing.T) {
 			name: "testing worse cli object",
 			fields: fields{
 				userAPIToken:   "bad_token",
-				currentAgentId: "bad_id",
+				currentAgentID: "bad_id",
 			},
 			args: args{
 				bytes: []byte(`"user_api_": "bad_token", "current_agent_id": "bad_id"}`),
@@ -58,14 +88,13 @@ func TestCli_UnmarshalJSON(t *testing.T) {
 	}
 	for i := range tests {
 		tt := tests[i]
-
+		
 		t.Run(
 			tt.name, func(t *testing.T) {
 				c := &Cli{}
 				if err := json.Unmarshal(tt.args.bytes, c); (err != nil) != tt.wantErr {
 					t.Errorf("UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 				}
-
 			},
 		)
 	}
@@ -98,7 +127,7 @@ func TestCli_Validate(t *testing.T) {
 	}
 	for i := range tests {
 		tt := tests[i]
-
+		
 		t.Run(
 			tt.name, func(t *testing.T) {
 				c := &Cli{
@@ -139,7 +168,7 @@ func TestCli_Save(t *testing.T) {
 	}
 	for i := range tests {
 		tt := tests[i]
-
+		
 		t.Run(
 			tt.name, func(t *testing.T) {
 				c := &Cli{
