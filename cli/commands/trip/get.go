@@ -1,13 +1,11 @@
 package trip
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/fatih/color"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -49,56 +47,7 @@ any data outside of your network/its network because of privacy and security con
 
 With this subcommand, you can inspect your logs get is a subcommand of trip command where you can query
 trips on your agent, without leaking any sensitive data outside of your network`,
-		Run: func(cmd *cobra.Command, args []string) {
-			queryArgs := QueryArgs{Limit: 1}
-
-			// parse and set list of suspects to be queried
-			suspects, err := cmd.Flags().GetStringSlice("suspects")
-			if err != nil {
-				color.Red(err.Error())
-				os.Exit(1)
-			} else if len(suspects) > 0 {
-				queryArgs.SuspectIds = suspects
-			}
-
-			// parse and set list of endpoints to be queried
-			endpoints, err := cmd.Flags().GetStringSlice("endpoints")
-			if err != nil {
-				color.Red(err.Error())
-				os.Exit(1)
-			} else if len(endpoints) > 0 {
-				queryArgs.Endpoints = endpoints
-			}
-
-			// parse max limit of rows displayed.
-			limit, err := cmd.Flags().GetInt("limit")
-			if err != nil {
-				color.Red(err.Error())
-				os.Exit(1)
-			} else if limit > 0 {
-				queryArgs.Limit = limit
-			}
-
-			// get trips with parsed query arguments for this subcommand
-			trips, err := Get(queryArgs)
-			if err != nil {
-				color.Red(err.Error())
-				os.Exit(1)
-			}
-
-			// marshal result with colors
-			data, err := prettyjson.Marshal(trips)
-			if err != nil {
-				color.Red(err.Error())
-				os.Exit(1)
-			}
-
-			// print out query settings
-			color.Blue(queryArgs.String())
-
-			// print out result
-			fmt.Println(string(data))
-		},
+		RunE: getTripCmd,
 	}
 
 	// declaring local flags used by get trip commands.
@@ -116,9 +65,74 @@ trips on your agent, without leaking any sensitive data outside of your network`
 	return getCmd
 }
 
+// getTripCmd implements GetCommand logic.
+func getTripCmd(cmd *cobra.Command, _ []string) error {
+	var (
+		cliConfig config.Cli
+		err       error
+	)
+
+	// get cli config for authentication
+	err = viper.Unmarshal(&cliConfig)
+	if err != nil {
+		return err
+	}
+
+	queryArgs := QueryArgs{Limit: 1}
+
+	// parse and set list of suspects to be queried
+	suspects, err := cmd.Flags().GetStringSlice("suspects")
+	if err != nil {
+		return err
+	} else if len(suspects) > 0 {
+		queryArgs.SuspectIds = suspects
+	}
+
+	// parse and set list of endpoints to be queried
+	endpoints, err := cmd.Flags().GetStringSlice("endpoints")
+	if err != nil {
+		return err
+
+	} else if len(endpoints) > 0 {
+		queryArgs.Endpoints = endpoints
+	}
+
+	// parse max limit of rows displayed.
+	limit, err := cmd.Flags().GetInt("limit")
+	if err != nil {
+		return err
+
+	} else if limit > 0 {
+		queryArgs.Limit = limit
+	}
+
+	// get trips with parsed query arguments for this subcommand
+	trips, err := Get(cliConfig, queryArgs)
+	if err != nil {
+		return err
+
+	}
+
+	// marshal result with colors
+	data, err := prettyjson.Marshal(trips)
+	if err != nil {
+		return err
+
+	}
+
+	// print out query settings
+	color.Blue(queryArgs.String())
+
+	// print out result
+	color.Blue("%s", string(data))
+
+	return nil
+}
+
 // Get is a temporary method to satisfy the authentication process.
-func Get(args QueryArgs) ([]Trip, error) {
-	agentConfig, err := userconfig.FetchAgentWithEnvVars()
+func Get(cliConfig config.Cli, args QueryArgs) ([]Trip, error) {
+
+	agentConfig, err := userconfig.GetAgentConfig(cliConfig)
 	if err != nil {
 		return nil, err
 	}
