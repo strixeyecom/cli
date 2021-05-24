@@ -11,10 +11,10 @@
 <br />
 <p align="center">
   <a href="https://github.com/usestrix/cli">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="data/images/strixeye_icon-purple.svg" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">The StrixEye CLI</h3>
+<h3 align="center">The StrixEye CLI</h3>
 
   <p align="center">
     Get the most out of your StrixEye experience
@@ -61,22 +61,22 @@
 
 
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
 [![Product Name Screen Shot][product-screenshot]](https://strixeye.com)
 
-
-
 ### Built With
 
-Thanks to maintainers and communities of the following projects for making development of our CLI easier. Full list of dependencies can be found in go modules file.
+Thanks to maintainers and communities of the following projects for making development of our CLI easier. Full list of
+dependencies can be found in go modules file.
+
 * [Cobra](https://github.com/spf13/cobra)
 * [Viper](https://github.com/spf13/viper)
 * [Laravel](https://laravel.com)
 
-
-
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
 General information about setting up StrixEye CLI locally
@@ -84,14 +84,17 @@ General information about setting up StrixEye CLI locally
 ### Prerequisites
 
 Required softwares and installations.
+
 * CLI has no external dependencies. It will work on all machines those operating systems we support.
 
 ### Installation
 
-1. Register or contact [StrixEye](https://strixeye.com/)
-1. Get your User API Key from [StrixEye Dashboard](https://dashboard.strixeye.com/settings/profile)
-2. Get StrixEye CLI from your package manager or see <a href="#build">Build</a>
-3. Authenticate yourself to StrixEye User API with CLI
+1. Download StrixEye for your Operating System and Distribution from <a href="#downloads">here</a> or <a href="#build">
+   build from source</a>
+2. Register or contact [StrixEye](https://strixeye.com/)
+3. Get your User API Key from [StrixEye Dashboard](https://dashboard.strixeye.com/settings/profile)
+4. Get StrixEye CLI from your package manager or see <a href="#build">Build</a>
+5. Authenticate yourself to StrixEye User API with CLI
    ```sh
    strixeye configure user
    ```
@@ -99,30 +102,28 @@ Required softwares and installations.
    ```sh
    strixeye login
    ```
-
    Then, enter your User API Key when prompted.
-   ![StrixEye CLI Login Processs](https://raw.githubusercontent.com/usestrix/cli/master/data/screenshots/login.gif)
-   
-   
-4. Choose an agent to work with:
-   ![StrixEye CLI Login Processs](https://raw.githubusercontent.com/usestrix/cli/master/data/screenshots/agents.gif)
 
+   ![StrixEye CLI Login Processs](data/screenshots/login.gif)
+
+
+6. Choose an agent to work with:
    ```sh
    strixeye configure agent
    ```
 
-
+   ![StrixEye CLI Login Processs](data/screenshots/agents.gif)
 
 <!-- USAGE EXAMPLES -->
+
 ## Usage
-
-
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
 
 
 <!-- ROADMAP -->
+
 ## Roadmap
 
 See the [open issues](https://github.com/usestrix/cli/issues) for a list of proposed features (and known issues).
@@ -130,9 +131,11 @@ See the [open issues](https://github.com/usestrix/cli/issues) for a list of prop
 
 
 <!-- CONTRIBUTING -->
+
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any
+contributions you make are **greatly appreciated**.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -140,9 +143,8 @@ Contributions are what make the open source community such an amazing place to b
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-
-
 <!-- LICENSE -->
+
 ## License
 
 Distributed under the Apache License 2.0 License. See `LICENSE` for more information.
@@ -150,9 +152,10 @@ Distributed under the Apache License 2.0 License. See `LICENSE` for more informa
 
 
 <!-- CONTACT -->
+
 ## Contact
 
-Your Name - [@strixeye](https://twitter.com/strixeye) - help@strixeye.com
+StrixEye - [@strixeye](https://twitter.com/strixeye) - help@strixeye.com
 
 Project Link: [https://github.com/usestrix/cli](https://github.com/usestrix/cli)
 
@@ -161,16 +164,29 @@ Project Link: [https://github.com/usestrix/cli](https://github.com/usestrix/cli)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
 [contributors-shield]: https://img.shields.io/github/contributors/usestrix/cli.svg?style=for-the-badge
+
 [contributors-url]: https://github.com/usestrix/cli/graphs/contributors
+
 [forks-shield]: https://img.shields.io/github/forks/usestrix/cli.svg?style=for-the-badge
+
 [forks-url]: https://github.com/usestrix/clinetwork/members
+
 [stars-shield]: https://img.shields.io/github/stars/usestrix/cli?style=for-the-badge
+
 [stars-url]: https://github.com/usestrix/cli/stargazers
+
 [issues-shield]: https://img.shields.io/github/issues/usestrix/cli.svg?style=for-the-badge
+
 [issues-url]: https://github.com/usestrix/cli/issues
+
 [license-shield]: https://img.shields.io/github/license/usestrix/cli.svg?style=for-the-badge
+
 [license-url]: https://github.com/usestrix/cli/blob/master/LICENSE.txt
+
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+
 [linkedin-url]: https://linkedin.com/in/strixeye
-[product-screenshot]: images/screenshot.png
+
+[product-screenshot]: data/images/base_command.png
