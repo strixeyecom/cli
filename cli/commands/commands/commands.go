@@ -31,7 +31,8 @@ import (
 // global constants for file
 const (
 	// The name of our config file, without the file extension because viper supports many different config file languages.
-	defaultConfigFilename = "cli.json"
+	defaultConfigFilename = "cli"
+	defaultConfigFileType = "toml"
 	
 	// The environment variable prefix of all environment variables bound to our command line flags.
 	// For example, --number is bound to STING_NUMBER.
@@ -130,15 +131,17 @@ func handleConfig(cmd *cobra.Command) error {
 	return nil
 }
 
+//nolint:funlen
 func initializeConfig(cmd *cobra.Command) error {
 	var (
-	// err error
+		err error
 	)
 	
 	// Set the base name of the config file, without the file extension.
 	viper.SetConfigName(defaultConfigFilename)
+	viper.SetConfigType(defaultConfigFileType)
 	
-	viper.SetDefault("API_URL", "https://***REMOVED***")
+	viper.SetDefault("API_URL", "https://dashboard.***REMOVED***")
 	
 	// Set as many paths as you like where viper should look for the
 	// config file. We are only looking in the current working directory.
@@ -169,26 +172,18 @@ func initializeConfig(cmd *cobra.Command) error {
 	}
 	
 	// after creating file, we can start using default config file.
-	viper.SetConfigFile(cfgFile)
 	
-	
-	// seems like viper doesn't like writing to a config file if it doesn't exist. lol.
-	_, statErr := os.Stat(cfgFile)
-	if os.IsNotExist(statErr) {
-		if _, err := os.Create(cfgFile); err != nil { // perm 0666
-			// handle failed create
-			return err
-		}
-		
-		// after creating file, we can start using default config file.
-		viper.SetConfigFile(cfgFile)
-		
-		// and store it as default
-		if err := viper.SafeWriteConfig(); err != nil {
+	// and store it as default
+	err = viper.SafeWriteConfig()
+	if err != nil {
+		// this is not my fault. It is either poor documentation or it is my fault.
+		if !(strings.Contains(err.Error(), "Config File") && strings.Contains(err.Error(),
+			"Already Exists")) {
 			// handle failed write
 			return err
 		}
 	}
+	// }
 	
 	// Attempt to read the config file, gracefully ignoring errors
 	// caused by a config file not being found. Return an error

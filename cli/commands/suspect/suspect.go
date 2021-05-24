@@ -27,7 +27,7 @@ type Suspect struct {
 	ID         string
 	Suspicions []*suspicion.Suspicion `gorm:"anomalies;foreignKey:profile_id"`
 	Ips        []*suspicion.Ip        `gorm:"ips;foreignKey:profile_id"`
-	Score      int64
+	Score      float64
 }
 
 // TableName as I explained in type definition, agent knows suspects as profiles.
@@ -42,7 +42,7 @@ type QueryArgs struct {
 	SuspectIds []string
 	
 	// Minimum risk score of queried suspects. Higher means they are more likely to attack.
-	MinScore int64
+	MinScore float64
 	
 	// get only profiles who has detected since given epoch "millisecond" timestamp
 	SinceTime int64
@@ -50,6 +50,7 @@ type QueryArgs struct {
 	// 	most fields are kept in different tables, bound via foreign keys and have nested relations
 	// 	to get which fields you want to load other than the default, set it via fields argument
 	Fields  []string
+	
 	Verbose bool
 	
 }
