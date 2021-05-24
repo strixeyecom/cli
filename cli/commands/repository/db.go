@@ -2,9 +2,11 @@ package repository
 
 import (
 	"log"
+	`net`
 	"os"
 	"time"
 	
+	`github.com/pkg/errors`
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -40,7 +42,7 @@ func ConnectToAgentDB(dbConfig repository.Database) (*gorm.DB, error) {
 			Colorful:                  false,         // Disable color
 		},
 	)
-
+	
 	// establish connection
 	db, err := gorm.Open(
 		mysql.New(
@@ -56,6 +58,19 @@ func ConnectToAgentDB(dbConfig repository.Database) (*gorm.DB, error) {
 			Logger: newLogger,
 		},
 	)
+	
+	// handle possible errors.
+	
+	// one error is that we are using stack network hostnames like "db" "database" instead of ips or
+	// resolvable domains
+	_, err = net.LookupAddr(dbConfig.DBAddr)
+	if err != nil {
+		return nil, errors.Wrap(
+			err, `
+db_addr field in your in your database config is not a resolvable hostname.
 
+You can override it from your config. Check out https://docs.strixeye.com/cli/configuration#override`,
+		)
+	}
 	return db, err
 }
