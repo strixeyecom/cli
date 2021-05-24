@@ -126,11 +126,11 @@ func getSuspectCmd(cmd *cobra.Command, _ []string) error {
 	}
 	
 	// parse minimum score of suspects
-	minScore, err := cmd.Flags().GetInt("min-score")
+	minScore, err := cmd.Flags().GetFloat64("min-score")
 	if err != nil {
 		return err
-	} else if minScore > 0 {
-		queryArgs.MinScore = int64(minScore)
+	} else if minScore >= 0 {
+		queryArgs.MinScore = minScore
 	}
 	
 	// get trips with parsed query arguments for this subcommand
