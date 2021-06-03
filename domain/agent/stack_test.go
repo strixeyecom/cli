@@ -195,7 +195,7 @@ const (
         "config": {
             "addresses": {
                 "connector_scheme": "wss",
-                "connector_address": "***REMOVED***",
+                "connector_address": "dashboard.***REMOVED***",
                 "connector_port": "2120"
             },
             "use_https": false,
@@ -281,7 +281,7 @@ const (
         "config": {
             "addresses": {
                 "connector_scheme": "wss",
-                "connector_address": "***REMOVED***",
+                "connector_address": "dashboard.***REMOVED***",
                 "connector_port": "2120"
             },
             "use_https": false,
@@ -367,7 +367,7 @@ const (
         "config": {
             "addresses": {
                 "connector_scheme": "ass",
-                "connector_address": "***REMOVED***",
+                "connector_address": "dashboard.***REMOVED***",
                 "connector_port": ":2120"
             },
             "use_https": false,
@@ -453,7 +453,7 @@ const (
         "config": {
             "addresses": {
                 "connector_scheme": "wss",
-                "connector_address": "***REMOVED***",
+                "connector_address": "dashboard.***REMOVED***",
                 "connector_port": "2120"
             },
             "use_https": false,
@@ -539,7 +539,7 @@ const (
         "config": {
             "addresses": {
                 "connector_scheme": "wss",
-                "connector_address": "***REMOVED***",
+                "connector_address": "dashboard.***REMOVED***",
                 "connector_port": "2120"
             },
             "use_https": false,
@@ -625,7 +625,7 @@ const (
         "config": {
             "addresses": {
                 "connector_scheme": "wss",
-                "connector_address": "***REMOVED***",
+                "connector_address": "dashboard.***REMOVED***",
                 "connector_port": "2120"
             },
             "use_https": false,
@@ -711,7 +711,7 @@ const (
         "config": {
             "addresses": {
                 "connector_scheme": "wss",
-                "connector_address": "***REMOVED***",
+                "connector_address": "dashboard.***REMOVED***",
                 "connector_port": "2120"
             },
             "use_https": false,
@@ -797,7 +797,7 @@ const (
         "config": {
             "addresses": {
                 "connector_scheme": "wss",
-                "connector_address": "***REMOVED***",
+                "connector_address": "dashboard.***REMOVED***",
                 "connector_port": "2120"
             },
             "use_https": false,
@@ -883,7 +883,7 @@ const (
         "config": {
             "addresses": {
                 "connector_scheme": "wss",
-                "connector_address": "***REMOVED***",
+                "connector_address": "dashboard.***REMOVED***",
                 "connector_port": "2120"
             },
             "use_https": false,

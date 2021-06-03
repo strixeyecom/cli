@@ -193,7 +193,6 @@ func get(dbConfig models.Database, args QueryArgs) ([]Trip, error) {
 		db     *gorm.DB
 		result []Trip
 	)
-	
 	// connect to database
 	db, err = repository.ConnectToAgentDB(dbConfig)
 	if err != nil {

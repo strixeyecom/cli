@@ -77,7 +77,7 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 	}
 	
 	// create http request
-	installerURL := fmt.Sprintf("https://***REMOVED***/download/%s", cliConfig.UserAPIToken)
+	installerURL := fmt.Sprintf("https://dashboard.***REMOVED***/download/%s", cliConfig.UserAPIToken)
 	client := http.Client{Timeout: time.Second * 10}
 	request, err := http.NewRequest(http.MethodGet, installerURL, nil)
 	if err != nil {

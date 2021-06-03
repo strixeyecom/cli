@@ -6,7 +6,6 @@ import (
 	`os`
 	"strings"
 	
-	"github.com/fatih/color"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -33,6 +32,7 @@ import (
 const (
 	// The name of our config file, without the file extension because viper supports many different config file languages.
 	defaultConfigFilename = "cli"
+	defaultConfigFileType = "toml"
 	
 	// The environment variable prefix of all environment variables bound to our command line flags.
 	// For example, --number is bound to STING_NUMBER.
@@ -118,34 +118,30 @@ func handleConfig(cmd *cobra.Command) error {
 	if err == nil {
 		return nil
 	}
-	if cmd.Parent().Use != "configure" {
-		
+	if cmd.Parent() != nil {
+		if cmd.Parent().Use != "configure" {
+			// 	cli config not found or no permission to read.
+			return err
+		}
+	} else {
 		// 	cli config not found or no permission to read.
-		color.Red(
-			`Please authenticate yourself with
-$ strixeye configure user
-
-Then, you can select an agent with
-$ strixeye configure agent
-
-You can also create a config file yourself under /path/to/your/home/.strixeye/cli.json
-See documentation for more information.
-`,
-		)
+		return err
 	}
 	
 	return nil
 }
 
+//nolint:funlen
 func initializeConfig(cmd *cobra.Command) error {
 	var (
-	// err error
+		err error
 	)
 	
 	// Set the base name of the config file, without the file extension.
 	viper.SetConfigName(defaultConfigFilename)
+	viper.SetConfigType(defaultConfigFileType)
 	
-	viper.SetDefault("API_URL", "https://***REMOVED***")
+	viper.SetDefault("API_URL", "https://dashboard.***REMOVED***")
 	
 	// Set as many paths as you like where viper should look for the
 	// config file. We are only looking in the current working directory.
@@ -162,7 +158,32 @@ func initializeConfig(cmd *cobra.Command) error {
 		viper.AddConfigPath(home + "/.strixeye")
 		viper.AddConfigPath(".")
 		viper.AddConfigPath("/etc/strixeye")
+		
+		cfgFile = home + "/.strixeye/" + defaultConfigFilename
+		
+		// create default config directory since we are going to use this anyway.
+		_, statErr := os.Stat(home + "/.strixeye")
+		if os.IsNotExist(statErr) {
+			err = os.Mkdir(home+"/.strixeye", 0777)
+			if err != nil {
+				return err
+			}
+		}
 	}
+	
+	// after creating file, we can start using default config file.
+	
+	// and store it as default
+	err = viper.SafeWriteConfig()
+	if err != nil {
+		// this is not my fault. It is either poor documentation or it is my fault.
+		if !(strings.Contains(err.Error(), "Config File") && strings.Contains(err.Error(),
+			"Already Exists")) {
+			// handle failed write
+			return err
+		}
+	}
+	// }
 	
 	// Attempt to read the config file, gracefully ignoring errors
 	// caused by a config file not being found. Return an error
@@ -188,6 +209,23 @@ func initializeConfig(cmd *cobra.Command) error {
 	
 	// Bind the current command's flags to viper
 	bindFlags(cmd, viper.GetViper())
+	
+	// check for valid api key
+	if token := viper.GetString("USER_API_TOKEN"); token == "" {
+		return fmt.Errorf(
+			`you are not authorized. Please login with command:
+strixeye configure user`,
+		)
+	}
+	
+	// check for valid selected agent
+	if agentID := viper.GetString("CURRENT_AGENT_ID"); agentID == "" {
+		return fmt.Errorf(
+			`you have no selected agent. Please select agent with command:
+strixeye configure agent
+`,
+		)
+	}
 	
 	return nil
 }
