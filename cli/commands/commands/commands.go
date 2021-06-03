@@ -256,7 +256,27 @@ func bindFlags(cmd *cobra.Command, v *viper.Viper) {
 func ShowHelp(err io.Writer) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		cmd.SetOut(err)
+		d := color.New(color.FgBlue, color.Bold)
+		_, _ = d.Print(strixeyeAscii)
+		d = color.New(color.FgGreen, color.Bold)
+		_, _ = d.Print(normalOwl)
 		cmd.HelpFunc()(cmd, args)
 		return nil
 	}
 }
+
+const (
+	normalOwl = `
+  ___
+ (o,o)
+ {'"'}
+ -"-"-
+`
+	strixeyeAscii = `
+  ___   _           _         ___
+ / __| | |_   _ _  (_) __ __ | __|  _  _   ___
+ \__ \ |  _| | '_| | | \ \ / | _|  | || | / -_)
+ |___/  \__| |_|   |_| /_\_\ |___|  \_, | \___|
+                                    |__/
+`
+)

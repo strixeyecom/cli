@@ -41,15 +41,16 @@ with a single StrixEye Agent at a time. `,
 				err           error
 				cliConfig     cli.Cli
 				selectedAgent agent2.AgentInformation
+				agents        []agent2.AgentInformation
 				selectedID    string
 			)
-
+			
 			// try to get from flags.
 			selectedID, err = cmd.Flags().GetString("set-agent-id")
 			if err != nil {
 				return err
 			}
-
+			
 			// if flags aren't provided, let user choose from a select list.
 			if selectedID == "" {
 				// get cli config if exists.
@@ -57,56 +58,54 @@ with a single StrixEye Agent at a time. `,
 				if err != nil {
 					return err
 				}
-
-				// select agent with current cli configuration
-				selectedAgent, err = selectAgent(cliConfig)
+				
+				// get a list of agents
+				agents, err = agent.GetAgents(cliConfig)
 				if err != nil {
 					return err
 				}
-
+				// select agent with current cli configuration
+				selectedAgent, err = selectAgent(agents)
+				if err != nil {
+					return err
+				}
+				
 				selectedID = selectedAgent.ID
 			}
-
+			
 			// print selected information
 			color.Blue("Selected agent: %s", selectedID)
-
+			
 			// store selected agent to configuration file.
 			viper.Set("CURRENT_AGENT_ID", selectedID)
 			err = viper.WriteConfig()
 			if err != nil {
 				return errors.Wrap(err, "failed to save config. Do you have permissions on the filesystem? ")
 			}
-
+			
 			return nil
 		},
 	}
-
+	
 	// Add subcommands
 	configureCommand.AddCommand()
-
+	
 	// Add local flags
 	configureCommand.Flags().StringP(
 		"set-agent-id", "s", "",
 		`Set agent directly without using select functionality`,
 	)
-
+	
 	return configureCommand
 }
 
 // selectAgent displays a select list of agents retrieved from user api.
-func selectAgent(cliConfig cli.Cli) (agent2.AgentInformation, error) {
+func selectAgent(agents []agent2.AgentInformation) (agent2.AgentInformation, error) {
 	var (
 		err           error
-		agents        []agent2.AgentInformation
 		selectedAgent agent2.AgentInformation
 	)
-
-	// fetch agents from user api
-	agents, err = agent.GetAgents(cliConfig)
-	if err != nil {
-		return agent2.AgentInformation{}, err
-	}
-
+	
 	// prepare inputs. create a string slice of agents.
 	var selectedIndex int
 	promptItems := make([]string, len(agents))
@@ -114,7 +113,7 @@ func selectAgent(cliConfig cli.Cli) (agent2.AgentInformation, error) {
 	for i := range agents {
 		promptItems[i] = agents[i].String()
 	}
-
+	
 	question := []*survey.Question{
 		{
 			Name: "agent",
@@ -124,14 +123,14 @@ func selectAgent(cliConfig cli.Cli) (agent2.AgentInformation, error) {
 			},
 		},
 	}
-
+	
 	// perform the questions
 	err = survey.Ask(question, &selectedIndex)
 	if err != nil {
 		return agent2.AgentInformation{}, err
 	}
-
+	
 	selectedAgent = agents[selectedIndex]
-
+	
 	return selectedAgent, nil
 }
