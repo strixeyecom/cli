@@ -2,11 +2,11 @@ package agent
 
 import (
 	"testing"
-	
+
 	"github.com/spf13/viper"
-	
-	`github.com/usestrix/cli/domain/agent`
-	`github.com/usestrix/cli/domain/cli`
+
+	"github.com/usestrix/cli/domain/agent"
+	"github.com/usestrix/cli/domain/cli"
 )
 
 /*
@@ -29,13 +29,13 @@ func TestGetAgent(t *testing.T) {
 		t.Fatal(err)
 	}
 	viper.AutomaticEnv()
-	
+
 	err = viper.Unmarshal(&cliConfig)
 
 	if err != nil {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
-	
+
 	type args struct {
 		userAPIToken string
 		agentID      string
@@ -86,6 +86,55 @@ func TestGetAgent(t *testing.T) {
 					_ = got.String()
 					_ = got
 				}
+			},
+		)
+	}
+}
+
+func Test_getVersions(t *testing.T) {
+	var (
+		// get good keys
+		err       error
+		cliConfig cli.Cli
+	)
+	viper.SetConfigFile("../../../.env")
+	// Try to read from file, but use env variables if non exists. it's fine
+	err = viper.ReadInConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	viper.AutomaticEnv()
+
+	err = viper.Unmarshal(&cliConfig)
+
+	if err != nil {
+		t.Fatalf("unable to decode into map, %v", err)
+	}
+
+	type args struct {
+		apiURL string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    agent.Versions
+		wantErr bool
+	}{
+		{
+			name:    "succesfully get versions",
+			args:    args{apiURL: cliConfig.APIUrl},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got, err := getVersions(tt.args.apiURL)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("getVersions() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+				_ = got
 			},
 		)
 	}

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	
+
 	"github.com/pkg/errors"
-	
+
 	"github.com/usestrix/cli/api/user/repository"
-	`github.com/usestrix/cli/domain/agent`
-	`github.com/usestrix/cli/domain/cli`
+	"github.com/usestrix/cli/domain/agent"
+	"github.com/usestrix/cli/domain/cli"
 )
 
 /*
@@ -81,4 +81,52 @@ func getAgent(apiToken, apiURL, agentID string) (agent.AgentInformation, error) 
 	}
 
 	return apiResponse.Data, nil
+}
+
+// getVersions returns latest image versions you can use with StrixEye Agents.
+func getVersions(apiURL string) (agent.Versions, error) {
+	var (
+		err  error
+		resp *http.Response
+	)
+
+	url := fmt.Sprintf("%s/versions", apiURL)
+	resp, err = http.Get(url)
+
+	if err != nil {
+		return agent.Versions{}, errors.Wrap(err, "failed to complete request to get versions")
+	}
+	// read response body
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return agent.Versions{}, errors.Wrap(err, "bad response body")
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	// handle reject/fail responses
+	if resp.StatusCode != http.StatusOK {
+		return agent.Versions{}, fmt.Errorf(
+			"sorry, please double check your credentials. "+
+				"Status Code : %d, error message : %s", resp.StatusCode, body,
+		)
+	}
+
+	// if status is ok, than this is possibly a api success response
+	var apiResponse agent.APIVersionsMessage
+	err = json.Unmarshal(body, &apiResponse)
+	if err != nil {
+		return agent.Versions{}, errors.Wrap(
+			err,
+			"api says response is okay but possibly there is a misunderstanding",
+		)
+	}
+
+	// turn api response to usable version structure
+	versions, err := apiResponse.ToVersions()
+	if err != nil {
+		return agent.Versions{}, err
+	}
+	return versions, nil
 }
