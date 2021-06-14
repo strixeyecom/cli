@@ -20,6 +20,7 @@ import (
 
 // global constants for file
 const (
+	// StatusOK is status message from StrixEye API for 2xx messages.
 	StatusOK = "ok"
 )
 
@@ -57,14 +58,14 @@ type Meta struct {
 
 // Versions keeps all version information for StrixEye stack.
 type Versions struct {
-	Manager   string `json:"manager_version"`
-	Database  string `json:"database_version"`
-	Engine    string `json:"engine_version"`
-	Profiler  string `json:"profiler_version"`
-	Queue     string `json:"queue_version"`
-	Scheduler string `json:"scheduler_version"`
-	Sensor    string `json:"sensor_version"`
-	Installer string `json:"installer_version"`
+	Manager   *version `json:"manager_version"`
+	Database  *version `json:"database_version"`
+	Engine    *version `json:"engine_version"`
+	Profiler  *version `json:"profiler_version"`
+	Queue     *version `json:"queue_version"`
+	Scheduler *version `json:"scheduler_version"`
+	Sensor    *version `json:"sensor_version"`
+	Installer *version `json:"installer_version"`
 }
 
 // AgentInformation keeps all information relevant to an agent instance.
@@ -92,11 +93,17 @@ type APIVersionsMessage struct {
 	Status string `json:"status"`
 	Data   []struct {
 		Key       string      `json:"key"`
-		Value     string      `json:"value"`
+		Value     *version    `json:"value"`
 		CreatedAt interface{} `json:"created_at"`
 		UpdatedAt *time.Time  `json:"updated_at"`
 		DeletedAt interface{} `json:"deleted_at"`
 	} `json:"data"`
+}
+
+type version struct {
+	Checksum string `json:"checksum"`
+	Size     int    `json:"size"`
+	Version  string `json:"version"`
 }
 
 func (message APIVersionsMessage) ToVersions() (Versions, error) {
@@ -120,13 +127,15 @@ func (message APIVersionsMessage) ToVersions() (Versions, error) {
 }
 
 // decode fills versions message using reflect package.
+// Simple switch factory would be more than enough but since this is a really boring thing to do,
+// I wanted to spice things up a little.
 func decode(s APIVersionsMessage, i interface{}) error {
-	v := reflect.ValueOf(i)
-	if v.Kind() != reflect.Ptr || v.IsNil() {
+	dst := reflect.ValueOf(i)
+	if dst.Kind() != reflect.Ptr || dst.IsNil() {
 		return fmt.Errorf("decode requires non-nil pointer")
 	}
-	// get the value that the pointer v points to.
-	v = v.Elem()
+	// get the value that the pointer dst points to.
+	dst = dst.Elem()
 	// assume that the input is valid.
 	for _, kv := range s.Data {
 		// strip version suffix
@@ -136,18 +145,18 @@ func decode(s APIVersionsMessage, i interface{}) error {
 		fieldName = strings.Title(fieldName)
 
 		// get field
-		f := v.FieldByName(fieldName)
+		f := dst.FieldByName(fieldName)
 
 		// make sure that this field is defined, and can be changed.
 		if !f.IsValid() || !f.CanSet() {
 			continue
 		}
 
-		if kv.Value == "" {
+		if kv.Value.Version == "" {
 			return errors.New("sorry, api returned a bad versions message")
 		}
-		// assume all the fields are type string.
-		f.SetString(kv.Value)
+
+		f.Set(reflect.ValueOf(kv.Value))
 	}
 	return nil
 }
