@@ -2,22 +2,25 @@ package commands
 
 import (
 	"fmt"
-	`io`
-	`os`
+	"io"
+	"os"
+	`path/filepath`
 	"strings"
 	
+	"github.com/fatih/color"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	`github.com/usestrix/cli/domain/consts`
 	
-	`github.com/usestrix/cli/cli/commands/agent`
+	"github.com/usestrix/cli/cli/commands/agent"
 	"github.com/usestrix/cli/cli/commands/configure"
-	`github.com/usestrix/cli/cli/commands/suspect`
-	`github.com/usestrix/cli/cli/commands/suspicion`
+	"github.com/usestrix/cli/cli/commands/suspect"
+	"github.com/usestrix/cli/cli/commands/suspicion"
 	"github.com/usestrix/cli/cli/commands/trip"
-	`github.com/usestrix/cli/domain/cli`
+	"github.com/usestrix/cli/domain/cli"
 )
 
 /*
@@ -98,6 +101,16 @@ func NewStrixeyeCommand() *cobra.Command {
 		&cfgFile, "config", "", "config file (default is $HOME/.strixeye/."+
 			"cli.json)",
 	)
+	rootCmd.PersistentFlags().StringVar(
+		&apiURL, "api-url", "", "dashboard.strixeye.com",
+	)
+	rootCmd.PersistentFlags().StringVar(
+		&userAPIToken, "user-api-token", "", "",
+	)
+	
+	rootCmd.PersistentFlags().StringVar(
+		&agentID, "current-agent-id", "", "",
+	)
 	
 	// Add subcommands
 	rootCmd.AddCommand(
@@ -143,7 +156,7 @@ func initializeConfig(cmd *cobra.Command) error {
 	viper.SetConfigName(defaultConfigFilename)
 	viper.SetConfigType(defaultConfigFileType)
 	
-	viper.SetDefault("API_URL", "https://dashboard.***REMOVED***")
+	viper.SetDefault("API_URL", consts.APIHost)
 	
 	// Set as many paths as you like where viper should look for the
 	// config file. We are only looking in the current working directory.
@@ -179,8 +192,10 @@ func initializeConfig(cmd *cobra.Command) error {
 	err = viper.SafeWriteConfig()
 	if err != nil {
 		// this is not my fault. It is either poor documentation or it is my fault.
-		if !(strings.Contains(err.Error(), "Config File") && strings.Contains(err.Error(),
-			"Already Exists")) {
+		if !(strings.Contains(err.Error(), "Config File") && strings.Contains(
+			err.Error(),
+			"Already Exists",
+		)) {
 			// handle failed write
 			return err
 		}
@@ -242,6 +257,11 @@ func bindFlags(cmd *cobra.Command, v *viper.Viper) {
 				envVarSuffix := strings.ToUpper(strings.ReplaceAll(f.Name, "-", "_"))
 				err := v.BindEnv(f.Name, fmt.Sprintf("%s_%s", envPrefix, envVarSuffix))
 				cobra.CheckErr(err)
+			}
+			
+			if f.Changed {
+				envVarSuffix := strings.ToUpper(strings.ReplaceAll(f.Name, "-", "_"))
+				v.Set(envVarSuffix, f.Value)
 			}
 			
 			// Apply the viper config value to the flag when the flag is not set and viper has a value
