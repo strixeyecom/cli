@@ -7,7 +7,8 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
-
+	repository2 `github.com/usestrix/cli/domain/repository`
+	
 	"github.com/usestrix/cli/api/user/repository"
 	"github.com/usestrix/cli/domain/agent"
 	"github.com/usestrix/cli/domain/cli"
@@ -83,8 +84,13 @@ func getAgent(apiToken, apiURL, agentID string) (agent.AgentInformation, error) 
 	return apiResponse.Data, nil
 }
 
+// GetLatestVersions return latest image/binary versions
+func GetLatestVersions(cliConfig cli.Cli) (repository2.Versions, error) {
+	return getVersions(cliConfig.APIUrl)
+}
+
 // getVersions returns latest image versions you can use with StrixEye Agents.
-func getVersions(apiURL string) (agent.Versions, error) {
+func getVersions(apiURL string) (repository2.Versions, error) {
 	var (
 		err  error
 		resp *http.Response
@@ -94,12 +100,12 @@ func getVersions(apiURL string) (agent.Versions, error) {
 	resp, err = http.Get(url)
 
 	if err != nil {
-		return agent.Versions{}, errors.Wrap(err, "failed to complete request to get versions")
+		return repository2.Versions{}, errors.Wrap(err, "failed to complete request to get versions")
 	}
 	// read response body
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return agent.Versions{}, errors.Wrap(err, "bad response body")
+		return repository2.Versions{}, errors.Wrap(err, "bad response body")
 	}
 	defer func() {
 		_ = resp.Body.Close()
@@ -107,26 +113,33 @@ func getVersions(apiURL string) (agent.Versions, error) {
 
 	// handle reject/fail responses
 	if resp.StatusCode != http.StatusOK {
-		return agent.Versions{}, fmt.Errorf(
+		return repository2.Versions{}, fmt.Errorf(
 			"sorry, please double check your credentials. "+
 				"Status Code : %d, error message : %s", resp.StatusCode, body,
 		)
 	}
 
 	// if status is ok, than this is possibly a api success response
-	var apiResponse agent.APIVersionsMessage
+	var apiResponse repository2.APIVersionsMessage
 	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {
-		return agent.Versions{}, errors.Wrap(
+		return repository2.Versions{}, errors.Wrap(
 			err,
 			"api says response is okay but possibly there is a misunderstanding",
+		)
+	}
+
+	if len(apiResponse.Data) == 0 {
+		return repository2.Versions{}, errors.Wrap(
+			err,
+			"under maintenance, please try again in a few minutes",
 		)
 	}
 
 	// turn api response to usable version structure
 	versions, err := apiResponse.ToVersions()
 	if err != nil {
-		return agent.Versions{}, err
+		return repository2.Versions{}, err
 	}
 	return versions, nil
 }

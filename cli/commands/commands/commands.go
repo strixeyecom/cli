@@ -32,7 +32,7 @@ import (
 const (
 	// The name of our config file, without the file extension because viper supports many different config file languages.
 	defaultConfigFilename = "cli"
-	defaultConfigFileType = "toml"
+	defaultConfigFileType = "json"
 	
 	// The environment variable prefix of all environment variables bound to our command line flags.
 	// For example, --number is bound to STING_NUMBER.
@@ -42,6 +42,9 @@ const (
 // global variables (not cool) for this file
 var (
 	cfgFile string
+	apiURL string
+	userAPIToken string
+	agentID string
 )
 
 // NewStrixeyeCommand is the highest command in the hierarchy and all commands root from it.
@@ -86,7 +89,6 @@ func NewStrixeyeCommand() *cobra.Command {
 			return nil
 		},
 		RunE: ShowHelp(os.Stdout),
-		
 	}
 	
 	// Here you will define your flags and configuration settings.
@@ -155,16 +157,16 @@ func initializeConfig(cmd *cobra.Command) error {
 		
 		// Search config in home directory with name ".cli" (without extension).
 		
+		viper.AddConfigPath(consts.WorkingDir)
 		viper.AddConfigPath(home + "/.strixeye")
 		viper.AddConfigPath(".")
-		viper.AddConfigPath("/etc/strixeye")
 		
-		cfgFile = home + "/.strixeye/" + defaultConfigFilename
+		cfgFile = filepath.Join(consts.WorkingDir, defaultConfigFilename)
 		
 		// create default config directory since we are going to use this anyway.
-		_, statErr := os.Stat(home + "/.strixeye")
+		_, statErr := os.Stat(consts.WorkingDir)
 		if os.IsNotExist(statErr) {
-			err = os.Mkdir(home+"/.strixeye", 0777)
+			err = os.Mkdir(consts.WorkingDir, 0600)
 			if err != nil {
 				return err
 			}

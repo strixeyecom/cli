@@ -15,7 +15,7 @@ import (
 */
 
 /*
-*/
+ */
 
 // global constants for file
 const (
@@ -73,15 +73,15 @@ func init() {
 	}
 }
 
-
 // Database stores credentials and configurations about strixeye agent database.
 type Database struct {
-	DBAddr               string `mapstructure:"DB_ADDR" json:"db_addr" validate:"hostname"`
+	DBAddr               string `mapstructure:"DB_ADDR" json:"db_addr"`
 	DBUser               string `mapstructure:"DB_USER" json:"db_user" validate:"omitempty"`
 	DBPass               string `mapstructure:"DB_PASS" json:"db_pass" validate:"omitempty"`
 	DBName               string `mapstructure:"DB_NAME" json:"db_name" validate:"omitempty"`
 	DBPort               string `mapstructure:"DB_PORT" json:"db_port" validate:"port"`
 	OverrideRemoteConfig bool   `mapstructure:"DB_OVERRIDE" json:"override_remote_config"`
+	TestContainerName_   string `json:"-"`
 }
 
 // DSN creates a dsn url from database config. DSN is used to connect to servers,
@@ -90,7 +90,7 @@ type Database struct {
 // See https://gorm.io/docs/connecting_to_the_database.html
 func (d Database) DSN() string {
 	return fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", d.DBUser,
+		"%s:%s@tcp(%s:%s)/%s", d.DBUser,
 		d.DBPass, d.DBAddr, d.DBPort, d.DBName,
 	)
 }
