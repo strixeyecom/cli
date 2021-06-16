@@ -29,6 +29,9 @@ const (
 
 	ServiceDir  = "/lib/systemd/system"
 	ServiceFile = "strixeyed.service"
+	
+	DownloadZipName = "manager.tar.gz"
+
 )
 
 // global variables (not cool) for this file
