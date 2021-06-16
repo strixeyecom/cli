@@ -44,21 +44,16 @@ with a single StrixEye Agent at a time. `,
 				agents        []agent2.AgentInformation
 				selectedID    string
 			)
-			
-			// try to get from flags.
-			selectedID, err = cmd.Flags().GetString("set-agent-id")
+			// get cli config if exists.
+			err = viper.Unmarshal(&cliConfig)
 			if err != nil {
 				return err
 			}
 			
+			
+			selectedID = viper.GetString("CURRENT_AGENT_ID")
 			// if flags aren't provided, let user choose from a select list.
 			if selectedID == "" {
-				// get cli config if exists.
-				err = viper.Unmarshal(&cliConfig)
-				if err != nil {
-					return err
-				}
-				
 				// get a list of agents
 				agents, err = agent.GetAgents(cliConfig)
 				if err != nil {
@@ -76,13 +71,22 @@ with a single StrixEye Agent at a time. `,
 			// print selected information
 			color.Blue("Selected agent: %s", selectedID)
 			
+			
+			// check given agent id is ok
+			cliConfig.CurrentAgentID = selectedID
+			_, err = agent.GetAgentConfig(cliConfig)
+			if err != nil {
+				return err
+			}
+			
+			
 			// store selected agent to configuration file.
 			viper.Set("CURRENT_AGENT_ID", selectedID)
 			err = viper.WriteConfig()
 			if err != nil {
 				return errors.Wrap(err, "failed to save config. Do you have permissions on the filesystem? ")
 			}
-			
+
 			return nil
 		},
 	}
@@ -109,7 +113,7 @@ func selectAgent(agents []agent2.AgentInformation) (agent2.AgentInformation, err
 	// prepare inputs. create a string slice of agents.
 	var selectedIndex int
 	promptItems := make([]string, len(agents))
-
+	
 	for i := range agents {
 		promptItems[i] = agents[i].String()
 	}

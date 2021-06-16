@@ -110,17 +110,17 @@ type APIErrorResponse struct {
 // send data more frequently, send data less frequently, use nginx, use apache, use http,
 // use https and all those stuff. fun.
 type StackConfig struct {
-	Addresses  addresses `json:"addresses"`
-	UseHTTPS   bool      `json:"use_https"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	Deployment string    `json:"deployment"`
-	Database   repository.Database  `json:"database"`
-	Broker     broker    `json:"broker"`
-	Scheduler  scheduler `json:"scheduler"`
-	Engine     engine    `json:"engine"`
-	Sensor     sensor    `json:"sensor"`
-	Profiler   profiler  `json:"profiler"`
+	Addresses  Addresses           `json:"addresses"`
+	UseHTTPS   bool                `json:"use_https"`
+	CreatedAt  time.Time           `json:"created_at"`
+	UpdatedAt  time.Time           `json:"updated_at"`
+	Deployment string              `json:"deployment"`
+	Database   repository.Database `json:"database"`
+	Broker     broker              `json:"broker"`
+	Scheduler  scheduler           `json:"scheduler"`
+	Engine     engine              `json:"engine"`
+	Sensor     sensor              `json:"sensor"`
+	Profiler   profiler            `json:"profiler"`
 	Intervals  intervals `json:"intervals"`
 	Paths      paths     `json:"paths"`
 }
@@ -187,8 +187,8 @@ func (config StackConfig) Validate() error {
 	return err
 }
 
-// addresses keep where/how agent connects to
-type addresses struct {
+// Addresses keep where/how agent connects to
+type Addresses struct {
 	// Scheme means here that whether it is a websocket connection, and therefore "ws" or "wss"
 	// or a normal http connection, "http" or "https"
 	ConnectorScheme string `json:"connector_scheme"`
@@ -196,7 +196,7 @@ type addresses struct {
 	// ConnectorAddress keeps connector's location.
 	// This is usually fixed since strixeye has a cloud management panel and it is on a predefined domain.
 	// But still, it has a hostname validation
-	ConnectorAddress string `json:"connector_address" validate:"hostname"`
+	ConnectorAddress string `json:"connector_address"`
 	
 	// ConnectorPort has same explanation with ConnectorAddress field of the same struct.
 	ConnectorPort string `json:"connector_port" validate:"port"`
@@ -204,7 +204,7 @@ type addresses struct {
 
 // validate checks for the fields of given instance.
 // check for struct type definition for more documentation about fields and their validation functions.
-func (a addresses) validate() error {
+func (a Addresses) validate() error {
 	if a.ConnectorScheme != "wss" && a.ConnectorScheme != "ws" {
 		return errors.New("bad connector scheme")
 	}
