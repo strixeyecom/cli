@@ -6,12 +6,12 @@ import (
 	"github.com/pkg/errors"
 	`github.com/spf13/cobra`
 	`github.com/spf13/viper`
+	userconfig `github.com/usestrix/cli/api/user/agent`
+	models `github.com/usestrix/cli/domain/repository`
 	"gorm.io/gorm"
 	
-	userconfig `github.com/usestrix/cli/api/user/agent`
 	`github.com/usestrix/cli/cli/commands/repository`
 	`github.com/usestrix/cli/domain/cli`
-	models `github.com/usestrix/cli/domain/repository`
 )
 
 /*
@@ -69,7 +69,7 @@ suspicions on your agent, without leaking any sensitive data outside of your net
 	
 	getCmd.Flags().IntP(
 		"since", "i", 0,
-		"Queries only suspicions after given time --since [epoch in seconds]  You can get current" +
+		"Queries only suspicions after given time --since [epoch in seconds]  You can get current"+
 			" timestamp with date +%s",
 	)
 	
@@ -89,7 +89,7 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 	
-	queryArgs := QueryArgs{Limit: 1}
+	queryArgs := models.SuspicionQueryArgs{Limit: 1}
 	
 	// parse and set list of suspects to be queried
 	suspects, err := cmd.Flags().GetStringSlice("suspects")
@@ -119,7 +119,6 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 	limit, err := cmd.Flags().GetInt("limit")
 	if err != nil {
 		return err
-		
 	} else if limit > 0 {
 		queryArgs.Limit = limit
 	}
@@ -157,7 +156,7 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 }
 
 // Get is a temporary method to satisfy the authentication process.
-func Get(cliConfig cli.Cli, args QueryArgs) ([]Suspicion, error) {
+func Get(cliConfig cli.Cli, args models.SuspicionQueryArgs) ([]models.Suspicion, error) {
 	var (
 		dbConfig models.Database
 	)
@@ -179,11 +178,11 @@ func Get(cliConfig cli.Cli, args QueryArgs) ([]Suspicion, error) {
 
 // Get retrieves all suspicions that matches given query args. Check out suspicions.
 // QueryArgs for more information about existing filters.
-func get(dbConfig models.Database, args QueryArgs) ([]Suspicion, error) {
+func get(dbConfig models.Database, args models.SuspicionQueryArgs) ([]models.Suspicion, error) {
 	var (
 		err    error
 		db     *gorm.DB
-		result []Suspicion
+		result []models.Suspicion
 	)
 	
 	// connect to database

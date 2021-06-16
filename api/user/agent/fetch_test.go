@@ -4,7 +4,8 @@ import (
 	"testing"
 
 	"github.com/spf13/viper"
-
+	`github.com/usestrix/cli/domain/repository`
+	
 	"github.com/usestrix/cli/domain/agent"
 	"github.com/usestrix/cli/domain/cli"
 )
@@ -117,7 +118,7 @@ func Test_getVersions(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    agent.Versions
+		want    repository.Versions
 		wantErr bool
 	}{
 		{

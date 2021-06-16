@@ -1,4 +1,4 @@
-package suspicion
+package repository
 
 import (
 	`fmt`
@@ -54,7 +54,7 @@ func (Suspicion) TableName() string {
 
 // QueryArgs are arguments you can use to customize your queries. Multiple fields can be used at once,
 // also empty query args is not a problem.
-type QueryArgs struct {
+type SuspicionQueryArgs struct {
 	// how many results do you want to retrieve
 	Limit int
 	
@@ -71,7 +71,7 @@ type QueryArgs struct {
 	SinceTime int64
 }
 
-func (q QueryArgs) String() string {
+func (q SuspicionQueryArgs) String() string {
 	var query string
 	
 	query = fmt.Sprintf("%s\nDisplaying maximum %d rows", query, q.Limit)

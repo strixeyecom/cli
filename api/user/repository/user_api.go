@@ -36,7 +36,7 @@ func UserAPIRequest(method, endpoint string, body io.Reader, apiToken, apiURL st
 	)
 
 	// create url
-	url = fmt.Sprintf("%s/api%s", apiURL, endpoint)
+	url = apiURL + endpoint
 
 	// create request
 	req, err = http.NewRequest(method, url, body)
