@@ -97,6 +97,7 @@ func getVersions(apiURL string) (repository2.Versions, error) {
 	)
 
 	url := fmt.Sprintf("%s/versions", apiURL)
+	// #nosec
 	resp, err = http.Get(url)
 
 	if err != nil {

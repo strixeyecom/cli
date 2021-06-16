@@ -39,8 +39,8 @@ var ()
 // gz file and placing it to predetermined download location.
 //
 // It uses constant output paths like /usr/bin/strixeyed on *NIX systems.
-func extractTarGz(version repository2.Version, zipPath string) error {
-	zipFile, err := os.Open(zipPath)
+func extractTarGz(version repository2.Version) error {
+	zipFile, err := os.Open(consts.DownloadZipName)
 	if err != nil {
 		return err
 	}
@@ -104,13 +104,14 @@ func extractTarGz(version repository2.Version, zipPath string) error {
 			}
 
 			// make it executable only by owner
+			// #nosec
 			err = os.Chmod(strixeyedPath, 0700)
 			if err != nil {
 				return err
 			}
 
 			// remove zip file
-			err = os.Remove(zipPath)
+			err = os.Remove(consts.DownloadZipName)
 			if err != nil {
 				return err
 			}
@@ -154,10 +155,9 @@ func DownloadDaemonBinary(userAPIToken, agentToken string, version repository2.V
 		return fmt.Errorf("can not download binary from server, status code :%d ", resp.StatusCode)
 	}
 
-	zipPath := fmt.Sprintf("manager_%s_Linux_amd64.tar.gz", version.Version)
 
 	// create zip file to write in it
-	zipFile, err := os.Create(zipPath)
+	zipFile, err := os.Create(consts.DownloadZipName)
 	if err != nil {
 		return err
 	}
@@ -175,7 +175,7 @@ func DownloadDaemonBinary(userAPIToken, agentToken string, version repository2.V
 
 	// extract downloaded tarball to daemon location
 	fmt.Printf("Extracting daemon to %s\n", filepath.Join(consts.DaemonDir, consts.DaemonName))
-	err = extractTarGz(version, zipPath)
+	err = extractTarGz(version)
 	if err != nil {
 		return err
 	}

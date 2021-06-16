@@ -1,18 +1,17 @@
 package agent
 
 import (
-	`fmt`
-	`io`
-	`net/http`
-	`os`
-	`time`
+	"fmt"
+	"os"
 	
-	`github.com/fatih/color`
-	`github.com/spf13/cobra`
-	`github.com/spf13/viper`
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	agent2 "github.com/usestrix/cli/domain/agent"
+	"github.com/usestrix/cli/domain/consts"
 	
-	`github.com/usestrix/cli/api/user/agent`
-	`github.com/usestrix/cli/domain/cli`
+	"github.com/usestrix/cli/api/user/agent"
+	"github.com/usestrix/cli/domain/cli"
 )
 
 /*
@@ -46,8 +45,30 @@ strixeye configure agent
 	}
 	
 	// declaring local flags used by get trip commands.
+	checkCmd.Flags().String(
+		"user-api-token", "", "--token {your StrixEye User API Token}",
+	)
+	
+	checkCmd.Flags().String(
+		"agent-id", "", "--agent-id {StrixEye Agent ID of your choice}",
+	)
 	
 	return checkCmd
+}
+
+func getCredentials(cmd *cobra.Command) (cli.Cli, error) {
+	var (
+		cliConfig cli.Cli
+		err       error
+	)
+	
+	// get cli config for authentication
+	err = viper.Unmarshal(&cliConfig)
+	if err != nil {
+		return cliConfig, err
+	}
+	
+	return cliConfig, nil
 }
 
 // installAgentCmd implements GetCommand logic.
@@ -57,8 +78,8 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 		err       error
 	)
 	
-	// get cli config for authentication
-	err = viper.Unmarshal(&cliConfig)
+	
+	cliConfig, err = getCredentials(cmd)
 	if err != nil {
 		return err
 	}
@@ -67,7 +88,6 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 	agentConfig, err := agent.GetAgentConfig(cliConfig)
 	if err != nil {
 		return err
-		
 	}
 	
 	// check if this host machine supports installing selected agent
@@ -76,44 +96,79 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 	
-	// create http request
-	installerURL := fmt.Sprintf("https://dashboard.***REMOVED***/download/%s", cliConfig.UserAPIToken)
-	client := http.Client{Timeout: time.Second * 10}
-	request, err := http.NewRequest(http.MethodGet, installerURL, nil)
-	if err != nil {
-		return err
-	}
-	request.Header.Add("accept", "application/json")
-	
-	// notify user
-	color.Blue("Downloading install script from %s", installerURL)
-	
-	// download installer script
-	resp, err := client.Do(request)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	
-	// open a temporary file to store installer script
-	tmpFileName := fmt.Sprintf("/tmp/installer_%d.sh", time.Now().UnixNano())
-	f, err := os.Create(tmpFileName)
+	// get latest versions
+	versions, err := agent.GetLatestVersions(cliConfig)
 	if err != nil {
 		return err
 	}
 	
-	// write to temporary file
-	_, err = io.Copy(f, resp.Body)
+	// create necessary directories and files.
+	err = createPaths(agentConfig)
+	if errors.Is(err, os.ErrExist) {
+		fmt.Println(err)
+	} else if err != nil {
+		return err
+	}
+	
+	// create service file depending on os/arch and deployment type
+	err = agentConfig.CreateServiceFile()
 	if err != nil {
 		return err
 	}
 	
-	color.Red(
-		`!!ATTENTION!!
-PLEASE RUN THE FOLLOWING SCRIPT
-%s
-`, tmpFileName,
-	)
+	// Save agent config file
+	a := agent2.Agent{
+		Versions: versions, Auth: agent2.Auth{
+			AgentID:    agentConfig.ID,
+			AgentToken: agentConfig.Token,
+		},
+		Addresses: agentConfig.Config.Addresses,
+	}
+	err = agent2.SaveAgentConfig(a)
+	if err != nil {
+		return err
+	}
+	
+	fmt.Println("Starting download process.")
+	// download tarball, decompress and place the binary
+	err = DownloadDaemonBinary(cliConfig.UserAPIToken, agentConfig.Token, versions.Manager)
+	if err != nil {
+		return err
+	}
+	agent2.InstallCompleted()
+	return nil
+}
+
+// createPaths creates paths depending on the host machine os/arch. For example,
+// working directory in win and unix are different, decided on the compile time.
+func createPaths(agentInformation agent2.AgentInformation) error {
+	// create working directory
+	_, err := os.Stat(consts.WorkingDir)
+	switch {
+	case errors.Is(os.ErrNotExist, err):
+		err = os.Mkdir(consts.WorkingDir, 0600)
+		if err != nil {
+			return err
+		}
+	case err == nil:
+		return errors.WithMessagef(os.ErrExist, "directory %s exists", consts.WorkingDir)
+	default:
+		return errors.WithMessagef(err, "can not create directory %s", consts.WorkingDir)
+	}
+	
+	// 	create config directory
+	_, err = os.Stat(consts.ConfigDir)
+	switch {
+	case errors.Is(os.ErrNotExist, err):
+		err = os.Mkdir(consts.ConfigDir, 0600)
+		if err != nil {
+			return err
+		}
+	case err == nil:
+		return errors.WithMessagef(os.ErrExist, "directory %s exists", consts.ConfigDir)
+	default:
+		return errors.WithMessagef(err, "can not create directory %s", consts.ConfigDir)
+	}
 	
 	return nil
 }
