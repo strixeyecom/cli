@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	agent2 `github.com/usestrix/cli/domain/agent`
 	`github.com/usestrix/cli/domain/consts`
 	
 	"github.com/usestrix/cli/cli/commands/agent"
@@ -44,10 +45,10 @@ const (
 
 // global variables (not cool) for this file
 var (
-	cfgFile string
-	apiURL string
+	cfgFile      string
+	apiURL       string
 	userAPIToken string
-	agentID string
+	agentID      string
 )
 
 // NewStrixeyeCommand is the highest command in the hierarchy and all commands root from it.
@@ -170,22 +171,61 @@ func initializeConfig(cmd *cobra.Command) error {
 		
 		// Search config in home directory with name ".cli" (without extension).
 		
-		viper.AddConfigPath(consts.WorkingDir)
+		viper.AddConfigPath(consts.CLIConfigDir)
 		viper.AddConfigPath(home + "/.strixeye")
 		viper.AddConfigPath(".")
 		
-		cfgFile = filepath.Join(consts.WorkingDir, defaultConfigFilename)
+		cfgFile = filepath.Join(consts.CLIConfigDir, defaultConfigFilename)
 		
 		// create default config directory since we are going to use this anyway.
-		_, statErr := os.Stat(consts.WorkingDir)
+		_, statErr := os.Stat(consts.CLIConfigDir)
+		
 		if os.IsNotExist(statErr) {
-			err = os.Mkdir(consts.WorkingDir, 0600)
+			// if this is the first time, it needs to be the root user.
+			// Because strixeye install command runs as a root and if you keep strixeye cli config in a
+			// user owned directory, like any directory under $HOME,
+			// it won't be accessible by root user by $HOME path, because for example in Linux,
+			// $HOME for root user is /root, and that means the config file is under /root/strixeye-cli.
+			//
+			// Because of this, we need to put it in a non-user based directory. However,
+			// it is totally fine to own the directory.
+			if !agent2.IsRootUser() {
+				color.Red(
+					`When running for the first time,you must run it as root user.
+Afterwards, You can own the config directory if you wish to continue using as a non-root user
+$ sudo chown -R $USER %s
+`, consts.CLIConfigDir,
+				)
+				os.Exit(1)
+			}
+			
+			// Than, create the directory with root perms only. Actually,
+			// a permission like 0666 would prevent the user from `chown`ing the directory,
+			// but this decision is not up to me.
+			err = os.Mkdir(consts.CLIConfigDir, 0600)
 			if err != nil {
+				if os.IsPermission(err) {
+					return fmt.Errorf(
+						`please set permissions of the directory, eg. using
+$ chown -R $USER %s   `, consts.CLIConfigDir,
+					)
+				}
 				return err
 			}
+			
+			// If you are here, then the configuration directories are created and owned by the current process owner
+			color.Blue(
+				"Successfully set up strixeye cli. "+
+					"Please own %s if you want to use it as a non-root user", consts.CLIConfigDir,
+			)
+		} else if os.IsPermission(err) {
+			return errors.WithMessagef(
+				err, `Please set permissions of the directory, eg. using
+$ chown -R $USER %s`, consts.CLIConfigDir,
+			)
 		}
 	}
-	
+
 	// after creating file, we can start using default config file.
 	
 	// and store it as default

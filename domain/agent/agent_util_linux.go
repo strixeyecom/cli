@@ -7,6 +7,7 @@ import (
 	`encoding/json`
 	"fmt"
 	"io/ioutil"
+	`os`
 	"os/exec"
 	"path/filepath"
 	
@@ -276,4 +277,15 @@ func StopDaemon() error {
 	}
 	
 	return nil
+}
+
+var IsCorrectUser = func() error {
+	if !IsRootUser() {
+		return errors.New("user not root")
+	}
+	return nil
+}
+
+func IsRootUser() bool {
+	return os.Geteuid() == 0
 }

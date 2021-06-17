@@ -78,7 +78,6 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 		err       error
 	)
 	
-	
 	cliConfig, err = getCredentials(cmd)
 	if err != nil {
 		return err
@@ -144,30 +143,28 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 func createPaths(agentInformation agent2.AgentInformation) error {
 	// create working directory
 	_, err := os.Stat(consts.WorkingDir)
-	switch {
-	case errors.Is(os.ErrNotExist, err):
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	
+	if errors.Is(err, os.ErrNotExist) {
 		err = os.Mkdir(consts.WorkingDir, 0600)
 		if err != nil {
 			return err
 		}
-	case err == nil:
-		return errors.WithMessagef(os.ErrExist, "directory %s exists", consts.WorkingDir)
-	default:
-		return errors.WithMessagef(err, "can not create directory %s", consts.WorkingDir)
 	}
 	
 	// 	create config directory
 	_, err = os.Stat(consts.ConfigDir)
-	switch {
-	case errors.Is(os.ErrNotExist, err):
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	
+	if os.IsNotExist(err) {
 		err = os.Mkdir(consts.ConfigDir, 0600)
 		if err != nil {
 			return err
 		}
-	case err == nil:
-		return errors.WithMessagef(os.ErrExist, "directory %s exists", consts.ConfigDir)
-	default:
-		return errors.WithMessagef(err, "can not create directory %s", consts.ConfigDir)
 	}
 	
 	return nil
