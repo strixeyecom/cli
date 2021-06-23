@@ -20,8 +20,8 @@ const (
 	ConfigDir = "/etc/strixeye/config"
 	ConfigFile = "config.json"
 
-	DownloadHost = "https://downloads.strixeye.com"
-	APIHost = "https://api.strixeye.com"
+	DownloadHost = "downloads.strixeye.com"
+	APIHost = "api.strixeye.com"
 
 	DockerComposeFileName = "docker-compose.yml"
 
