@@ -45,6 +45,7 @@ type Cli struct {
 	// APIDomain is almost always dashboard.strixeye.com or api.strixeye.com. However,
 	// this is needed for testing purposes
 	APIDomain string `mapstructure:"API_DOMAIN"`
+	DownloadDomain      string `mapstructure:"DOWNLOAD_DOMAIN"`
 	
 	// 	DB can be removed in the future, however it is something user might want to override.
 	// 	I'm not sure if this will cause a vuln for now, however even I need this for myself. Because:

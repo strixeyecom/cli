@@ -170,6 +170,7 @@ func initializeConfig(cmd *cobra.Command) error {
 	viper.SetConfigType(defaultConfigFileType)
 	
 	viper.SetDefault("API_DOMAIN", consts.APIHost)
+	viper.SetDefault("DOWNLOAD_DOMAIN", consts.DownloadHost)
 	
 	// Set as many paths as you like where viper should look for the
 	// config file. We are only looking in the current working directory.
@@ -261,22 +262,22 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 	// Bind the current command's flags to viper
 	bindFlags(cmd, viper.GetViper())
 	
-// 	// check for valid api token
-// 	if token := viper.GetString("USER_API_TOKEN"); token == "" {
-// 		return fmt.Errorf(
-// 			`you are not authorized. Please login with command:
-// strixeye configure user`,
-// 		)
-// 	}
-//
-// 	// check for valid selected agent
-// 	if agentID := viper.GetString("CURRENT_AGENT_ID"); agentID == "" {
-// 		return fmt.Errorf(
-// 			`you have no selected agent. Please select agent with command:
-// strixeye configure agent
-// `,
-// 		)
-// 	}
+	// 	// check for valid api token
+	// 	if token := viper.GetString("USER_API_TOKEN"); token == "" {
+	// 		return fmt.Errorf(
+	// 			`you are not authorized. Please login with command:
+	// strixeye configure user`,
+	// 		)
+	// 	}
+	//
+	// 	// check for valid selected agent
+	// 	if agentID := viper.GetString("CURRENT_AGENT_ID"); agentID == "" {
+	// 		return fmt.Errorf(
+	// 			`you have no selected agent. Please select agent with command:
+	// strixeye configure agent
+	// `,
+	// 		)
+	// 	}
 	
 	return nil
 }
