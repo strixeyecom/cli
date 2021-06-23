@@ -53,7 +53,7 @@ func TestGetAgent(t *testing.T) {
 			args: args{
 				userAPIToken: cliConfig.UserAPIToken,
 				agentID:      cliConfig.CurrentAgentID,
-				apiURL:       cliConfig.APIUrl,
+				apiURL:       cliConfig.APIDomain,
 			},
 			wantErr: false,
 		}, {
@@ -61,7 +61,7 @@ func TestGetAgent(t *testing.T) {
 			args: args{
 				userAPIToken: "fake-token",
 				agentID:      cliConfig.CurrentAgentID,
-				apiURL:       cliConfig.APIUrl,
+				apiURL:       cliConfig.APIDomain,
 			},
 			wantErr: true,
 		},
@@ -70,7 +70,7 @@ func TestGetAgent(t *testing.T) {
 			args: args{
 				userAPIToken: cliConfig.UserAPIToken,
 				agentID:      "fake-agent",
-				apiURL:       cliConfig.APIUrl,
+				apiURL:       cliConfig.APIDomain,
 			},
 			wantErr: true,
 		},
@@ -123,7 +123,7 @@ func Test_getVersions(t *testing.T) {
 	}{
 		{
 			name:    "succesfully get versions",
-			args:    args{apiURL: cliConfig.APIUrl},
+			args:    args{apiURL: cliConfig.APIDomain},
 			wantErr: false,
 		},
 	}

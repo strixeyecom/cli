@@ -38,7 +38,7 @@ type agentResponse struct {
 
 // GetAgentConfig return stack configuration for given agent.
 func GetAgentConfig(cliConfig cli.Cli) (agent.AgentInformation, error) {
-	return getAgent(cliConfig.UserAPIToken, cliConfig.APIUrl, cliConfig.CurrentAgentID)
+	return getAgent(cliConfig.UserAPIToken, cliConfig.APIDomain, cliConfig.CurrentAgentID)
 }
 
 // getAgents returns list of agents from user api, parses and validates information.
@@ -86,17 +86,17 @@ func getAgent(apiToken, apiDomain, agentID string) (agent.AgentInformation, erro
 
 // GetLatestVersions return latest image/binary versions
 func GetLatestVersions(cliConfig cli.Cli) (repository2.Versions, error) {
-	return getVersions(cliConfig.APIUrl)
+	return getVersions(cliConfig.APIDomain)
 }
 
 // getVersions returns latest image versions you can use with StrixEye Agents.
-func getVersions(apiURL string) (repository2.Versions, error) {
+func getVersions(apiDomain string) (repository2.Versions, error) {
 	var (
 		err  error
 		resp *http.Response
 	)
 
-	url := fmt.Sprintf("%s/versions", apiURL)
+	url := fmt.Sprintf("https://%s/versions", apiDomain)
 	// #nosec
 	resp, err = http.Get(url)
 

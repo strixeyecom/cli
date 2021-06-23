@@ -60,7 +60,7 @@ func TestUserAPIRequest(t *testing.T) {
 			name: "Get with no body",
 			args: args{
 				apiToken: cliConfig.UserAPIToken,
-				apiURL:   cliConfig.APIUrl,
+				apiURL:   cliConfig.APIDomain,
 				body:     nil,
 				endpoint: "/agents",
 			},

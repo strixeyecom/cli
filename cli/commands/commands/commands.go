@@ -133,7 +133,7 @@ func checkUser(cmd *cobra.Command) {
 	// it is totally fine to own the directory.
 	if !agent2.IsRootUser() {
 		color.Red(
-			`For now, StrixEye doesn't support non-root users for your security.'`,
+			`For now, StrixEye doesn't support non-root users for your security.`,
 		)
 		os.Exit(1)
 	}

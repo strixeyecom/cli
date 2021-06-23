@@ -89,7 +89,7 @@ func Test_addresses_Validate(t *testing.T) {
 			name: "pass",
 			fields: fields{
 				ConnectorScheme:  "wss",
-				ConnectorAddress: cliConfig.APIUrl,
+				ConnectorAddress: cliConfig.APIDomain,
 				ConnectorPort:    "2118",
 				SchedulerAddr:    "2141",
 			},

@@ -60,7 +60,7 @@ func TestGetAgents(t *testing.T) {
 		}, {
 			name: "Authentication failure",
 			args: args{
-				cliConfig: cli.Cli{UserAPIToken: "fake-token", APIUrl: cliConfig.APIUrl},
+				cliConfig: cli.Cli{UserAPIToken: "fake-token", APIDomain: cliConfig.APIDomain},
 			},
 			wantErr: true,
 		}, {

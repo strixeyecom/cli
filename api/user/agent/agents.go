@@ -38,7 +38,7 @@ type agentsResponse struct {
 
 // GetAgents returns list of agents from user api, parses and validates information.
 func GetAgents(cliConfig cli.Cli) ([]agent.AgentInformation, error) {
-	return getAgents(cliConfig.UserAPIToken, cliConfig.APIUrl)
+	return getAgents(cliConfig.UserAPIToken, cliConfig.APIDomain)
 }
 
 // getAgents returns list of agents from user api, parses and validates information.
