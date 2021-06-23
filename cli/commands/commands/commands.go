@@ -46,7 +46,7 @@ const (
 // global variables (not cool) for this file
 var (
 	cfgFile      string
-	apiURL       string
+	apiDomain    string
 	userAPIToken string
 	agentID      string
 )
@@ -98,7 +98,7 @@ func NewStrixeyeCommand() *cobra.Command {
 			"cli.json)",
 	)
 	rootCmd.PersistentFlags().StringVar(
-		&apiURL, "api-url", "", "dashboard.strixeye.com",
+		&apiDomain, "api-url", "", "dashboard.strixeye.com",
 	)
 	rootCmd.PersistentFlags().StringVar(
 		&userAPIToken, "user-api-token", "", "",
@@ -169,7 +169,7 @@ func initializeConfig(cmd *cobra.Command) error {
 	viper.SetConfigName(defaultConfigFilename)
 	viper.SetConfigType(defaultConfigFileType)
 	
-	viper.SetDefault("API_URL", consts.APIHost)
+	viper.SetDefault("API_DOMAIN", consts.APIHost)
 	
 	// Set as many paths as you like where viper should look for the
 	// config file. We are only looking in the current working directory.

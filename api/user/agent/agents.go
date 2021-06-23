@@ -42,13 +42,13 @@ func GetAgents(cliConfig cli.Cli) ([]agent.AgentInformation, error) {
 }
 
 // getAgents returns list of agents from user api, parses and validates information.
-func getAgents(apiToken, apiURL string) ([]agent.AgentInformation, error) {
+func getAgents(apiToken, apiDomain string) ([]agent.AgentInformation, error) {
 	var (
 		err  error
 		resp *http.Response
 	)
 
-	resp, err = repository.UserAPIRequest(http.MethodGet, "/agents", nil, apiToken, apiURL)
+	resp, err = repository.UserAPIRequest(http.MethodGet, "/agents", nil, apiToken, apiDomain)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to complete user api request to agents")
 	}

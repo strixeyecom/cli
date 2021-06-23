@@ -33,7 +33,7 @@ func TestNewStrixeyeCommand(t *testing.T) {
 			tt.name, func(t *testing.T) {
 				got := NewStrixeyeCommand()
 				_ = got
-				if viper.Get("API_URL") == "" {
+				if viper.Get("API_DOMAIN") == "" {
 					t.Fatalf("bad config initialization")
 				}
 			},

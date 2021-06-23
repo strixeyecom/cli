@@ -25,7 +25,7 @@ const (
 // global variables (not cool) for this file
 var ()
 
-func UserAPIRequest(method, endpoint string, body io.Reader, apiToken, apiURL string) (
+func UserAPIRequest(method, endpoint string, body io.Reader, apiToken, apiDomain string) (
 	*http.Response, error,
 ) {
 	var (
@@ -36,7 +36,7 @@ func UserAPIRequest(method, endpoint string, body io.Reader, apiToken, apiURL st
 	)
 	
 	// create url
-	url = fmt.Sprintf("https://%s%s", apiURL, endpoint)
+	url = fmt.Sprintf("https://%s%s", apiDomain, endpoint)
 	// create request
 	req, err = http.NewRequest(method, url, body)
 	if err != nil {

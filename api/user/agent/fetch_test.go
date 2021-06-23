@@ -40,7 +40,7 @@ func TestGetAgent(t *testing.T) {
 	type args struct {
 		userAPIToken string
 		agentID      string
-		apiURL       string
+		apiDomain       string
 	}
 	tests := []struct {
 		name    string
@@ -53,7 +53,7 @@ func TestGetAgent(t *testing.T) {
 			args: args{
 				userAPIToken: cliConfig.UserAPIToken,
 				agentID:      cliConfig.CurrentAgentID,
-				apiURL:       cliConfig.APIDomain,
+				apiDomain:       cliConfig.APIDomain,
 			},
 			wantErr: false,
 		}, {
@@ -61,7 +61,7 @@ func TestGetAgent(t *testing.T) {
 			args: args{
 				userAPIToken: "fake-token",
 				agentID:      cliConfig.CurrentAgentID,
-				apiURL:       cliConfig.APIDomain,
+				apiDomain:       cliConfig.APIDomain,
 			},
 			wantErr: true,
 		},
@@ -70,7 +70,7 @@ func TestGetAgent(t *testing.T) {
 			args: args{
 				userAPIToken: cliConfig.UserAPIToken,
 				agentID:      "fake-agent",
-				apiURL:       cliConfig.APIDomain,
+				apiDomain:       cliConfig.APIDomain,
 			},
 			wantErr: true,
 		},
@@ -78,7 +78,7 @@ func TestGetAgent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(
 			tt.name, func(t *testing.T) {
-				got, err := getAgent(tt.args.userAPIToken, tt.args.apiURL, tt.args.agentID)
+				got, err := getAgent(tt.args.userAPIToken, tt.args.apiDomain, tt.args.agentID)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("FetchAgentById() error = %v, wantErr %v", err, tt.wantErr)
 					return
@@ -113,7 +113,7 @@ func Test_getVersions(t *testing.T) {
 	}
 
 	type args struct {
-		apiURL string
+		apiDomain string
 	}
 	tests := []struct {
 		name    string
@@ -123,14 +123,14 @@ func Test_getVersions(t *testing.T) {
 	}{
 		{
 			name:    "succesfully get versions",
-			args:    args{apiURL: cliConfig.APIDomain},
+			args:    args{apiDomain: cliConfig.APIDomain},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(
 			tt.name, func(t *testing.T) {
-				got, err := getVersions(tt.args.apiURL)
+				got, err := getVersions(tt.args.apiDomain)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("getVersions() error = %v, wantErr %v", err, tt.wantErr)
 					return
