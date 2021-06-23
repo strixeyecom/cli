@@ -126,7 +126,7 @@ func extractTarGz(version repository2.Version) error {
 // DownloadDaemonBinary downloads from install API and places it to predesignated location.
 func DownloadDaemonBinary(userAPIToken, agentToken string, version repository2.Version) error {
 	url := fmt.Sprintf(
-		"%s/get/manager/%s/manager_%s_Linux_amd64.tar.gz",
+		"https://%s/get/manager/%s/manager_%s_Linux_amd64.tar.gz",
 		consts.DownloadHost, version.Version, version.Version,
 	)
 

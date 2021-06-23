@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	`github.com/usestrix/cli/cli/commands/repository/ux`
 	agent2 "github.com/usestrix/cli/domain/agent"
 	"github.com/usestrix/cli/domain/consts"
 	
@@ -44,13 +45,8 @@ strixeye configure agent
 		RunE: installAgentCmd,
 	}
 	
-	// declaring local flags used by get trip commands.
-	checkCmd.Flags().String(
-		"user-api-token", "", "--token {your StrixEye User API Token}",
-	)
-	
-	checkCmd.Flags().String(
-		"agent-id", "", "--agent-id {StrixEye Agent ID of your choice}",
+	checkCmd.Flags().Bool(
+		"interactive", false, "--interactive if you want to configure StrixEye CLI during installation",
 	)
 	
 	return checkCmd
@@ -62,6 +58,32 @@ func getCredentials(cmd *cobra.Command) (cli.Cli, error) {
 		err       error
 	)
 	
+	isInteractive, err := cmd.Flags().GetBool("interactive")
+	if err != nil {
+		return cli.Cli{}, err
+	}
+	
+	if !isInteractive {
+		// get cli config for authentication
+		err = viper.Unmarshal(&cliConfig)
+		if err != nil {
+			return cliConfig, err
+		}
+		
+		return cliConfig, nil
+	}
+	
+	// if interactive install,
+	err = ux.SetupUser(cmd, nil)
+	if err != nil {
+		return cli.Cli{}, err
+	}
+	
+	// if successfully setup user, than we can set up the agent
+	err = ux.SetupAgent(cmd, nil)
+	if err != nil {
+		return cli.Cli{}, err
+	}
 	// get cli config for authentication
 	err = viper.Unmarshal(&cliConfig)
 	if err != nil {
@@ -129,6 +151,7 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 	}
 	
 	fmt.Println("Starting download process.")
+	
 	// download tarball, decompress and place the binary
 	err = DownloadDaemonBinary(cliConfig.UserAPIToken, agentConfig.Token, versions.Manager)
 	if err != nil {

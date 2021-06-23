@@ -37,7 +37,7 @@ func checkDockerRunning() error {
 	// try to list containers
 	_, err = cli.ContainerList(ctx, types.ContainerListOptions{})
 	if err != nil {
-		panic(err)
+		return err
 	}
 	
 	return nil

@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 	"time"
-
+	
 	"github.com/pkg/errors"
 )
 
@@ -34,31 +34,30 @@ func UserAPIRequest(method, endpoint string, body io.Reader, apiToken, apiURL st
 		req  *http.Request
 		resp *http.Response
 	)
-
+	
 	// create url
-	url = apiURL + endpoint
-
+	url = fmt.Sprintf("https://%s%s", apiURL, endpoint)
 	// create request
 	req, err = http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, err
 	}
-
+	
 	// authentication is made via bearer token over http headers.
 	tokenHeader := fmt.Sprintf("Bearer %s", apiToken)
 	req.Header.Add(APITokenName, tokenHeader)
 	req.Header.Add("accept", "application/json")
-
+	
 	// create client to do the request
 	client := http.Client{
 		Timeout: time.Second * 5,
 	}
-
+	
 	// fetch response
 	resp, err = client.Do(req)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to send request to user api")
 	}
-
+	
 	return resp, nil
 }
