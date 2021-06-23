@@ -45,10 +45,11 @@ const (
 
 // global variables (not cool) for this file
 var (
-	cfgFile      string
-	apiDomain    string
-	userAPIToken string
-	agentID      string
+	cfgFile        string
+	apiDomain      string
+	downloadDomain string
+	userAPIToken   string
+	agentID        string
 )
 
 // NewStrixeyeCommand is the highest command in the hierarchy and all commands root from it.
@@ -98,7 +99,11 @@ func NewStrixeyeCommand() *cobra.Command {
 			"cli.json)",
 	)
 	rootCmd.PersistentFlags().StringVar(
-		&apiDomain, "api-domain", "", "dashboard.strixeye.com",
+		&apiDomain, "api-domain", "", "api.strixeye.com",
+	)
+	
+	rootCmd.PersistentFlags().StringVar(
+		&downloadDomain, "api-domain", "", "downloads.strixeye.com",
 	)
 	rootCmd.PersistentFlags().StringVar(
 		&userAPIToken, "user-api-token", "", "",
