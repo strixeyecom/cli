@@ -65,7 +65,7 @@ type AgentInformation struct {
 
 func (a AgentInformation) String() string {
 	return fmt.Sprintf(
-		"Name: %s,\tId: %s\tIP: %s", a.Name, a.ID,
+		"Name: %s, Id: %s IP: %s", a.Name, a.ID,
 		a.IPAddress,
 	)
 }
