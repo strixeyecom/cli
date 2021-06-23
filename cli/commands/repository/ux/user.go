@@ -38,7 +38,7 @@ func PromptUserAPIToken() (string, error) {
 	}
 	
 	prompt = &promptui.Prompt{
-		Label:    "Please enter your User API Key",
+		Label:    "Please enter your User API Token",
 		Validate: validate,
 	}
 	

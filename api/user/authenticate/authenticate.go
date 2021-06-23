@@ -25,7 +25,7 @@ const ()
 // global variables (not cool) for this file
 var ()
 
-// Authenticate checks if given user api key and url is valid.
+// Authenticate checks if given user api token and url is valid.
 // it returns error for status codes other than 200.
 func Authenticate(cliConfig cli.Cli) error {
 	return authenticate(cliConfig.UserAPIToken, cliConfig.APIDomain)

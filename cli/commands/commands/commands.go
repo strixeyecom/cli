@@ -98,7 +98,7 @@ func NewStrixeyeCommand() *cobra.Command {
 			"cli.json)",
 	)
 	rootCmd.PersistentFlags().StringVar(
-		&apiDomain, "api-url", "", "dashboard.strixeye.com",
+		&apiDomain, "api-domain", "", "dashboard.strixeye.com",
 	)
 	rootCmd.PersistentFlags().StringVar(
 		&userAPIToken, "user-api-token", "", "",
@@ -261,7 +261,7 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 	// Bind the current command's flags to viper
 	bindFlags(cmd, viper.GetViper())
 	
-// 	// check for valid api key
+// 	// check for valid api token
 // 	if token := viper.GetString("USER_API_TOKEN"); token == "" {
 // 		return fmt.Errorf(
 // 			`you are not authorized. Please login with command:

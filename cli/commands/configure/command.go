@@ -29,7 +29,7 @@ func NewConfigureCommand() *cobra.Command {
 		Use:   "configure",
 		Short: "Setup your cli configuration and credentials.",
 		Long: `Setup your cli configuration and credentials.
-At bare, you will need a User API Key from StrixEye and a chosen StrixEye Agent's id.`,
+At bare, you will need a User API Token from StrixEye and a chosen StrixEye Agent's id.`,
 		RunE: ShowHelp(os.Stdout),
 	}
 	

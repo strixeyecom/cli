@@ -37,7 +37,7 @@ func NewInspectCommand() *cobra.Command {
 		Use:   "inspect",
 		Short: "Inspect configurations",
 		Long: `A default user must be selected to work with because StrixEye's CLI is designed to work
-with a single StrixEye user's API Key.
+with a single StrixEye user's API Token.
 
 Authentication will be executed via this user's API Token
 
