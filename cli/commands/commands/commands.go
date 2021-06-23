@@ -103,7 +103,7 @@ func NewStrixeyeCommand() *cobra.Command {
 	)
 	
 	rootCmd.PersistentFlags().StringVar(
-		&downloadDomain, "api-domain", "", "downloads.strixeye.com",
+		&downloadDomain, "download-domain", "", "downloads.strixeye.com",
 	)
 	rootCmd.PersistentFlags().StringVar(
 		&userAPIToken, "user-api-token", "", "",
