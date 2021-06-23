@@ -66,6 +66,9 @@ func NewStrixeyeCommand() *cobra.Command {
 				err       error
 			)
 			
+			// don't allow non strixeye or non-root users to run StrixEye CLI
+			checkUser(cmd)
+			
 			// You can bind cobra and viper in a few locations, but PersistencePreRunE on the root command works well
 			err = handleConfig(cmd)
 			if err != nil {
@@ -81,14 +84,6 @@ func NewStrixeyeCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			// if it is not a valid config file, force user to configure strixeye cli first.
-			// err = cliConfig.Validate()
-			// if err != nil {
-			// 	return fmt.Errorf(
-			// 		"validating configuration: %w\nplease check your configuration file or run"+
-			// 			"\n\t>  strixeye configure", err,
-			// 	)
-			// }
 			
 			return nil
 		},
@@ -125,6 +120,23 @@ func NewStrixeyeCommand() *cobra.Command {
 	// Add flags
 	
 	return rootCmd
+}
+
+func checkUser(cmd *cobra.Command) {
+	// if this is the first time, it needs to be the root user.
+	// Because strixeye install command runs as a root and if you keep strixeye cli config in a
+	// user owned directory, like any directory under $HOME,
+	// it won't be accessible by root user by $HOME path, because for example in Linux,
+	// $HOME for root user is /root, and that means the config file is under /root/strixeye-cli.
+	//
+	// Because of this, we need to put it in a non-user based directory. However,
+	// it is totally fine to own the directory.
+	if !agent2.IsRootUser() {
+		color.Red(
+			`For now, StrixEye doesn't support non-root users for your security.'`,
+		)
+		os.Exit(1)
+	}
 }
 
 // initializeConfig tries to open config and validate it. If a bad config is given,
@@ -181,24 +193,6 @@ func initializeConfig(cmd *cobra.Command) error {
 		_, statErr := os.Stat(consts.CLIConfigDir)
 		
 		if os.IsNotExist(statErr) {
-			// if this is the first time, it needs to be the root user.
-			// Because strixeye install command runs as a root and if you keep strixeye cli config in a
-			// user owned directory, like any directory under $HOME,
-			// it won't be accessible by root user by $HOME path, because for example in Linux,
-			// $HOME for root user is /root, and that means the config file is under /root/strixeye-cli.
-			//
-			// Because of this, we need to put it in a non-user based directory. However,
-			// it is totally fine to own the directory.
-			if !agent2.IsRootUser() {
-				color.Red(
-					`When running for the first time,you must run it as root user.
-Afterwards, You can own the config directory if you wish to continue using as a non-root user
-$ sudo chown -R $USER %s
-`, consts.CLIConfigDir,
-				)
-				os.Exit(1)
-			}
-			
 			// Than, create the directory with root perms only. Actually,
 			// a permission like 0666 would prevent the user from `chown`ing the directory,
 			// but this decision is not up to me.
@@ -225,7 +219,7 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 			)
 		}
 	}
-
+	
 	// after creating file, we can start using default config file.
 	
 	// and store it as default
@@ -267,22 +261,22 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 	// Bind the current command's flags to viper
 	bindFlags(cmd, viper.GetViper())
 	
-	// check for valid api key
-	if token := viper.GetString("USER_API_TOKEN"); token == "" {
-		return fmt.Errorf(
-			`you are not authorized. Please login with command:
-strixeye configure user`,
-		)
-	}
-	
-	// check for valid selected agent
-	if agentID := viper.GetString("CURRENT_AGENT_ID"); agentID == "" {
-		return fmt.Errorf(
-			`you have no selected agent. Please select agent with command:
-strixeye configure agent
-`,
-		)
-	}
+// 	// check for valid api key
+// 	if token := viper.GetString("USER_API_TOKEN"); token == "" {
+// 		return fmt.Errorf(
+// 			`you are not authorized. Please login with command:
+// strixeye configure user`,
+// 		)
+// 	}
+//
+// 	// check for valid selected agent
+// 	if agentID := viper.GetString("CURRENT_AGENT_ID"); agentID == "" {
+// 		return fmt.Errorf(
+// 			`you have no selected agent. Please select agent with command:
+// strixeye configure agent
+// `,
+// 		)
+// 	}
 	
 	return nil
 }
