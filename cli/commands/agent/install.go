@@ -108,12 +108,19 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 	
 	// early cut if bad credentials
 	if cliConfig.UserAPIToken == "" {
-		return errors.Errorf("empty user api token during installation. Please")
+		return errors.Errorf(`empty user api token during installation. Please check out documentation.
+ If you haven't set up your cli, you can set it up during installation:
+
+	$ strixeye agent install --interactive
+`)
 	}
 	// early cut if bad agent id
 	if cliConfig.AgentID == "" {
-		return errors.Errorf("empty user api token during installation. Please")
-	}
+		return errors.Errorf(`empty agent id in configuration. Please check out documentation.
+ If you haven't set up your cli, you can set it up during installation:
+
+	$ strixeye agent install --interactive
+`)	}
 	
 	
 	// get agent config from remote.
