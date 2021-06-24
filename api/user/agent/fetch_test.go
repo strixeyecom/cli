@@ -52,7 +52,7 @@ func TestGetAgent(t *testing.T) {
 			name: "get with good token",
 			args: args{
 				userAPIToken: cliConfig.UserAPIToken,
-				agentID:      cliConfig.CurrentAgentID,
+				agentID:      cliConfig.AgentID,
 				apiDomain:       cliConfig.APIDomain,
 			},
 			wantErr: false,
@@ -60,7 +60,7 @@ func TestGetAgent(t *testing.T) {
 			name: "get with good agent with bad token",
 			args: args{
 				userAPIToken: "fake-token",
-				agentID:      cliConfig.CurrentAgentID,
+				agentID:      cliConfig.AgentID,
 				apiDomain:       cliConfig.APIDomain,
 			},
 			wantErr: true,

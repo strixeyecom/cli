@@ -153,8 +153,10 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 	fmt.Println("Starting download process.")
 	
 	// download tarball, decompress and place the binary
-	err = DownloadDaemonBinary(cliConfig.UserAPIToken, agentConfig.Token, versions.Manager,
-		cliConfig.DownloadDomain)
+	err = DownloadDaemonBinary(
+		cliConfig.UserAPIToken, agentConfig.Token, versions.Manager,
+		cliConfig.DownloadDomain,
+	)
 	if err != nil {
 		return err
 	}

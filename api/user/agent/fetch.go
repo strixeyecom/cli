@@ -38,7 +38,7 @@ type agentResponse struct {
 
 // GetAgentConfig return stack configuration for given agent.
 func GetAgentConfig(cliConfig cli.Cli) (agent.AgentInformation, error) {
-	return getAgent(cliConfig.UserAPIToken, cliConfig.APIDomain, cliConfig.CurrentAgentID)
+	return getAgent(cliConfig.UserAPIToken, cliConfig.APIDomain, cliConfig.AgentID)
 }
 
 // getAgents returns list of agents from user api, parses and validates information.

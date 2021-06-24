@@ -39,7 +39,7 @@ type Cli struct {
 	// while not necessary, this field can be use to save user preference.
 	//
 	// However, most functions are agent id dependent.
-	CurrentAgentID string `mapstructure:"CURRENT_AGENT_ID"`
+	AgentID string `mapstructure:"AGENT_ID"`
 	
 	// DO NOT EDIT
 	// APIDomain is almost always dashboard.strixeye.com or api.strixeye.com. However,
@@ -72,7 +72,7 @@ func (c *Cli) Validate() error {
 	)
 	
 	// TODO add validation support
-	if c.UserAPIToken == "" || c.CurrentAgentID == "" {
+	if c.UserAPIToken == "" || c.AgentID == "" {
 		return errors.New("cli config has empty field")
 	}
 	

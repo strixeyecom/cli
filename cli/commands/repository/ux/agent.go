@@ -80,7 +80,7 @@ func SetupAgent(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 	
-	selectedID = viper.GetString("CURRENT_AGENT_ID")
+	selectedID = viper.GetString("AGENT_ID")
 	// if flags aren't provided, let user choose from a select list.
 	isInteractive, err := cmd.Flags().GetBool("interactive")
 	if err != nil {
@@ -115,14 +115,14 @@ func SetupAgent(cmd *cobra.Command, _ []string) error {
 	color.Blue("Selected agent: %s", selectedAgent.String())
 	
 	// check given agent id is ok
-	cliConfig.CurrentAgentID = selectedID
+	cliConfig.AgentID = selectedID
 	_, err = agent.GetAgentConfig(cliConfig)
 	if err != nil {
 		return err
 	}
 	
 	// store selected agent to configuration file.
-	viper.Set("CURRENT_AGENT_ID", selectedID)
+	viper.Set("AGENT_ID", selectedID)
 	err = viper.WriteConfig()
 	if err != nil {
 		return errors.Wrap(err, "failed to save config. Do you have permissions on the filesystem? ")

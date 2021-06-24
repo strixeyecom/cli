@@ -75,7 +75,7 @@ func inspectCmd(cmd *cobra.Command, args []string) error {
 		// Show all requested agent configurations from user api
 		tmp := cliConfig
 		for i, arg := range args {
-			tmp.CurrentAgentID = arg
+			tmp.AgentID = arg
 			AgentInformations[i], err = agent.GetAgentConfig(cliConfig)
 			if err != nil {
 				return err

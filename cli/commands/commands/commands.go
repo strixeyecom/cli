@@ -110,7 +110,7 @@ func NewStrixeyeCommand() *cobra.Command {
 	)
 	
 	rootCmd.PersistentFlags().StringVar(
-		&agentID, "current-agent-id", "", "",
+		&agentID, "agent-id", "", "",
 	)
 	
 	// Add subcommands
@@ -276,7 +276,7 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 	// 	}
 	//
 	// 	// check for valid selected agent
-	// 	if agentID := viper.GetString("CURRENT_AGENT_ID"); agentID == "" {
+	// 	if agentID := viper.GetString("AGENT_ID"); agentID == "" {
 	// 		return fmt.Errorf(
 	// 			`you have no selected agent. Please select agent with command:
 	// strixeye configure agent
@@ -292,7 +292,7 @@ func bindFlags(cmd *cobra.Command, v *viper.Viper) {
 	cmd.Flags().VisitAll(
 		func(f *pflag.Flag) {
 			// Environment variables can't have dashes in them, so bind them to their equivalent
-			// keys with underscores, e.g. --favorite-color to STING_FAVORITE_COLOR
+			// keys with underscores, e.g. --favorite-color to STRIXEYE_FAVORITE_COLOR
 			if strings.Contains(f.Name, "-") {
 				envVarSuffix := strings.ToUpper(strings.ReplaceAll(f.Name, "-", "_"))
 				err := v.BindEnv(f.Name, fmt.Sprintf("%s_%s", envPrefix, envVarSuffix))
