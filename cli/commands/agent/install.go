@@ -63,6 +63,7 @@ func getCredentials(cmd *cobra.Command) (cli.Cli, error) {
 		return cli.Cli{}, err
 	}
 	
+	delete(viper.AllSettings(), "interactive")
 	if !isInteractive {
 		// get cli config for authentication
 		err = viper.Unmarshal(&cliConfig)
