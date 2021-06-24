@@ -46,6 +46,7 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#authentication">Authentication</a></li>
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
@@ -73,7 +74,6 @@ dependencies can be found in go modules file.
 
 * [Cobra](https://github.com/spf13/cobra)
 * [Viper](https://github.com/spf13/viper)
-* [Laravel](https://laravel.com)
 
 <!-- GETTING STARTED -->
 
@@ -86,6 +86,33 @@ General information about setting up StrixEye CLI locally
 Required softwares and installations.
 
 * CLI has no external dependencies. It will work on all machines those operating systems we support.
+
+### Authentication
+There are 3 ways you can authenticate yourself to StrixEye Cloud servers.
+
+#### via CLI
+   ```sh
+   strixeye configure user
+   ```
+or
+   ```sh
+   strixeye login
+   ```
+Then, enter your User API Token when prompted.
+
+![StrixEye CLI Login Process](data/screenshots/login.gif)
+
+### via flags
+```shell
+   strixeye configure user --user-api-token=<YOUR_TOKEN> --agent-id=<YOUR_AGENT_ID>
+```
+
+### via config file
+Check out documentation to see possible places for StrixEye CLI. On *NIX, it is under `/etc/strixeye-cli/cli.json`
+
+Edit/Add `user_api_token` and `agent_id` fields in your cli config file 
+
+
 
 ### Installation
 
@@ -104,7 +131,7 @@ Required softwares and installations.
    ```
    Then, enter your User API Key when prompted.
 
-   ![StrixEye CLI Login Processs](data/screenshots/login.gif)
+   ![StrixEye CLI Login Process](data/screenshots/login.gif)
 
 
 6. Choose an agent to work with:
@@ -112,7 +139,7 @@ Required softwares and installations.
    strixeye configure agent
    ```
 
-   ![StrixEye CLI Login Processs](data/screenshots/agents.gif)
+   ![StrixEye CLI Login Process](data/screenshots/agents.gif)
 
 <!-- USAGE EXAMPLES -->
 
