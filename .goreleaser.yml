@@ -13,17 +13,12 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
-      - windows
-      - darwin
     ldflags:
       - -extldflags=-static -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
 archives:
   - replacements:
-      darwin: Darwin
       linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
+
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -43,7 +38,7 @@ release:
   # Default is extracted from the origin remote URL or empty if its private hosted.
   # Note: it can only be one: either github, gitlab or gitea
   github:
-    owner: usestrix
+    owner: strixeyecom
     name: cli
 
 
