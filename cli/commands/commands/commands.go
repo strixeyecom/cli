@@ -2,22 +2,26 @@ package commands
 
 import (
 	"fmt"
-	`io`
-	`os`
+	"io"
+	"os"
+	`path/filepath`
 	"strings"
 	
+	"github.com/fatih/color"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	agent2 `github.com/usestrix/cli/domain/agent`
+	`github.com/usestrix/cli/domain/consts`
 	
-	`github.com/usestrix/cli/cli/commands/agent`
+	"github.com/usestrix/cli/cli/commands/agent"
 	"github.com/usestrix/cli/cli/commands/configure"
-	`github.com/usestrix/cli/cli/commands/suspect`
-	`github.com/usestrix/cli/cli/commands/suspicion`
+	"github.com/usestrix/cli/cli/commands/suspect"
+	"github.com/usestrix/cli/cli/commands/suspicion"
 	"github.com/usestrix/cli/cli/commands/trip"
-	`github.com/usestrix/cli/domain/cli`
+	"github.com/usestrix/cli/domain/cli"
 )
 
 /*
@@ -32,7 +36,7 @@ import (
 const (
 	// The name of our config file, without the file extension because viper supports many different config file languages.
 	defaultConfigFilename = "cli"
-	defaultConfigFileType = "toml"
+	defaultConfigFileType = "json"
 	
 	// The environment variable prefix of all environment variables bound to our command line flags.
 	// For example, --number is bound to STING_NUMBER.
@@ -41,7 +45,11 @@ const (
 
 // global variables (not cool) for this file
 var (
-	cfgFile string
+	cfgFile        string
+	apiDomain      string
+	downloadDomain string
+	userAPIToken   string
+	agentID        string
 )
 
 // NewStrixeyeCommand is the highest command in the hierarchy and all commands root from it.
@@ -59,6 +67,9 @@ func NewStrixeyeCommand() *cobra.Command {
 				err       error
 			)
 			
+			// don't allow non strixeye or non-root users to run StrixEye CLI
+			checkUser(cmd)
+			
 			// You can bind cobra and viper in a few locations, but PersistencePreRunE on the root command works well
 			err = handleConfig(cmd)
 			if err != nil {
@@ -74,19 +85,10 @@ func NewStrixeyeCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			// if it is not a valid config file, force user to configure strixeye cli first.
-			// err = cliConfig.Validate()
-			// if err != nil {
-			// 	return fmt.Errorf(
-			// 		"validating configuration: %w\nplease check your configuration file or run"+
-			// 			"\n\t>  strixeye configure", err,
-			// 	)
-			// }
 			
 			return nil
 		},
 		RunE: ShowHelp(os.Stdout),
-		
 	}
 	
 	// Here you will define your flags and configuration settings.
@@ -95,6 +97,20 @@ func NewStrixeyeCommand() *cobra.Command {
 	rootCmd.PersistentFlags().StringVar(
 		&cfgFile, "config", "", "config file (default is $HOME/.strixeye/."+
 			"cli.json)",
+	)
+	rootCmd.PersistentFlags().StringVar(
+		&apiDomain, "api-domain", "", "api.strixeye.com",
+	)
+	
+	rootCmd.PersistentFlags().StringVar(
+		&downloadDomain, "download-domain", "", "downloads.strixeye.com",
+	)
+	rootCmd.PersistentFlags().StringVar(
+		&userAPIToken, "user-api-token", "", "",
+	)
+	
+	rootCmd.PersistentFlags().StringVar(
+		&agentID, "agent-id", "", "",
 	)
 	
 	// Add subcommands
@@ -109,6 +125,23 @@ func NewStrixeyeCommand() *cobra.Command {
 	// Add flags
 	
 	return rootCmd
+}
+
+func checkUser(cmd *cobra.Command) {
+	// if this is the first time, it needs to be the root user.
+	// Because strixeye install command runs as a root and if you keep strixeye cli config in a
+	// user owned directory, like any directory under $HOME,
+	// it won't be accessible by root user by $HOME path, because for example in Linux,
+	// $HOME for root user is /root, and that means the config file is under /root/strixeye-cli.
+	//
+	// Because of this, we need to put it in a non-user based directory. However,
+	// it is totally fine to own the directory.
+	if !agent2.IsRootUser() {
+		color.Red(
+			`For now, StrixEye doesn't support non-root users for your security.`,
+		)
+		os.Exit(1)
+	}
 }
 
 // initializeConfig tries to open config and validate it. If a bad config is given,
@@ -141,7 +174,8 @@ func initializeConfig(cmd *cobra.Command) error {
 	viper.SetConfigName(defaultConfigFilename)
 	viper.SetConfigType(defaultConfigFileType)
 	
-	viper.SetDefault("API_URL", "https://dashboard.***REMOVED***")
+	viper.SetDefault("API_DOMAIN", consts.APIHost)
+	viper.SetDefault("DOWNLOAD_DOMAIN", consts.DownloadHost)
 	
 	// Set as many paths as you like where viper should look for the
 	// config file. We are only looking in the current working directory.
@@ -155,19 +189,40 @@ func initializeConfig(cmd *cobra.Command) error {
 		
 		// Search config in home directory with name ".cli" (without extension).
 		
+		viper.AddConfigPath(consts.CLIConfigDir)
 		viper.AddConfigPath(home + "/.strixeye")
 		viper.AddConfigPath(".")
-		viper.AddConfigPath("/etc/strixeye")
 		
-		cfgFile = home + "/.strixeye/" + defaultConfigFilename
+		cfgFile = filepath.Join(consts.CLIConfigDir, defaultConfigFilename)
 		
 		// create default config directory since we are going to use this anyway.
-		_, statErr := os.Stat(home + "/.strixeye")
+		_, statErr := os.Stat(consts.CLIConfigDir)
+		
 		if os.IsNotExist(statErr) {
-			err = os.Mkdir(home+"/.strixeye", 0777)
+			// Than, create the directory with root perms only. Actually,
+			// a permission like 0666 would prevent the user from `chown`ing the directory,
+			// but this decision is not up to me.
+			err = os.Mkdir(consts.CLIConfigDir, 0600)
 			if err != nil {
+				if os.IsPermission(err) {
+					return fmt.Errorf(
+						`please set permissions of the directory, eg. using
+$ chown -R $USER %s   `, consts.CLIConfigDir,
+					)
+				}
 				return err
 			}
+			
+			// If you are here, then the configuration directories are created and owned by the current process owner
+			color.Blue(
+				"Successfully set up strixeye cli. "+
+					"Please own %s if you want to use it as a non-root user", consts.CLIConfigDir,
+			)
+		} else if os.IsPermission(err) {
+			return errors.WithMessagef(
+				err, `Please set permissions of the directory, eg. using
+$ chown -R $USER %s`, consts.CLIConfigDir,
+			)
 		}
 	}
 	
@@ -177,8 +232,10 @@ func initializeConfig(cmd *cobra.Command) error {
 	err = viper.SafeWriteConfig()
 	if err != nil {
 		// this is not my fault. It is either poor documentation or it is my fault.
-		if !(strings.Contains(err.Error(), "Config File") && strings.Contains(err.Error(),
-			"Already Exists")) {
+		if !(strings.Contains(err.Error(), "Config File") && strings.Contains(
+			err.Error(),
+			"Already Exists",
+		)) {
 			// handle failed write
 			return err
 		}
@@ -210,22 +267,22 @@ func initializeConfig(cmd *cobra.Command) error {
 	// Bind the current command's flags to viper
 	bindFlags(cmd, viper.GetViper())
 	
-	// check for valid api key
-	if token := viper.GetString("USER_API_TOKEN"); token == "" {
-		return fmt.Errorf(
-			`you are not authorized. Please login with command:
-strixeye configure user`,
-		)
-	}
-	
-	// check for valid selected agent
-	if agentID := viper.GetString("CURRENT_AGENT_ID"); agentID == "" {
-		return fmt.Errorf(
-			`you have no selected agent. Please select agent with command:
-strixeye configure agent
-`,
-		)
-	}
+	// 	// check for valid api token
+	// 	if token := viper.GetString("USER_API_TOKEN"); token == "" {
+	// 		return fmt.Errorf(
+	// 			`you are not authorized. Please login with command:
+	// strixeye configure user`,
+	// 		)
+	// 	}
+	//
+	// 	// check for valid selected agent
+	// 	if agentID := viper.GetString("AGENT_ID"); agentID == "" {
+	// 		return fmt.Errorf(
+	// 			`you have no selected agent. Please select agent with command:
+	// strixeye configure agent
+	// `,
+	// 		)
+	// 	}
 	
 	return nil
 }
@@ -235,11 +292,16 @@ func bindFlags(cmd *cobra.Command, v *viper.Viper) {
 	cmd.Flags().VisitAll(
 		func(f *pflag.Flag) {
 			// Environment variables can't have dashes in them, so bind them to their equivalent
-			// keys with underscores, e.g. --favorite-color to STING_FAVORITE_COLOR
+			// keys with underscores, e.g. --favorite-color to STRIXEYE_FAVORITE_COLOR
 			if strings.Contains(f.Name, "-") {
 				envVarSuffix := strings.ToUpper(strings.ReplaceAll(f.Name, "-", "_"))
 				err := v.BindEnv(f.Name, fmt.Sprintf("%s_%s", envPrefix, envVarSuffix))
 				cobra.CheckErr(err)
+			}
+			
+			if f.Changed {
+				envVarSuffix := strings.ToUpper(strings.ReplaceAll(f.Name, "-", "_"))
+				v.Set(envVarSuffix, f.Value)
 			}
 			
 			// Apply the viper config value to the flag when the flag is not set and viper has a value

@@ -1,10 +1,10 @@
 package agent
 
 import (
-	`io`
-	`os`
-	
-	`github.com/spf13/cobra`
+	"io"
+	"os"
+
+	"github.com/spf13/cobra"
 )
 
 /*
@@ -30,10 +30,11 @@ func NewAgentCommand() *cobra.Command {
 		Long:  `Install, Uninstall, Reset selected agent on current host machine`,
 		RunE:  ShowHelp(os.Stdout),
 	}
-	
+
 	agentCommands.AddCommand(
 		CheckCommand(),
 		InstallCommand(),
+		UninstallCommand(),
 	)
 	return agentCommands
 }

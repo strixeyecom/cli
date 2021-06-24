@@ -1,9 +1,7 @@
-package suspect
+package repository
 
 import (
 	`fmt`
-	
-	`github.com/usestrix/cli/cli/commands/suspicion`
 )
 
 /*
@@ -25,9 +23,12 @@ var ()
 // and not all of them are actually "suspect"s
 type Suspect struct {
 	ID         string
-	Suspicions []*suspicion.Suspicion `gorm:"anomalies;foreignKey:profile_id"`
-	Ips        []*suspicion.Ip        `gorm:"ips;foreignKey:profile_id"`
+	Suspicions []*Suspicion `gorm:"anomalies;foreignKey:profile_id"`
+	Ips        []*Ip        `gorm:"ips;foreignKey:profile_id"`
 	Score      float64
+	
+	// to be able to query for TimeSince
+	CreatedAt  int64
 }
 
 // TableName as I explained in type definition, agent knows suspects as profiles.
@@ -37,7 +38,7 @@ func (suspect Suspect) TableName() string {
 
 // QueryArgs are arguments you can use to customize your queries. Multiple fields can be used at once,
 // also empty query args is not a problem.
-type QueryArgs struct {
+type SuspectQueryArgs struct {
 	Limit      int
 	SuspectIds []string
 	
@@ -49,13 +50,12 @@ type QueryArgs struct {
 	
 	// 	most fields are kept in different tables, bound via foreign keys and have nested relations
 	// 	to get which fields you want to load other than the default, set it via fields argument
-	Fields  []string
+	Fields []string
 	
 	Verbose bool
-	
 }
 
-func (q QueryArgs) String() string {
+func (q SuspectQueryArgs) String() string {
 	var query string
 	
 	query = fmt.Sprintf("%s\nDisplaying maximum %d rows", query, q.Limit)
@@ -70,7 +70,7 @@ func (q QueryArgs) String() string {
 	}
 	
 	if q.MinScore > 0 {
-		query = fmt.Sprintf("%s\nQuerying only suspects with score higher than: %d", query, q.MinScore)
+		query = fmt.Sprintf("%s\nQuerying only suspects with score higher than: %f", query, q.MinScore)
 	}
 	
 	return query

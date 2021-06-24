@@ -71,9 +71,9 @@ func init() {
 
 // Config is base interface to implement for strixeye configuration structs.
 type Config interface {
-	// Since most of the config is crucial, validation process is highly encouraged.
+	// Validate Since most of the config is crucial, validation process is highly encouraged.
 	Validate() error
 
-	// Configs are mostly kept as files.
+	// Save Configs are mostly kept as files.
 	Save(filePath string) error
 }

@@ -46,10 +46,16 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#authentication">Authentication</a></li>
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li>
+      <a href="#usage">Usage</a>
+         <ul>
+            <li><a href="#agent-installation">Agent Installation</a></li>
+         </ul>
+   </li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -73,7 +79,6 @@ dependencies can be found in go modules file.
 
 * [Cobra](https://github.com/spf13/cobra)
 * [Viper](https://github.com/spf13/viper)
-* [Laravel](https://laravel.com)
 
 <!-- GETTING STARTED -->
 
@@ -87,32 +92,61 @@ Required softwares and installations.
 
 * CLI has no external dependencies. It will work on all machines those operating systems we support.
 
+### Authentication
+
+There are 3 ways you can authenticate yourself to StrixEye Cloud servers.
+
+#### via CLI
+
+   ```sh
+   strixeye configure user
+   ```
+
+or
+
+   ```sh
+   strixeye login
+   ```
+
+Then, enter your User API Token when prompted.
+
+![StrixEye CLI Login Process](data/screenshots/login.gif)
+
+### via flags
+
+```shell
+   strixeye configure user --user-api-token=<YOUR_TOKEN> --agent-id=<YOUR_AGENT_ID>
+```
+
+### via config file
+
+Check out documentation to see possible places for StrixEye CLI. On *NIX, it is under `/etc/strixeye-cli/cli.json`
+
+Edit/Add `user_api_token` and `agent_id` fields in your cli config file
+
+```json5
+{
+  "user_api_token": "YOUR_USER_API_TOKEN",
+  "agent_id": "SELECTED_AGENT_ID"
+}
+```
+
 ### Installation
 
-1. Download StrixEye for your Operating System and Distribution from <a href="#downloads">here</a> or <a href="#build">
+1. Download StrixEye CLI for your Operating System and Distribution from <a href="#downloads">here</a>
+   or <a href="#build">
    build from source</a>
 2. Register or contact [StrixEye](https://strixeye.com/)
 3. Get your User API Key from [StrixEye Dashboard](https://dashboard.strixeye.com/settings/profile)
 4. Get StrixEye CLI from your package manager or see <a href="#build">Build</a>
-5. Authenticate yourself to StrixEye User API with CLI
-   ```sh
-   strixeye configure user
-   ```
-   or
-   ```sh
-   strixeye login
-   ```
-   Then, enter your User API Key when prompted.
-
-   ![StrixEye CLI Login Processs](data/screenshots/login.gif)
-
+5. <a href="#authenticate">Authenticate</a> yourself to StrixEye
 
 6. Choose an agent to work with:
    ```sh
    strixeye configure agent
    ```
 
-   ![StrixEye CLI Login Processs](data/screenshots/agents.gif)
+   ![StrixEye CLI Login Process](data/screenshots/agents.gif)
 
 <!-- USAGE EXAMPLES -->
 
@@ -120,7 +154,27 @@ Required softwares and installations.
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
+### Installing Agent
 
+After you have authenticated and selected an agent, you can simply install the agent via:
+```shell
+   $ strixeye agent install
+```
+
+If you are not sure about your configuration, you can ask for an interactive installation process
+```shell
+   $ strixeye agent install --interactive
+```
+
+## Build
+
+Other than Go version 1.16.+, StrixEye CLI has no dependencies/requirements.
+
+Basic building process like the following would suffice.
+
+```shell
+   $ go build -o strixeye cmd/strixeye/main.go
+```
 
 <!-- ROADMAP -->
 

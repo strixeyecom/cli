@@ -1,4 +1,4 @@
-package trip
+package repository
 
 import (
 	`fmt`
@@ -82,9 +82,9 @@ func (Trip) TableName() string {
 	return "trips"
 }
 
-// QueryArgs are arguments you can use to customize your queries. Multiple fields can be used at once,
+// TripQueryArgs are arguments you can use to customize your queries. Multiple fields can be used at once,
 // also empty query args is not a problem.
-type QueryArgs struct {
+type TripQueryArgs struct {
 	// how many results do you want to retrieve
 	Limit int
 	
@@ -104,7 +104,7 @@ type QueryArgs struct {
 	Verbose bool
 }
 
-func (q QueryArgs) String() string {
+func (q TripQueryArgs) String() string {
 	var query string
 	
 	query = fmt.Sprintf("%s\nDisplaying maximum %d rows", query, q.Limit)

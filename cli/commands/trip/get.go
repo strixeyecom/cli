@@ -93,7 +93,7 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 	
-	queryArgs := QueryArgs{Limit: 1}
+	queryArgs := models.TripQueryArgs{Limit: 1}
 	
 	// parse and set list of suspects to be queried
 	suspects, err := cmd.Flags().GetStringSlice("suspects")
@@ -165,7 +165,7 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 }
 
 // Get is a temporary method to satisfy the authentication process.
-func Get(cliConfig cli.Cli, args QueryArgs) ([]Trip, error) {
+func Get(cliConfig cli.Cli, args models.TripQueryArgs) ([]models.Trip, error) {
 	var (
 		dbConfig models.Database
 	)
@@ -186,12 +186,12 @@ func Get(cliConfig cli.Cli, args QueryArgs) ([]Trip, error) {
 }
 
 // Get retrieves all trips that matches given query args. Check out trips.
-// QueryArgs for more information about existing filters.
-func get(dbConfig models.Database, args QueryArgs) ([]Trip, error) {
+// TripQueryArgs for more information about existing filters.
+func get(dbConfig models.Database, args models.TripQueryArgs) ([]models.Trip, error) {
 	var (
 		err    error
 		db     *gorm.DB
-		result []Trip
+		result []models.Trip
 	)
 	// connect to database
 	db, err = repository.ConnectToAgentDB(dbConfig)

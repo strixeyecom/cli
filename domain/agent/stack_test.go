@@ -6,12 +6,14 @@ import (
 	"testing"
 	"time"
 	
+	`github.com/spf13/viper`
+	`github.com/usestrix/cli/domain/cli`
 	`github.com/usestrix/cli/domain/repository`
 )
 
 func TestStackConfig_Marshall(t *testing.T) {
 	t.Parallel()
-
+	
 	var a StackConfig
 	_, err := json.MarshalIndent(a, "", "  ")
 	if err != nil {
@@ -21,20 +23,20 @@ func TestStackConfig_Marshall(t *testing.T) {
 
 func TestStackConfig_UnMarshall(t *testing.T) {
 	t.Parallel()
-
+	
 	var (
 		a APIStackResponse
-
+		
 		b APIErrorResponse
 	)
-
+	
 	err := json.Unmarshal(
 		[]byte(_goldenStackConfig), &a,
 	)
 	if err != nil {
 		t.Error(err)
 	}
-
+	
 	err = json.Unmarshal(
 		[]byte(`{
     "status": "error",
@@ -51,6 +53,25 @@ func TestStackConfig_UnMarshall(t *testing.T) {
 }
 
 func Test_addresses_Validate(t *testing.T) {
+	var (
+		// get good keys
+		err       error
+		cliConfig cli.Cli
+	)
+	viper.SetConfigFile("../../.env")
+	// Try to read from file, but use env variables if non exists. it's fine
+	err = viper.ReadInConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	viper.AutomaticEnv()
+	
+	err = viper.Unmarshal(&cliConfig)
+	
+	if err != nil {
+		t.Fatalf("unable to decode into map, %v", err)
+	}
+	
 	t.Parallel()
 	type fields struct {
 		ConnectorScheme  string
@@ -58,7 +79,7 @@ func Test_addresses_Validate(t *testing.T) {
 		ConnectorPort    string
 		SchedulerAddr    string
 	}
-
+	
 	tests := []struct {
 		name    string
 		fields  fields
@@ -68,7 +89,7 @@ func Test_addresses_Validate(t *testing.T) {
 			name: "pass",
 			fields: fields{
 				ConnectorScheme:  "wss",
-				ConnectorAddress: "dashboard.strixeye.com",
+				ConnectorAddress: cliConfig.APIDomain,
 				ConnectorPort:    "2118",
 				SchedulerAddr:    "2141",
 			},
@@ -76,12 +97,12 @@ func Test_addresses_Validate(t *testing.T) {
 	}
 	for i := range tests {
 		tt := tests[i]
-
+		
 		t.Run(
 			tt.name, func(t *testing.T) {
 				t.Parallel()
-
-				a := addresses{
+				
+				a := Addresses{
 					ConnectorScheme:  tt.fields.ConnectorScheme,
 					ConnectorAddress: tt.fields.ConnectorAddress,
 					ConnectorPort:    tt.fields.ConnectorPort,
@@ -99,7 +120,7 @@ func Test_stackConfig_Validate(t *testing.T) {
 	type fields struct {
 		data []byte
 	}
-
+	
 	tests := []struct {
 		name    string
 		wantErr bool
@@ -161,18 +182,18 @@ func Test_stackConfig_Validate(t *testing.T) {
 			},
 		},
 	}
-
+	
 	for i := range tests {
 		tt := tests[i]
 		t.Run(
 			tt.name, func(t *testing.T) {
 				t.Parallel()
 				var stackResponse APIStackResponse
-
+				
 				if err := json.Unmarshal(tt.fields.data, &stackResponse); err != nil {
 					t.Error(err)
 				}
-
+				
 				config := stackResponse.Stack.Config
 				if err := config.Validate(); (err != nil) != tt.wantErr {
 					t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
@@ -964,7 +985,7 @@ const (
 //nolint:funlen
 func Test_stackConfig_Save(t *testing.T) {
 	type fields struct {
-		Addresses  addresses
+		Addresses  Addresses
 		UseHTTPS   bool
 		CreatedAt  time.Time
 		UpdatedAt  time.Time
@@ -978,11 +999,11 @@ func Test_stackConfig_Save(t *testing.T) {
 		Intervals  intervals
 		Paths      paths
 	}
-
+	
 	type args struct {
 		filePath string
 	}
-
+	
 	tests := []struct {
 		name    string
 		fields  fields
@@ -999,14 +1020,14 @@ func Test_stackConfig_Save(t *testing.T) {
 			wantErr: true,
 		},
 	}
-
+	
 	for i := range tests {
 		tt := tests[i]
-
+		
 		t.Run(
 			tt.name, func(t *testing.T) {
 				t.Parallel()
-
+				
 				config := StackConfig{
 					Addresses:  tt.fields.Addresses,
 					UseHTTPS:   tt.fields.UseHTTPS,

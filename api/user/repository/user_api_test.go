@@ -48,7 +48,7 @@ func TestUserAPIRequest(t *testing.T) {
 		endpoint string
 		body     io.Reader
 		apiToken string
-		apiURL   string
+		apiDomain   string
 	}
 	tests := []struct {
 		name    string
@@ -60,7 +60,7 @@ func TestUserAPIRequest(t *testing.T) {
 			name: "Get with no body",
 			args: args{
 				apiToken: cliConfig.UserAPIToken,
-				apiURL:   cliConfig.APIUrl,
+				apiDomain:   cliConfig.APIDomain,
 				body:     nil,
 				endpoint: "/agents",
 			},
@@ -77,7 +77,7 @@ func TestUserAPIRequest(t *testing.T) {
 		t.Run(
 			tt.name, func(t *testing.T) {
 				got, err := UserAPIRequest(
-					tt.args.method, tt.args.endpoint, tt.args.body, tt.args.apiToken, tt.args.apiURL,
+					tt.args.method, tt.args.endpoint, tt.args.body, tt.args.apiToken, tt.args.apiDomain,
 				)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("UserAPIRequest() error = %v, wantErr %v", err, tt.wantErr)

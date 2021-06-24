@@ -39,12 +39,13 @@ type Cli struct {
 	// while not necessary, this field can be use to save user preference.
 	//
 	// However, most functions are agent id dependent.
-	CurrentAgentID string `mapstructure:"CURRENT_AGENT_ID"`
+	AgentID string `mapstructure:"AGENT_ID"`
 	
 	// DO NOT EDIT
-	// APIUrl is almost always dashboard.strixeye.com or api.strixeye.com. However,
+	// APIDomain is almost always dashboard.strixeye.com or api.strixeye.com. However,
 	// this is needed for testing purposes
-	APIUrl string `mapstructure:"API_URL"`
+	APIDomain string `mapstructure:"API_DOMAIN"`
+	DownloadDomain      string `mapstructure:"DOWNLOAD_DOMAIN"`
 	
 	// 	DB can be removed in the future, however it is something user might want to override.
 	// 	I'm not sure if this will cause a vuln for now, however even I need this for myself. Because:
@@ -71,7 +72,7 @@ func (c *Cli) Validate() error {
 	)
 	
 	// TODO add validation support
-	if c.UserAPIToken == "" || c.CurrentAgentID == "" {
+	if c.UserAPIToken == "" || c.AgentID == "" {
 		return errors.New("cli config has empty field")
 	}
 	

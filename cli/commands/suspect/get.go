@@ -89,7 +89,7 @@ func getSuspectCmd(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 	
-	queryArgs := QueryArgs{Limit: 1}
+	queryArgs := models.SuspectQueryArgs{Limit: 1}
 	
 	// parse and set list of suspects to be queried
 	suspects, err := cmd.Flags().GetStringSlice("ids")
@@ -153,7 +153,7 @@ func getSuspectCmd(cmd *cobra.Command, _ []string) error {
 }
 
 // Get is a temporary method to satisfy the authentication process.
-func Get(cliConfig cli.Cli, args QueryArgs) ([]Suspect, error) {
+func Get(cliConfig cli.Cli, args models.SuspectQueryArgs) ([]models.Suspect, error) {
 	var (
 		dbConfig models.Database
 	)
@@ -175,11 +175,11 @@ func Get(cliConfig cli.Cli, args QueryArgs) ([]Suspect, error) {
 
 // get retrieves all suspects that matches given query args. Check out suspects.
 // QueryArgs for more information about existing filters.
-func get(dbConfig models.Database, args QueryArgs) ([]Suspect, error) {
+func get(dbConfig models.Database, args models.SuspectQueryArgs) ([]models.Suspect, error) {
 	var (
 		err    error
 		db     *gorm.DB
-		result []Suspect
+		result []models.Suspect
 	)
 	
 	// connect to database

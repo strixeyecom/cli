@@ -52,7 +52,7 @@ func TestCli_Load(t *testing.T) {
 func TestCli_UnmarshalJSON(t *testing.T) {
 	type fields struct {
 		userAPIToken   string
-		currentAgentID string
+		agentID string
 		DBConfig       repository.Database
 	}
 	type args struct {
@@ -68,11 +68,11 @@ func TestCli_UnmarshalJSON(t *testing.T) {
 			name: "testing bad cli object",
 			fields: fields{
 				userAPIToken:   "bad_token",
-				currentAgentID: "bad_id",
+				agentID: "bad_id",
 				DBConfig:       repository.Database{},
 			},
 			args: args{
-				bytes: []byte(`{"user_api_token": "bad_token", "current_agent_id": "bad_id"}`),
+				bytes: []byte(`{"user_api_token": "bad_token", "agent_id": "bad_id"}`),
 			},
 			wantErr: false,
 		},
@@ -80,10 +80,10 @@ func TestCli_UnmarshalJSON(t *testing.T) {
 			name: "testing worse cli object",
 			fields: fields{
 				userAPIToken:   "bad_token",
-				currentAgentID: "bad_id",
+				agentID: "bad_id",
 			},
 			args: args{
-				bytes: []byte(`"user_api_": "bad_token", "current_agent_id": "bad_id"}`),
+				bytes: []byte(`"user_api_": "bad_token", "agent_id": "bad_id"}`),
 			},
 			wantErr: true,
 		},
@@ -105,7 +105,7 @@ func TestCli_UnmarshalJSON(t *testing.T) {
 func TestCli_Validate(t *testing.T) {
 	type fields struct {
 		userAPIToken   string
-		currentAgentId string
+		agentID string
 	}
 	tests := []struct {
 		name    string
@@ -122,7 +122,7 @@ func TestCli_Validate(t *testing.T) {
 			name: "Good object",
 			fields: fields{
 				userAPIToken:   "blah",
-				currentAgentId: "blah",
+				agentID: "blah",
 			},
 			wantErr: false,
 		},
@@ -134,7 +134,7 @@ func TestCli_Validate(t *testing.T) {
 			tt.name, func(t *testing.T) {
 				c := &Cli{
 					UserAPIToken:   tt.fields.userAPIToken,
-					CurrentAgentID: tt.fields.currentAgentId,
+					AgentID: tt.fields.agentID,
 				}
 				if err := c.Validate(); (err != nil) != tt.wantErr {
 					t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
@@ -147,7 +147,7 @@ func TestCli_Validate(t *testing.T) {
 func TestCli_Save(t *testing.T) {
 	type fields struct {
 		UserAPIToken   string
-		CurrentAgentId string
+		agentID string
 	}
 	type args struct {
 		filePath string
@@ -175,7 +175,7 @@ func TestCli_Save(t *testing.T) {
 			tt.name, func(t *testing.T) {
 				c := &Cli{
 					UserAPIToken:   tt.fields.UserAPIToken,
-					CurrentAgentID: tt.fields.CurrentAgentId,
+					AgentID: tt.fields.agentID,
 				}
 				if err := c.Save(tt.args.filePath); (err != nil) != tt.wantErr {
 					t.Errorf("Save() error = %v, wantErr %v", err, tt.wantErr)

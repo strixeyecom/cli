@@ -1,9 +1,9 @@
 package agent
 
 import (
-	`fmt`
+	"fmt"
 	
-	`github.com/usestrix/cli/domain/repository`
+	"github.com/usestrix/cli/domain/repository"
 )
 
 /*
@@ -15,7 +15,10 @@ import (
 */
 
 // global constants for file
-const ()
+const (
+	// StatusOK is status message from StrixEye API for 2xx messages.
+	StatusOK = "ok"
+)
 
 // global variables (not cool) for this file
 var ()
@@ -28,14 +31,14 @@ var ()
 // We don't see this struct being used too often.
 type Agent struct {
 	Versions  repository.Versions `json:"versions"`
-	Auth      auth                `json:"auth"`
-	Addresses addresses    `json:"addresses"`
+	Auth      Auth                `json:"auth"`
+	Addresses Addresses           `json:"addresses"`
 }
 
-type auth struct {
-	CompanyID    string `json:"company_id"`
-	CompanyToken string `json:"company_token"`
-	AgentID      string `json:"agent_id"`
+// Auth stores authentication credentials of agent.
+type Auth struct {
+	AgentToken string `json:"agent_token"`
+	AgentID    string `json:"agent_id"`
 }
 
 // Meta keeps meta information about a companies all agents. Not very important.
@@ -52,6 +55,7 @@ type Meta struct {
 // AgentInformation keeps all information relevant to an agent instance.
 type AgentInformation struct {
 	ID        string      `json:"id"`
+	Token     string      `json:"token"`
 	CompanyID string      `json:"company_id"`
 	Name      string      `json:"name"`
 	IPAddress string      `json:"ip_address"`
@@ -61,7 +65,7 @@ type AgentInformation struct {
 
 func (a AgentInformation) String() string {
 	return fmt.Sprintf(
-		"Name: %s,\tId: %s\tIP: %s", a.Name, a.ID,
+		"Name: %s, Id: %s IP: %s", a.Name, a.ID,
 		a.IPAddress,
 	)
 }
