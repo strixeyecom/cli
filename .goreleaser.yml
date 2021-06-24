@@ -1,0 +1,61 @@
+# This is an example .goreleaser.yml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+#    - go test ./...
+    - make security
+builds:
+  - main: ./cmd/strixeye/main.go
+    flags: -tags=production,osusergo,netgo
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    ldflags:
+      - -extldflags=-static -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+archives:
+  - replacements:
+      linux: Linux
+
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+signs:
+  - artifacts: checksum
+
+release:
+  # Repo in which the release will be created.
+  # Default is extracted from the origin remote URL or empty if its private hosted.
+  # Note: it can only be one: either github, gitlab or gitea
+  github:
+    owner: strixeyecom
+    name: cli
+
+
+  # If set, will create a release discussion in the category specified.
+  # Default is empty.
+  discussion_category_name: General
+
+  # If set to auto, will mark the release as not ready for production
+  # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
+  # If set to true, will mark the release as not ready for production.
+  # Default is false.
+  prerelease: auto
+
+  # You can change the name of the release.
+  # Default is `{{.Tag}}`
+  name_template: "{{.ProjectName}}-v{{.Version}}"
+
+  # You can disable this pipe in order to not upload any artifacts.
+  # Defaults to false.
+  disable: false
