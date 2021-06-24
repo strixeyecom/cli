@@ -106,6 +106,16 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 	
+	// early cut if bad credentials
+	if cliConfig.UserAPIToken == "" {
+		return errors.Errorf("empty user api token during installation. Please")
+	}
+	// early cut if bad agent id
+	if cliConfig.AgentID == "" {
+		return errors.Errorf("empty user api token during installation. Please")
+	}
+	
+	
 	// get agent config from remote.
 	agentConfig, err := agent.GetAgentConfig(cliConfig)
 	if err != nil {
