@@ -1,16 +1,16 @@
 package repository
 
 import (
-	`log`
-	`os`
+	"log"
+	"os"
 	"testing"
-	
+
 	"github.com/sirupsen/logrus"
-	`github.com/spf13/viper`
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
-	
-	`github.com/usestrix/cli/domain/cli`
-	`github.com/usestrix/cli/domain/repository`
+
+	"github.com/usestrix/cli/domain/cli"
+	"github.com/usestrix/cli/domain/repository"
 )
 
 /*
@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 		cliConfig cli.Cli
 		dbConfig  repository.Database
 	)
-	
+
 	// get good keys
 	viper.SetConfigFile("../../../.env")
 	// Try to read from file, but use env variables if non exists. it's fine
@@ -43,17 +43,17 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	
+
 	viper.AutomaticEnv()
-	
+
 	err = viper.Unmarshal(&cliConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	dbConfig = cliConfig.Database
-	dbConfig.TestContainerName_ = "strixeye_test_db"
-	
+	dbConfig.SetTestContainerName( "strixeye_test_db")
+
 	// Create a temporary database container for testing
 	err = CreateDatabase(cliConfig.Database)
 	if err != nil {
@@ -61,9 +61,9 @@ func TestMain(m *testing.M) {
 	}
 	// run all tests
 	exitCode := m.Run()
-	
+
 	_ = RemoveDatabase(dbConfig)
-	
+
 	// 	exit with test runcode
 	os.Exit(exitCode)
 }
@@ -73,18 +73,18 @@ func TestConnectToAgentDB(t *testing.T) {
 	if disabled {
 		t.SkipNow()
 	}
-	
+
 	var (
 		err       error
 		cliConfig cli.Cli
 	)
-	
+
 	err = viper.Unmarshal(&cliConfig)
-	
+
 	if err != nil {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
-	
+
 	type args struct {
 		dbConfig repository.Database
 	}
@@ -100,9 +100,9 @@ func TestConnectToAgentDB(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	
+
 	// Stop created containers
-	
+
 	for _, tt := range tests {
 		t.Run(
 			tt.name, func(t *testing.T) {

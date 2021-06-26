@@ -1,13 +1,13 @@
 package repository
 
 import (
-	`fmt`
-	`regexp`
-	`strconv`
-	`strings`
-	
-	`github.com/go-playground/validator`
-	`github.com/sirupsen/logrus`
+	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
+
+	"github.com/go-playground/validator"
+	"github.com/sirupsen/logrus"
 )
 
 /*
@@ -46,7 +46,7 @@ func init() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	
+
 	// register custom validation: semantic version
 	err = validate.RegisterValidation(
 		`semver`, func(fl validator.FieldLevel) bool {
@@ -55,16 +55,16 @@ func init() {
 			if err != nil {
 				logrus.Fatal(err)
 			}
-			
+
 			// temporary edge case handling
 			if version == "staging" || version == "latest" {
 				return true
 			}
-			
+
 			// return true if field is a semantic version
 			version = strings.TrimPrefix(version, "v")
 			pass := rex.MatchString(version)
-			
+
 			return pass
 		},
 	)
@@ -75,13 +75,21 @@ func init() {
 
 // Database stores credentials and configurations about strixeye agent database.
 type Database struct {
-	DBAddr               string `mapstructure:"DB_ADDR" json:"db_addr"`
-	DBUser               string `mapstructure:"DB_USER" json:"db_user" validate:"omitempty"`
-	DBPass               string `mapstructure:"DB_PASS" json:"db_pass" validate:"omitempty"`
-	DBName               string `mapstructure:"DB_NAME" json:"db_name" validate:"omitempty"`
-	DBPort               string `mapstructure:"DB_PORT" json:"db_port" validate:"port"`
-	OverrideRemoteConfig bool   `mapstructure:"DB_OVERRIDE" json:"override_remote_config"`
-	TestContainerName_   string `json:"-"`
+	DBAddr               string `mapstructure:"DB_ADDR" json:"db_addr" yaml:"db_addr"`
+	DBUser               string `mapstructure:"DB_USER" json:"db_user" validate:"omitempty" yaml:"db_user" `
+	DBPass               string `mapstructure:"DB_PASS" json:"db_pass" validate:"omitempty" yaml:"db_pass"`
+	DBName               string `mapstructure:"DB_NAME" json:"db_name" validate:"omitempty" yaml:"db_name"`
+	DBPort               string `mapstructure:"DB_PORT" json:"db_port" validate:"port" yaml:"db_port"`
+	OverrideRemoteConfig bool   `mapstructure:"DB_OVERRIDE" json:"override_remote_config" yaml:"override_remote_config"`
+	testContainerName    string
+}
+
+func (d *Database) TestContainerName() string {
+	return d.testContainerName
+}
+
+func (d *Database) SetTestContainerName(testContainerName string) {
+	d.testContainerName = testContainerName
 }
 
 // DSN creates a dsn url from database config. DSN is used to connect to servers,

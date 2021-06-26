@@ -148,17 +148,17 @@ func CreateDatabase(cliConfig repository.Database) error {
 			}, Env: []string{
 				mysqlUser, mysqlPass, mysqlDatabase, mysqlRootPass,
 			},
-		}, hostConfig, nil, nil, cliConfig.TestContainerName_,
+		}, hostConfig, nil, nil, cliConfig.TestContainerName(),
 	)
 	if err != nil {
 		return err
 	}
-	
+
 	err = dockerClient.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
 	if err != nil {
 		return err
 	}
-	
+
 	filterArgs := filters.NewArgs(
 		filters.KeyValuePair{Key: "container", Value: resp.ID},
 		filters.KeyValuePair{Key: "event", Value: "health_status"},
@@ -233,35 +233,35 @@ func RemoveDatabase(dbConfig repository.Database) error {
 	var (
 		err error
 	)
-	
+
 	ctx := context.Background()
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return err
 	}
-	
+
 	// Find StrixEye Database container
 	containers, err := dockerClient.ContainerList(ctx, types.ContainerListOptions{})
 	if err != nil {
 		return err
 	}
 	var strixeyeContainerID string
-	
+
 	// Iterate through containers and find our one.
 	for _, cont := range containers {
 		for _, name := range cont.Names {
-			if strings.Contains(name, dbConfig.TestContainerName_) {
+			if strings.Contains(name, dbConfig.TestContainerName()) {
 				strixeyeContainerID = cont.ID
 				break
 			}
 		}
 	}
-	
+
 	// can't find container
 	if strixeyeContainerID == "" {
 		return err
 	}
-	
+
 	// container found, stopping container
 	timeout := time.Second * 5
 	err = dockerClient.ContainerStop(ctx, strixeyeContainerID, &timeout)

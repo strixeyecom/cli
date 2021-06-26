@@ -107,18 +107,18 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	
+
 	viper.AutomaticEnv()
-	
+
 	err = viper.Unmarshal(&cliConfig)
-	
+
 	databaseConfig = cliConfig.Database
 	databaseConfig.DBPort = "12348"
-	databaseConfig.TestContainerName_ = "strixeye_trip_db"
+	databaseConfig.SetTestContainerName("strixeye_trip_db")
 	if err != nil {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
-	
+
 	type args struct {
 		cliConfig repository2.Database
 		args      repository2.TripQueryArgs
