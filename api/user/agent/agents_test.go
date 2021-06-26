@@ -36,9 +36,9 @@ func TestGetAgents(t *testing.T) {
 		t.Fatal(err)
 	}
 	viper.AutomaticEnv()
-	
+
 	err = viper.Unmarshal(&cliConfig)
-	
+
 	if err != nil {
 		fmt.Printf("Unable to decode into map, %v", err)
 	}
