@@ -27,3 +27,5 @@ bin/
 cli.json
 
 test/
+
+.local.goreleaser.yml
