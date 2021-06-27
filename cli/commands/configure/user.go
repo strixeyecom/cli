@@ -33,12 +33,13 @@ with a single StrixEye user's API Token.
 Authentication will be executed via this user's API Token' `,
 		RunE: ux.SetupUser,
 	}
-	
+
 	// Add subcommands
+	configureUserCommand.Flags().Bool(
+		"interactive", false, "--interactive if you want to configure StrixEye CLI during installation",
+	)
+
 	configureUserCommand.AddCommand()
-	
+
 	return configureUserCommand
 }
-
-
-

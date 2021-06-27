@@ -1,9 +1,9 @@
 package repository
 
 import (
-	`encoding/json`
-	`testing`
-	`time`
+	"encoding/json"
+	"testing"
+	"time"
 )
 
 /*
@@ -22,15 +22,15 @@ var ()
 
 func TestVersions_Validate(t *testing.T) {
 	type fields struct {
-	ManagerVersion   Version
-	DatabaseVersion  Version
-	EngineVersion    Version
-	ProfilerVersion  Version
-	QueueVersion     Version
-	SchedulerVersion Version
-	SensorVersion    Version
-	InstallVersion   Version
-}
+		ManagerVersion   Version
+		DatabaseVersion  Version
+		EngineVersion    Version
+		ProfilerVersion  Version
+		QueueVersion     Version
+		SchedulerVersion Version
+		SensorVersion    Version
+		InstallVersion   Version
+	}
 	tests := []struct {
 		name    string
 		fields  fields
@@ -75,7 +75,7 @@ func TestVersions_Validate(t *testing.T) {
 	}
 	for i := range tests {
 		tt := tests[i]
-		
+
 		t.Run(
 			tt.name, func(t *testing.T) {
 				m := Versions{
@@ -86,7 +86,7 @@ func TestVersions_Validate(t *testing.T) {
 					Queue:     tt.fields.QueueVersion,
 					Scheduler: tt.fields.SchedulerVersion,
 					Sensor:    tt.fields.SensorVersion,
-					Installer:    tt.fields.InstallVersion,
+					Installer: tt.fields.InstallVersion,
 				}
 				if err := m.Validate(); (err != nil) != tt.wantErr {
 					t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
@@ -126,7 +126,7 @@ func TestVersions_ToVersions(t *testing.T) {
 	}
 	for i := range tests {
 		tt := tests[i]
-		
+
 		t.Run(
 			tt.name, func(t *testing.T) {
 				v := APIVersionsMessage{}
@@ -166,9 +166,9 @@ func Test_decode(t *testing.T) {
 					}{
 						{
 							Key: "Manager", Value: Version{
-							Version: "test-version", Size: 12345,
-							Checksum: "test-checksum",
-						},
+								Version: "test-version", Size: 12345,
+								Checksum: "test-checksum",
+							},
 						}, {
 							Key: "Installer", Value: Version{
 								Version: "test-installer-version", Size: 54322,

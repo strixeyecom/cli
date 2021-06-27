@@ -1,18 +1,18 @@
 package trip
 
 import (
-	`fmt`
-	`os`
+	"fmt"
+	"os"
 	"testing"
-	`time`
-	
-	`github.com/pkg/errors`
+	"time"
+
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	`github.com/spf13/viper`
-	`github.com/usestrix/cli/cli/commands/repository`
-	repository2 `github.com/usestrix/cli/domain/repository`
-	
-	`github.com/usestrix/cli/domain/cli`
+	"github.com/spf13/viper"
+	"github.com/usestrix/cli/cli/commands/repository"
+	repository2 "github.com/usestrix/cli/domain/repository"
+
+	"github.com/usestrix/cli/domain/cli"
 )
 
 /*
@@ -20,7 +20,7 @@ import (
 */
 
 /*
- 
+
  */
 
 // global constants for file
@@ -31,7 +31,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	
+
 	os.Exit(exitCode)
 }
 
@@ -40,18 +40,18 @@ func wrapper(m *testing.M) (int, error) {
 		exitCode = 1
 		dbConfig repository2.Database
 	)
-	
+
 	defer func() {
 		// Clean up on exit.
 		_ = repository.RemoveDatabase(dbConfig)
 	}()
-	
+
 	// setup test environment
 	var (
 		err       error
 		cliConfig cli.Cli
 	)
-	
+
 	// get good keys
 	viper.SetConfigFile("../../../.env")
 	// Try to read from file, but use env variables if non exists. it's fine
@@ -64,32 +64,32 @@ func wrapper(m *testing.M) (int, error) {
 	if err != nil {
 		return 1, err
 	}
-	
+
 	dbConfig = cliConfig.Database
 	dbConfig.DBPort = "12348"
-	dbConfig.TestContainerName_ = "strixeye_trip_db"
-	
+	dbConfig.SetTestContainerName("strixeye_trip_db")
+
 	// delete all database data just in case
 	_ = repository.RemoveDatabase(dbConfig)
-	
+
 	// Create a temporary database container for testing
 	err = repository.CreateDatabaseIFNotExists(dbConfig)
 	if err != nil {
 		return 1, err
 	}
-	
+
 	// Setup temporary database
 	err = repository.SetupDatabase(dbConfig)
 	if err != nil {
 		return 1, err
 	}
-	
+
 	// run all tests
 	exitCode = m.Run()
 	if exitCode != 0 {
 		return exitCode, errors.New("tests are failed")
 	}
-	
+
 	return exitCode, nil
 }
 
@@ -99,7 +99,7 @@ func TestGet(t *testing.T) {
 		databaseConfig repository2.Database
 		cliConfig      cli.Cli
 	)
-	
+
 	// get good keys
 	viper.SetConfigFile("../../../.env")
 	// Try to read from file, but use env variables if non exists. it's fine
@@ -107,18 +107,18 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	
+
 	viper.AutomaticEnv()
-	
+
 	err = viper.Unmarshal(&cliConfig)
-	
+
 	databaseConfig = cliConfig.Database
 	databaseConfig.DBPort = "12348"
-	databaseConfig.TestContainerName_ = "strixeye_trip_db"
+	databaseConfig.SetTestContainerName("strixeye_trip_db")
 	if err != nil {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
-	
+
 	type args struct {
 		cliConfig repository2.Database
 		args      repository2.TripQueryArgs
@@ -178,7 +178,7 @@ func TestGet(t *testing.T) {
 					t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}
-				
+
 				_ = got
 			},
 		)

@@ -17,11 +17,12 @@ const (
 
 	WorkingDir = "/etc/strixeye"
 
-	ConfigDir = "/etc/strixeye/config"
+	ConfigDir  = "/etc/strixeye/config"
 	ConfigFile = "config.json"
 
 	DownloadHost = "downloads.strixeye.com"
-	APIHost = "api.strixeye.com"
+	DockerRegistry = "docker.strixeye.com"
+	APIHost      = "api.strixeye.com"
 
 	DockerComposeFileName = "docker-compose.yml"
 
@@ -29,9 +30,8 @@ const (
 
 	ServiceDir  = "/lib/systemd/system"
 	ServiceFile = "strixeyed.service"
-	
-	DownloadZipName = "manager.tar.gz"
 
+	DownloadZipName = "manager.tar.gz"
 )
 
 // global variables (not cool) for this file

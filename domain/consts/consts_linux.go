@@ -16,13 +16,14 @@ const (
 	DaemonName = "strixeyed"
 	
 	CLIConfigDir = "/etc/strixeye-cli"
-	WorkingDir = "/etc/strixeye"
+	WorkingDir   = "/etc/strixeye"
 	
 	ConfigDir  = "/etc/strixeye/config"
 	ConfigFile = "config.json"
 	
-	DownloadHost = "downloads.strixeye.com"
-	APIHost      = "api.strixeye.com"
+	DownloadHost   = "downloads.strixeye.com"
+	DockerRegistry = "docker.strixeye.com"
+	APIHost        = "api.strixeye.com"
 	
 	DockerComposeFileName = "docker-compose.yml"
 	
