@@ -29,11 +29,13 @@ func NewConfigureAgentCommand() *cobra.Command {
 		Long: `A default agent must be selected to work with because StrixEye's CLI is designed to work
 with a single StrixEye Agent at a time. `,
 		RunE: ux.SetupAgent,
-		
 	}
-	
+
 	// Add subcommands
+	configureCommand.Flags().Bool(
+		"interactive", false, "--interactive if you want to configure StrixEye CLI during installation",
+	)
 	configureCommand.AddCommand()
-	
+
 	return configureCommand
 }

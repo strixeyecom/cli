@@ -135,32 +135,36 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 	} else if limit > 0 {
 		queryArgs.Verbose = verbose
 	}
-	
+
 	// parse oldest timestamp to be queries
 	sinceTime, err := cmd.Flags().GetInt("since")
 	if err != nil {
 		return err
-		
+
 	} else if sinceTime > 0 {
 		queryArgs.SinceTime = int64(sinceTime)
 	}
-	
+
 	// get trips with parsed query arguments for this subcommand
 	trips, err := Get(cliConfig, queryArgs)
 	if err != nil {
 		return err
-		
 	}
-	
+
 	// print out query settings
 	color.Blue(queryArgs.String())
-	
+
+	if trips == nil || len(trips) == 0 {
+		color.Blue("0 result.")
+		return nil
+	}
+
 	// print out result
 	_, err = pp.Print(trips)
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 

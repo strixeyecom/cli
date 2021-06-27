@@ -1,9 +1,12 @@
 package agent
 
 import (
+	`bytes`
 	"fmt"
 	"os"
+	`os/exec`
 	
+	`github.com/fatih/color`
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -63,7 +66,6 @@ func getCredentials(cmd *cobra.Command) (cli.Cli, error) {
 		return cli.Cli{}, err
 	}
 	
-	delete(viper.AllSettings(), "interactive")
 	if !isInteractive {
 		// get cli config for authentication
 		err = viper.Unmarshal(&cliConfig)
@@ -108,20 +110,24 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 	
 	// early cut if bad credentials
 	if cliConfig.UserAPIToken == "" {
-		return errors.Errorf(`empty user api token during installation. Please check out documentation.
+		return errors.Errorf(
+			`empty user api token during installation. Please check out documentation.
  If you haven't set up your cli, you can set it up during installation:
 
 	$ strixeye agent install --interactive
-`)
+`,
+		)
 	}
 	// early cut if bad agent id
 	if cliConfig.AgentID == "" {
-		return errors.Errorf(`empty agent id in configuration. Please check out documentation.
+		return errors.Errorf(
+			`empty agent id in configuration. Please check out documentation.
  If you haven't set up your cli, you can set it up during installation:
 
 	$ strixeye agent install --interactive
-`)	}
-	
+`,
+		)
+	}
 	
 	// get agent config from remote.
 	agentConfig, err := agent.GetAgentConfig(cliConfig)
@@ -137,6 +143,11 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 	
 	// get latest versions
 	versions, err := agent.GetLatestVersions(cliConfig)
+	if err != nil {
+		return err
+	}
+	
+	err = loginToDocker(agentConfig, cliConfig)
 	if err != nil {
 		return err
 	}
@@ -175,6 +186,7 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 		cliConfig.UserAPIToken, agentConfig.Token, versions.Manager,
 		cliConfig.DownloadDomain,
 	)
+	
 	if err != nil {
 		return err
 	}
@@ -209,6 +221,39 @@ func createPaths(agentInformation agent2.AgentInformation) error {
 		if err != nil {
 			return err
 		}
+	}
+	
+	return nil
+}
+
+// loginToDocker is necessary because StrixEye images are kept in a secure registry.
+func loginToDocker(agentConfig agent2.AgentInformation, cliConfig cli.Cli) error {
+	testRefStr := fmt.Sprintf("%s/%s", cliConfig.DockerRegistry, "hello-world")
+	
+	cmd := exec.Command("docker", "pull", testRefStr)
+	
+	var outBuffer bytes.Buffer
+	cmd.Stdout = &outBuffer
+	
+	err := cmd.Run()
+	
+	if err != nil {
+		color.Red(
+			`
+Docker can not fetch test image from StrixEye registry.
+If you haven't logged in to Strixeye Docker Registry yet, you need to login to StrixEye registry at %s.
+
+Here is a direct command you can execute:
+
+$ docker login --username strixeye --password %s %s
+
+If you don't want to show credentials in your history, following is a custom command you can use.
+Logging in to a docker registry is a basic procedure that is documented by docker as well. https://docs.docker.com/engine/reference/commandline/login/
+
+$ strixeye agent show-token | docker login --username strixeye --password-stdin $(strixeye agent show-registry)
+`, cliConfig.DockerRegistry, agentConfig.Token, cliConfig.DockerRegistry,
+		)
+		return err
 	}
 	
 	return nil
