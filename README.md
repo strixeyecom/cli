@@ -56,6 +56,7 @@
             <li><a href="#agent-installation">Agent Installation</a></li>
          </ul>
    </li>
+    <li><a href="#downloads">Downloads</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -157,11 +158,13 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 ### Installing Agent
 
 After you have authenticated and selected an agent, you can simply install the agent via:
+
 ```shell
    $ strixeye agent install
 ```
 
 If you are not sure about your configuration, you can ask for an interactive installation process
+
 ```shell
    $ strixeye agent install --interactive
 ```
@@ -175,6 +178,15 @@ Basic building process like the following would suffice.
 ```shell
    $ go build -o strixeye cmd/strixeye/main.go
 ```
+
+## Downloads
+
+### Tarball
+
+1. Download [latest-release] for your operating system/architecture
+2. Unzip binary and place it somewhere in your path
+3. Make it executable
+
 
 <!-- ROADMAP -->
 
@@ -244,3 +256,5 @@ Project Link: [https://github.com/usestrix/cli](https://github.com/usestrix/cli)
 [linkedin-url]: https://linkedin.com/in/strixeye
 
 [product-screenshot]: data/images/base_command.png
+
+[latest-release]: https://github.com/strixeyecom/cli/releases
