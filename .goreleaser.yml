@@ -28,7 +28,7 @@ changelog:
   filters:
     exclude:
       - '^docs:'
-      - '^test:'
+      - '^[test]:'
 
 signs:
   - artifacts: checksum
