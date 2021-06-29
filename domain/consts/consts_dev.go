@@ -26,9 +26,10 @@ const (
 	DockerComposeFileName = "docker-compose.yml"
 
 	LogFile = "/var/log/strixeyed"
-
+	PidFile = "/var/run/strixeyed.pid"
 	ServiceDir  = "./test"
 	ServiceFile = "strixeyed.service"
+	
 
 	DownloadZipName = "manager.tar.gz"
 )
