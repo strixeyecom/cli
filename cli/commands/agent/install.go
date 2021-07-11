@@ -103,6 +103,12 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 		err       error
 	)
 	
+	// Installing a new agent while one is still running is a bad practice in our current system
+	err = agent2.CheckIfAnotherAgentRunning()
+	if err != nil {
+		return err
+	}
+	
 	cliConfig, err = getCredentials(cmd)
 	if err != nil {
 		return err

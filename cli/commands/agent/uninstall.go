@@ -55,7 +55,14 @@ func uninstallAgentCmd(cmd *cobra.Command, _ []string) error {
 		cliConfig cli.Cli
 		err       error
 	)
-
+	
+	
+	// Uninstalling a new agent while one is still running is a bad practice in our current system
+	err = agent2.CheckIfAnotherAgentRunning()
+	if err != nil {
+		return err
+	}
+	
 	// get cli config for authentication
 	err = viper.Unmarshal(&cliConfig)
 	if err != nil {

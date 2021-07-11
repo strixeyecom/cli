@@ -28,7 +28,7 @@ const (
 	DockerComposeFileName = "docker-compose.yml"
 	
 	LogFile = "/var/log/strixeyed"
-	
+	PidFile = "/var/run/strixeyed.pid"
 	ServiceDir  = "/lib/systemd/system"
 	ServiceFile = "strixeyed.service"
 	
