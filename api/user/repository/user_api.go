@@ -50,7 +50,7 @@ func UserAPIRequest(method, endpoint string, body io.Reader, apiToken, apiDomain
 	
 	// create client to do the request
 	client := http.Client{
-		Timeout: time.Second * 5,
+		Timeout: time.Second * 45,
 	}
 	
 	// fetch response

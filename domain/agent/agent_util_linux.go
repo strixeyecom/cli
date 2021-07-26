@@ -51,6 +51,8 @@ func checkIfAnotherAgentRunning() error {
 }
 
 // checkIfHostSupports controls whether you can install your current agent on the host machine or not.
+//
+// It handles kubernetes/docker based differentiation
 func (a AgentInformation) checkIfHostSupports() error {
 	var (
 		err error
