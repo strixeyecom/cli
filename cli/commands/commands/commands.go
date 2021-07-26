@@ -189,18 +189,16 @@ func initializeConfig(cmd *cobra.Command) error {
 		// Search config in home directory with name ".cli" (without extension).
 		configPath := home + "/.strixeye"
 		viper.AddConfigPath(configPath)
-		// viper.AddConfigPath(".")
 		
 		cfgFile = filepath.Join(configPath, defaultConfigFilename, defaultConfigFileType)
 		
 		// create default config directory since we are going to use this anyway.
 		_, statErr := os.Stat(configPath)
-		
 		if os.IsNotExist(statErr) {
 			// Than, create the directory with root perms only. Actually,
 			// a permission like 0666 would prevent the user from `chown`ing the directory,
 			// but this decision is not up to me.
-			err = os.Mkdir(configPath, 0600)
+			err = os.MkdirAll(configPath, 0750)
 			if err != nil {
 				if os.IsPermission(err) {
 					return fmt.Errorf(

@@ -111,7 +111,7 @@ func SetupUser(cmd *cobra.Command, args []string) error {
 	// store edited viper config to file.
 	err = viper.WriteConfig()
 	if err != nil {
-		return errors.Wrap(err, "failed to save config. Do you have permissions on the filesystem? ")
+		return errors.Wrap(err, "failed to save config")
 	}
 
 	// Write success message.

@@ -269,7 +269,7 @@ func SaveAgentConfig(cfg Agent) error {
 	}
 	
 	// save data
-	err = ioutil.WriteFile(filepath.Join(consts.ConfigDir, consts.ConfigFile), data, 0600)
+	err = ioutil.WriteFile(filepath.Join(consts.ConfigDir, consts.ConfigFile), data, 0644)
 	if err != nil {
 		return err
 	}
