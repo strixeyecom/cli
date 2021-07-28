@@ -223,7 +223,7 @@ func createPaths(agentInformation agent2.AgentInformation) error {
 	}
 	
 	if os.IsNotExist(err) {
-		err = os.Mkdir(consts.ConfigDir, 0600)
+		err = os.Mkdir(consts.ConfigDir, 0644)
 		if err != nil {
 			return err
 		}

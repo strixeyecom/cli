@@ -51,6 +51,8 @@ func checkIfAnotherAgentRunning() error {
 }
 
 // checkIfHostSupports controls whether you can install your current agent on the host machine or not.
+//
+// It handles kubernetes/docker based differentiation
 func (a AgentInformation) checkIfHostSupports() error {
 	var (
 		err error
@@ -267,7 +269,7 @@ func SaveAgentConfig(cfg Agent) error {
 	}
 	
 	// save data
-	err = ioutil.WriteFile(filepath.Join(consts.ConfigDir, consts.ConfigFile), data, 0600)
+	err = ioutil.WriteFile(filepath.Join(consts.ConfigDir, consts.ConfigFile), data, 0644)
 	if err != nil {
 		return err
 	}
