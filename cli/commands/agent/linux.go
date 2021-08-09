@@ -13,11 +13,3 @@ const ()
 
 // global variables (not cool) for this file
 var ()
-
-// func Restart(userAPIKey string) error {
-// 	return nil
-// }
-//
-// func Stop(userAPIKey string) error {
-// 	return nil
-// }

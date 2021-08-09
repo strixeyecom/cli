@@ -1,15 +1,19 @@
 package agent
 
 import (
-	"os"
-	"path/filepath"
-
+	`fmt`
+	`os`
+	`path/filepath`
+	`strings`
+	
 	"github.com/fatih/color"
+	`github.com/manifoldco/promptui`
+	`github.com/pkg/errors`
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	agent2 "github.com/usestrix/cli/domain/agent"
 	"github.com/usestrix/cli/domain/consts"
-
+	
 	"github.com/usestrix/cli/api/user/agent"
 	"github.com/usestrix/cli/domain/cli"
 )
@@ -43,9 +47,9 @@ strixeye configure agent
 `,
 		RunE: uninstallAgentCmd,
 	}
-
+	
 	// declaring local flags used by get trip commands.
-
+	
 	return checkCmd
 }
 
@@ -55,7 +59,6 @@ func uninstallAgentCmd(cmd *cobra.Command, _ []string) error {
 		cliConfig cli.Cli
 		err       error
 	)
-	
 	
 	// Uninstalling a new agent while one is still running is a bad practice in our current system
 	err = agent2.CheckIfAnotherAgentRunning()
@@ -68,32 +71,78 @@ func uninstallAgentCmd(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-
+	
 	// get agent config from remote.
-	_, err = agent.GetAgentConfig(cliConfig)
+	agentConfig, err := agent.GetAgentConfig(cliConfig)
 	if err != nil {
 		return err
-
 	}
-
+	
 	err = agent2.StopDaemon()
 	if err != nil {
 		return err
 	}
 	color.Red("Stopped StrixEye Daemon")
-
+	
 	err = os.Remove(filepath.Join(consts.DaemonDir, consts.DaemonName))
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
 	color.Red("Removed StrixEye Daemon")
-
+	
 	err = os.Remove(filepath.Join(consts.ServiceDir, consts.ServiceFile))
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
 	color.Red("Removed StrixEye Service Files")
-
+	
+	// Remove StrixEye Volumes
+	prompt := promptui.Prompt{
+		Label:     "Would you like to remove all StrixEye Agent related data? (recommended)",
+		IsConfirm: true,
+	}
+	
+	result, err := prompt.Run()
+	if err != nil {
+		fmt.Printf("Not removing volumes\n")
+		return nil
+	}
+	
+	if strings.EqualFold(result, "y") {
+		err = prune(agentConfig.Config.Deployment)
+		if err != nil {
+			return err
+		}
+	}
+	
 	color.Red("Uninstall completed successfully")
 	return nil
+}
+
+// prune removes all stored volume data on host machine depending on deployment type
+func prune(deploymentName string) error {
+	var (
+		err error
+	)
+	
+	// 	remove kubernetes volumes and networks
+	if deploymentName == consts.KubernetesDeployment {
+	
+	}
+	
+	// 	remove docker volumes and networks
+	if deploymentName == consts.DockerDeployment {
+		err = agent2.RemoveDockerVolumeByName(agent2.DockerBrokerVolumeName)
+		if err != nil {
+			return err
+		}
+		
+		err = agent2.RemoveDockerVolumeByName(agent2.DockerDatabaseVolumeName)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	
+	return errors.Errorf("no such strixeye volume :%s", deploymentName)
 }

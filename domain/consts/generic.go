@@ -8,12 +8,11 @@ package consts
 	INSERT FILE DESCRIPTION HERE
 */
 
-
-// global constants for file
+// global constants for package
 const (
-
+	DockerDeployment = "docker"
+	KubernetesDeployment = "kubernetes"
 )
 
 // global variables (not cool) for this file
 var ()
-
