@@ -47,7 +47,7 @@ const (
 
 // global variables (not cool) for this file
 var (
-	cfgFile        string
+	cfgFile string
 )
 
 // structToFlag add all fields of a struct to cmd as flags.
@@ -63,7 +63,18 @@ func structToFlag(
 	field := currentLayer[currentIdx]
 	if field.Kind() != reflect.Struct {
 		if cmd.Flag(field.Tag("flag")) == nil {
-			cmd.PersistentFlags().String(field.Tag("flag"), "", "")
+			// handle flag type
+			switch field.Kind().String() {
+			case "string":
+				cmd.PersistentFlags().String(field.Tag("flag"), "", "")
+			case "bool":
+				cmd.PersistentFlags().Bool(field.Tag("flag"), false, "")
+			case "int":
+				cmd.PersistentFlags().Int(field.Tag("flag"), 0, "")
+			case "float":
+				cmd.PersistentFlags().Float64(field.Tag("flag"), 0, "")
+				
+			}
 		}
 		structToFlag(cmd, upperLayer, currentLayer, upperIdx, currentIdx+1)
 		
@@ -101,7 +112,6 @@ func NewStrixeyeCommand() *cobra.Command {
 				return errors.WithMessage(err, "can not read config")
 			}
 			
-			
 			// unmarshal into config object
 			err = viper.Unmarshal(&cliConfig)
 			if err != nil {
@@ -113,8 +123,6 @@ func NewStrixeyeCommand() *cobra.Command {
 		RunE: ShowHelp(os.Stdout),
 		
 	}
-	
-
 	
 	// Add subcommands
 	rootCmd.AddCommand(
