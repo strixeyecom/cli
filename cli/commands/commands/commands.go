@@ -55,13 +55,18 @@ var (
 func structToFlag(
 	cmd *cobra.Command, upperLayer []*structs.Field, currentLayer []*structs.Field, upperIdx, currentIdx int,
 ) {
+	// stop recursion on lowest struct level
 	if currentLayer == nil {
 		return
 	}
+	
+	// if this level of struct is done, go a level up back
 	if currentIdx == len(currentLayer) {
 		return
 	}
 	field := currentLayer[currentIdx]
+	
+	// as long as the field is not a struct, create a flag for it
 	if field.Kind() != reflect.Struct {
 		if cmd.Flag(field.Tag("flag")) == nil {
 			// handle flag type
@@ -78,15 +83,22 @@ func structToFlag(
 			}
 		}
 		structToFlag(cmd, upperLayer, currentLayer, upperIdx, currentIdx+1)
-		
 	} else {
+		// for struct fields, recurse the struct
 		structToFlag(cmd, upperLayer, field.Fields(), currentIdx, 0)
 	}
 	
+	// go to neighbor field
+	/*
+				+
+	|   |   |   |   |   |   |
+	|                       |
+	+        --->           +
+	
+	*/
 	if upperIdx != len(upperLayer) {
 		structToFlag(cmd, upperLayer, upperLayer, upperIdx+1, upperIdx+1)
 	}
-	
 }
 
 // NewStrixeyeCommand is the highest command in the hierarchy and all commands root from it.
