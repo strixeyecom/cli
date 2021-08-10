@@ -115,6 +115,7 @@ func NewStrixeyeCommand() *cobra.Command {
 	
 	// Add subcommands
 	rootCmd.AddCommand(
+		InspectCommand(),
 		trip.NewTripCommand(),
 		configure.NewConfigureCommand(),
 		suspicion.NewSuspicionCommand(),
@@ -236,7 +237,6 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 			return err
 		}
 	}
-	// }
 	
 	// Attempt to read the config file, gracefully ignoring errors
 	// caused by a config file not being found. Return an error

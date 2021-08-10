@@ -3,12 +3,14 @@
 package agent
 
 import (
+	`bytes`
 	`encoding/json`
 	"fmt"
 	"io/ioutil"
 	`os`
 	"os/exec"
 	"path/filepath"
+	`syscall`
 	
 	"github.com/pkg/errors"
 	"github.com/usestrix/cli/domain/consts"
@@ -21,8 +23,6 @@ import (
 /*
 	utility functions for StrixEye agents running on Linux.
 */
-
-
 
 // checkIfAnotherAgentRunning tries to find a running strixeyed daemon and returns nil if **no agent is
 // running**
@@ -91,8 +91,6 @@ func (a AgentInformation) checkIfHostSupports() error {
 	
 	return errors.New("unknown deployment type. check your agent configuration again")
 }
-
-
 
 func (a AgentInformation) CreateServiceFile() error {
 	return createServiceFile(a)
@@ -278,13 +276,42 @@ func SaveAgentConfig(cfg Agent) error {
 }
 
 func StopDaemon() error {
+	var outbuf, errbuf bytes.Buffer
+	exitCode := 0
+	stderr := errbuf.String()
+	const defaultFailedCode = 1
+	
 	cmd := exec.Command("systemctl", "stop", "strixeyed")
+	cmd.Stdout = &outbuf
+	cmd.Stderr = &errbuf
 	
 	err := cmd.Run()
 	if err != nil {
-		return err
+		// try to get the exit code
+		if exitError, ok := err.(*exec.ExitError); ok {
+			ws := exitError.Sys().(syscall.WaitStatus)
+			exitCode = ws.ExitStatus()
+			if exitCode == 5 {
+				return nil
+			}
+			return err
+		} else {
+			// This will happen (in OSX) if `name` is not available in $PATH,
+			// in this situation, exit code could not be get, and stderr will be
+			// empty string very likely, so we use the default fail code, and format err
+			// to string and set to stderr
+			// return errors.Errorf("Could not get exit code for failed program")
+			exitCode = defaultFailedCode
+			if stderr == "" {
+				stderr = err.Error()
+			}
+			return err
+		}
+	} else {
+		// success, exitCode should be 0 if go is ok
+		ws := cmd.ProcessState.Sys().(syscall.WaitStatus)
+		exitCode = ws.ExitStatus()
 	}
-	
 	return nil
 }
 
