@@ -12,6 +12,9 @@ package consts
 const (
 	DockerDeployment = "docker"
 	KubernetesDeployment = "kubernetes"
+	
+	
+	KubernetesNamespace = "strixeye-agent"
 )
 
 // global variables (not cool) for this file

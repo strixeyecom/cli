@@ -7,7 +7,6 @@ require (
 	github.com/docker/docker v20.10.6+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/fatih/color v1.7.0
-	github.com/fatih/structs v1.1.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-yaml/yaml v2.1.0+incompatible
@@ -31,4 +30,6 @@ require (
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gorm.io/driver/mysql v1.1.0
 	gorm.io/gorm v1.21.10
+	k8s.io/apimachinery v0.20.6
+	k8s.io/client-go v0.20.6
 )

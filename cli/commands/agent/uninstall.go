@@ -1,10 +1,15 @@
 package agent
 
 import (
+	`context`
 	`fmt`
 	`os`
 	`path/filepath`
 	`strings`
+	
+	metav1 `k8s.io/apimachinery/pkg/apis/meta/v1`
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/util/homedir"
 	
 	"github.com/fatih/color"
 	`github.com/manifoldco/promptui`
@@ -13,6 +18,7 @@ import (
 	"github.com/spf13/viper"
 	agent2 "github.com/usestrix/cli/domain/agent"
 	"github.com/usestrix/cli/domain/consts"
+	`k8s.io/client-go/kubernetes`
 	
 	"github.com/usestrix/cli/api/user/agent"
 	"github.com/usestrix/cli/domain/cli"
@@ -79,9 +85,7 @@ func uninstallAgentCmd(cmd *cobra.Command, _ []string) error {
 	}
 	
 	err = agent2.StopDaemon()
-	if err != nil {
-		return err
-	}
+
 	color.Red("Stopped StrixEye Daemon")
 	
 	err = os.Remove(filepath.Join(consts.DaemonDir, consts.DaemonName))
@@ -109,7 +113,7 @@ func uninstallAgentCmd(cmd *cobra.Command, _ []string) error {
 	}
 	
 	if strings.EqualFold(result, "y") {
-		err = prune(agentConfig.Config.Deployment)
+		err = prune(agentConfig.Config)
 		if err != nil {
 			return err
 		}
@@ -120,18 +124,21 @@ func uninstallAgentCmd(cmd *cobra.Command, _ []string) error {
 }
 
 // prune removes all stored volume data on host machine depending on deployment type
-func prune(deploymentName string) error {
+func prune(agentConfig agent2.StackConfig) error {
 	var (
 		err error
 	)
 	
 	// 	remove kubernetes volumes and networks
-	if deploymentName == consts.KubernetesDeployment {
-	
+	if agentConfig.Deployment == consts.KubernetesDeployment {
+		err := DeleteNamespaceWithPath(consts.KubernetesNamespace, agentConfig.Paths.KubeConfig)
+		if err != nil {
+			return errors.Wrap(err, "can not delete namespace")
+		}
 	}
 	
 	// 	remove docker volumes and networks
-	if deploymentName == consts.DockerDeployment {
+	if agentConfig.Deployment == consts.DockerDeployment {
 		err = agent2.RemoveDockerVolumeByName(agent2.DockerBrokerVolumeName)
 		if err != nil {
 			return err
@@ -144,5 +151,39 @@ func prune(deploymentName string) error {
 		return nil
 	}
 	
-	return errors.Errorf("no such strixeye volume :%s", deploymentName)
+	return errors.Errorf("no such strixeye deployment :%s", agentConfig.Deployment)
+}
+
+// DeleteNamespace tries to delete everything exists in that namespace. Uses default kube config path
+func DeleteNamespace(namespace string) error {
+	var configPath string
+	
+	if home := homedir.HomeDir(); home != "" {
+		configPath = filepath.Join(home, ".kube", "config")
+	}
+	
+	return DeleteNamespaceWithPath(namespace, configPath)
+}
+
+// DeleteNamespaceWithPath tries to delete everything exists in that namespace. Uses default kube config path
+func DeleteNamespaceWithPath(namespace, configPath string) error {
+	config, err := clientcmd.BuildConfigFromFlags("", configPath)
+	if err != nil {
+		return err
+	}
+	
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return err
+	}
+	
+	// Delete namespace
+	err = clientset.CoreV1().Namespaces().Delete(
+		context.Background(), consts.KubernetesNamespace, metav1.DeleteOptions{},
+	)
+	if err != nil {
+		return err
+	}
+	
+	return nil
 }
