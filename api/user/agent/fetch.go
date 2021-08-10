@@ -7,11 +7,11 @@ import (
 	"net/http"
 	
 	"github.com/pkg/errors"
-	repository2 `github.com/usestrix/cli/domain/repository`
+	repository2 `github.com/strixeyecom/cli/domain/repository`
 	
-	"github.com/usestrix/cli/api/user/repository"
-	"github.com/usestrix/cli/domain/agent"
-	"github.com/usestrix/cli/domain/cli"
+	"github.com/strixeyecom/cli/api/user/repository"
+	"github.com/strixeyecom/cli/domain/agent"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*

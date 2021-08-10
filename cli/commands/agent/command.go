@@ -5,7 +5,7 @@ import (
 	"os"
 	
 	"github.com/spf13/cobra"
-	`github.com/usestrix/cli/domain/agent`
+	`github.com/strixeyecom/cli/domain/agent`
 )
 
 /*

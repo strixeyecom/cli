@@ -10,7 +10,7 @@ import (
 	`github.com/pkg/errors`
 	`github.com/spf13/cobra`
 	`github.com/spf13/viper`
-	`github.com/usestrix/cli/domain/cli`
+	`github.com/strixeyecom/cli/domain/cli`
 )
 
 /*
@@ -82,6 +82,23 @@ func inspectCmd(cmd *cobra.Command, args []string) error {
 	}
 	fmt.Println(string(conf))
 	return nil
+}
+
+// VersionCommand shows agent version.
+func VersionCommand() *cobra.Command {
+	checkCmd := &cobra.Command{
+		Use:   "version",
+		Short: "Command to show StrixEye CLI Version",
+		Long: `Command to show StrixEye CLI version
+
+
+strixeye version
+`,
+		Run: func(cmd *cobra.Command, args []string) {
+			color.Blue(Version)
+		},
+	}
+	return checkCmd
 }
 
 func marshalToFormat(cliConfig cli.Cli, fmt string) ([]byte, error) {

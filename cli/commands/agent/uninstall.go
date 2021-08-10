@@ -16,12 +16,12 @@ import (
 	`github.com/pkg/errors`
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	agent2 "github.com/usestrix/cli/domain/agent"
-	"github.com/usestrix/cli/domain/consts"
+	agent2 "github.com/strixeyecom/cli/domain/agent"
+	"github.com/strixeyecom/cli/domain/consts"
 	`k8s.io/client-go/kubernetes`
 	
-	"github.com/usestrix/cli/api/user/agent"
-	"github.com/usestrix/cli/domain/cli"
+	"github.com/strixeyecom/cli/api/user/agent"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*

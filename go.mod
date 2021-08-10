@@ -1,4 +1,4 @@
-module github.com/usestrix/cli
+module github.com/strixeyecom/cli
 
 go 1.16
 

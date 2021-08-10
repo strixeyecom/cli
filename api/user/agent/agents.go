@@ -8,9 +8,9 @@ import (
 	
 	"github.com/pkg/errors"
 	
-	"github.com/usestrix/cli/api/user/repository"
-	`github.com/usestrix/cli/domain/agent`
-	`github.com/usestrix/cli/domain/cli`
+	"github.com/strixeyecom/cli/api/user/repository"
+	`github.com/strixeyecom/cli/domain/agent`
+	`github.com/strixeyecom/cli/domain/cli`
 )
 
 /*

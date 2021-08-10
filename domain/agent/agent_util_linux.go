@@ -13,7 +13,7 @@ import (
 	`syscall`
 	
 	"github.com/pkg/errors"
-	"github.com/usestrix/cli/domain/consts"
+	"github.com/strixeyecom/cli/domain/consts"
 )
 
 /*
@@ -267,6 +267,7 @@ func SaveAgentConfig(cfg Agent) error {
 	}
 	
 	// save data
+	// #nosec
 	err = ioutil.WriteFile(filepath.Join(consts.ConfigDir, consts.ConfigFile), data, 0644)
 	if err != nil {
 		return err

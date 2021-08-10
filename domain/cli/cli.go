@@ -6,7 +6,7 @@ import (
 	
 	"github.com/pkg/errors"
 	
-	"github.com/usestrix/cli/domain/repository"
+	"github.com/strixeyecom/cli/domain/repository"
 )
 
 /*
@@ -67,6 +67,7 @@ func (c *Cli) Save(filePath string) error {
 	}
 	
 	// using rw|rw|rw for permission.
+	// #nosec
 	return ioutil.WriteFile(filePath, data, 0644)
 }
 

@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 	`github.com/sirupsen/logrus`
 	
-	`github.com/usestrix/cli/domain/repository`
+	`github.com/strixeyecom/cli/domain/repository`
 )
 
 /*

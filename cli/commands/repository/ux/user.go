@@ -10,8 +10,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/usestrix/cli/api/user/authenticate"
-	"github.com/usestrix/cli/domain/cli"
+	"github.com/strixeyecom/cli/api/user/authenticate"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*

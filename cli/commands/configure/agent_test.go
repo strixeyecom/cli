@@ -3,7 +3,7 @@ package configure
 import (
 	`testing`
 	
-	`github.com/usestrix/cli/domain/agent`
+	`github.com/strixeyecom/cli/domain/agent`
 )
 
 /*

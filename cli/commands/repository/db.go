@@ -21,7 +21,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	
-	`github.com/usestrix/cli/domain/repository`
+	`github.com/strixeyecom/cli/domain/repository`
 )
 
 /*
