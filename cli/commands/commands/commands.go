@@ -15,15 +15,15 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	agent2 "github.com/usestrix/cli/domain/agent"
-	"github.com/usestrix/cli/domain/consts"
+	agent2 "github.com/strixeyecom/cli/domain/agent"
+	"github.com/strixeyecom/cli/domain/consts"
 	
-	"github.com/usestrix/cli/cli/commands/agent"
-	"github.com/usestrix/cli/cli/commands/configure"
-	"github.com/usestrix/cli/cli/commands/suspect"
-	"github.com/usestrix/cli/cli/commands/suspicion"
-	"github.com/usestrix/cli/cli/commands/trip"
-	"github.com/usestrix/cli/domain/cli"
+	"github.com/strixeyecom/cli/cli/commands/agent"
+	"github.com/strixeyecom/cli/cli/commands/configure"
+	"github.com/strixeyecom/cli/cli/commands/suspect"
+	"github.com/strixeyecom/cli/cli/commands/suspicion"
+	"github.com/strixeyecom/cli/cli/commands/trip"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*
@@ -48,19 +48,25 @@ const (
 // global variables (not cool) for this file
 var (
 	cfgFile string
+	Version string
 )
 
 // structToFlag add all fields of a struct to cmd as flags.
 func structToFlag(
 	cmd *cobra.Command, upperLayer []*structs.Field, currentLayer []*structs.Field, upperIdx, currentIdx int,
 ) {
+	// stop recursion on lowest struct level
 	if currentLayer == nil {
 		return
 	}
+	
+	// if this level of struct is done, go a level up back
 	if currentIdx == len(currentLayer) {
 		return
 	}
 	field := currentLayer[currentIdx]
+	
+	// as long as the field is not a struct, create a flag for it
 	if field.Kind() != reflect.Struct {
 		if cmd.Flag(field.Tag("flag")) == nil {
 			// handle flag type
@@ -77,15 +83,22 @@ func structToFlag(
 			}
 		}
 		structToFlag(cmd, upperLayer, currentLayer, upperIdx, currentIdx+1)
-		
 	} else {
+		// for struct fields, recurse the struct
 		structToFlag(cmd, upperLayer, field.Fields(), currentIdx, 0)
 	}
 	
+	// go to neighbor field
+	/*
+				+
+	|   |   |   |   |   |   |
+	|                       |
+	+        --->           +
+	
+	*/
 	if upperIdx != len(upperLayer) {
 		structToFlag(cmd, upperLayer, upperLayer, upperIdx+1, upperIdx+1)
 	}
-	
 }
 
 // NewStrixeyeCommand is the highest command in the hierarchy and all commands root from it.
@@ -127,6 +140,7 @@ func NewStrixeyeCommand() *cobra.Command {
 	// Add subcommands
 	rootCmd.AddCommand(
 		InspectCommand(),
+		VersionCommand(),
 		trip.NewTripCommand(),
 		configure.NewConfigureCommand(),
 		suspicion.NewSuspicionCommand(),

@@ -6,7 +6,7 @@ import (
 	
 	`github.com/spf13/viper`
 	
-	`github.com/usestrix/cli/domain/repository`
+	`github.com/strixeyecom/cli/domain/repository`
 )
 
 /*

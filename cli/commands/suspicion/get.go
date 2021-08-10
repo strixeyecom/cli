@@ -6,12 +6,12 @@ import (
 	"github.com/pkg/errors"
 	`github.com/spf13/cobra`
 	`github.com/spf13/viper`
-	userconfig `github.com/usestrix/cli/api/user/agent`
-	models `github.com/usestrix/cli/domain/repository`
+	userconfig `github.com/strixeyecom/cli/api/user/agent`
+	models `github.com/strixeyecom/cli/domain/repository`
 	"gorm.io/gorm"
 	
-	`github.com/usestrix/cli/cli/commands/repository`
-	`github.com/usestrix/cli/domain/cli`
+	`github.com/strixeyecom/cli/cli/commands/repository`
+	`github.com/strixeyecom/cli/domain/cli`
 )
 
 /*

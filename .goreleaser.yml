@@ -14,7 +14,7 @@ builds:
     goos:
       - linux
     ldflags:
-      - -extldflags=-static -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+      - -extldflags=-static -s -w -X github.com/strixeyecom/cli/cli/commands/commands.Version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
 archives:
   - replacements:
       linux: Linux

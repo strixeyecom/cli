@@ -11,9 +11,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/usestrix/cli/api/user/agent"
-	agent2 "github.com/usestrix/cli/domain/agent"
-	"github.com/usestrix/cli/domain/cli"
+	"github.com/strixeyecom/cli/api/user/agent"
+	agent2 "github.com/strixeyecom/cli/domain/agent"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*

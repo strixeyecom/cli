@@ -9,10 +9,10 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	
-	userconfig "github.com/usestrix/cli/api/user/agent"
-	`github.com/usestrix/cli/cli/commands/repository`
-	`github.com/usestrix/cli/domain/cli`
-	models `github.com/usestrix/cli/domain/repository`
+	userconfig "github.com/strixeyecom/cli/api/user/agent"
+	`github.com/strixeyecom/cli/cli/commands/repository`
+	`github.com/strixeyecom/cli/domain/cli`
+	models `github.com/strixeyecom/cli/domain/repository`
 )
 
 /*

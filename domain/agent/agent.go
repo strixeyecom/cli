@@ -3,7 +3,7 @@ package agent
 import (
 	"fmt"
 	
-	"github.com/usestrix/cli/domain/repository"
+	"github.com/strixeyecom/cli/domain/repository"
 )
 
 /*

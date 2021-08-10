@@ -10,12 +10,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	`github.com/usestrix/cli/cli/commands/repository/ux`
-	agent2 "github.com/usestrix/cli/domain/agent"
-	"github.com/usestrix/cli/domain/consts"
+	`github.com/strixeyecom/cli/cli/commands/repository/ux`
+	agent2 "github.com/strixeyecom/cli/domain/agent"
+	"github.com/strixeyecom/cli/domain/consts"
 	
-	"github.com/usestrix/cli/api/user/agent"
-	"github.com/usestrix/cli/domain/cli"
+	"github.com/strixeyecom/cli/api/user/agent"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*

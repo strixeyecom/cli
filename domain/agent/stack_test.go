@@ -7,8 +7,8 @@ import (
 	"time"
 	
 	`github.com/spf13/viper`
-	`github.com/usestrix/cli/domain/cli`
-	`github.com/usestrix/cli/domain/repository`
+	`github.com/strixeyecom/cli/domain/cli`
+	`github.com/strixeyecom/cli/domain/repository`
 )
 
 func TestStackConfig_Marshall(t *testing.T) {

@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 
-	"github.com/usestrix/cli/domain/cli"
-	"github.com/usestrix/cli/domain/repository"
+	"github.com/strixeyecom/cli/domain/cli"
+	"github.com/strixeyecom/cli/domain/repository"
 )
 
 /*

@@ -9,10 +9,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"github.com/usestrix/cli/cli/commands/repository"
-	repository2 "github.com/usestrix/cli/domain/repository"
+	"github.com/strixeyecom/cli/cli/commands/repository"
+	repository2 "github.com/strixeyecom/cli/domain/repository"
 
-	"github.com/usestrix/cli/domain/cli"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*

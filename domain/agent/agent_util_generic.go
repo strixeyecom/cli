@@ -9,7 +9,7 @@ import (
 	"github.com/docker/docker/client"
 	`github.com/fatih/color`
 	`github.com/pkg/errors`
-	`github.com/usestrix/cli/domain/consts`
+	`github.com/strixeyecom/cli/domain/consts`
 )
 
 /*

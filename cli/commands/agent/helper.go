@@ -16,8 +16,8 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/pkg/errors"
-	"github.com/usestrix/cli/domain/consts"
-	repository2 "github.com/usestrix/cli/domain/repository"
+	"github.com/strixeyecom/cli/domain/consts"
+	repository2 "github.com/strixeyecom/cli/domain/repository"
 )
 
 /*

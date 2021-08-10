@@ -10,7 +10,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/usestrix/cli">
+  <a href="https://github.com/strixeyecom/cli">
     <img src="data/images/strixeye_icon-purple.svg" alt="Logo" width="80" height="80">
   </a>
 
@@ -19,14 +19,14 @@
   <p align="center">
     Get the most out of your StrixEye experience
     <br />
-    <a href="https://github.com/usestrix/cli"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/strixeyecom/cli"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/usestrix/cli">View Demo</a>
+    <a href="https://github.com/strixeyecom/cli">View Demo</a>
     ·
-    <a href="https://github.com/usestrix/cli/issues">Report Bug</a>
+    <a href="https://github.com/strixeyecom/cli/issues">Report Bug</a>
     ·
-    <a href="https://github.com/usestrix/cli/issues">Request Feature</a>
+    <a href="https://github.com/strixeyecom/cli/issues">Request Feature</a>
   </p>
 </p>
 
@@ -190,7 +190,7 @@ Basic building process like the following would suffice.
 
 ## Roadmap
 
-See the [open issues](https://github.com/usestrix/cli/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/strixeyecom/cli/issues) for a list of proposed features (and known issues).
 
 
 
@@ -221,7 +221,7 @@ Distributed under the Apache License 2.0 License. See `LICENSE` for more informa
 
 StrixEye - [@strixeye](https://twitter.com/strixeye) - help@strixeye.com
 
-Project Link: [https://github.com/usestrix/cli](https://github.com/usestrix/cli)
+Project Link: [https://github.com/strixeyecom/cli](https://github.com/strixeyecom/cli)
 
 
 
@@ -231,23 +231,23 @@ Project Link: [https://github.com/usestrix/cli](https://github.com/usestrix/cli)
 
 [contributors-shield]: https://img.shields.io/github/contributors/usestrix/cli.svg?style=for-the-badge
 
-[contributors-url]: https://github.com/usestrix/cli/graphs/contributors
+[contributors-url]: https://github.com/strixeyecom/cli/graphs/contributors
 
 [forks-shield]: https://img.shields.io/github/forks/usestrix/cli.svg?style=for-the-badge
 
-[forks-url]: https://github.com/usestrix/clinetwork/members
+[forks-url]: https://github.com/strixeyecom/clinetwork/members
 
 [stars-shield]: https://img.shields.io/github/stars/usestrix/cli?style=for-the-badge
 
-[stars-url]: https://github.com/usestrix/cli/stargazers
+[stars-url]: https://github.com/strixeyecom/cli/stargazers
 
 [issues-shield]: https://img.shields.io/github/issues/usestrix/cli.svg?style=for-the-badge
 
-[issues-url]: https://github.com/usestrix/cli/issues
+[issues-url]: https://github.com/strixeyecom/cli/issues
 
 [license-shield]: https://img.shields.io/github/license/usestrix/cli.svg?style=for-the-badge
 
-[license-url]: https://github.com/usestrix/cli/blob/master/LICENSE.txt
+[license-url]: https://github.com/strixeyecom/cli/blob/master/LICENSE.txt
 
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 
