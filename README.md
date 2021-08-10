@@ -89,7 +89,7 @@ General information about setting up StrixEye CLI locally
 
 ### Prerequisites
 
-Required softwares and installations.
+Required software and installations.
 
 * CLI has no external dependencies. It will work on all machines those operating systems we support.
 
@@ -125,11 +125,9 @@ Check out documentation to see possible places for StrixEye CLI. On *NIX, it is 
 
 Edit/Add `user_api_token` and `agent_id` fields in your cli config file
 
-```json5
-{
-  "user_api_token": "YOUR_USER_API_TOKEN",
-  "agent_id": "SELECTED_AGENT_ID"
-}
+```yaml
+user_api_token: YOUR_USER_API_TOKEN
+agent_id: SELECTED_AGENT_ID
 ```
 
 ### Installation
@@ -200,7 +198,7 @@ See the [open issues](https://github.com/usestrix/cli/issues) for a list of prop
 
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any
+Contributions are what make the open source community such an amazing place to be learned, inspire, and create. Any
 contributions you make are **greatly appreciated**.
 
 1. Fork the Project

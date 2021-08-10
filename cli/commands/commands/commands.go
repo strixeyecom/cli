@@ -5,9 +5,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	`reflect`
 	"strings"
 	
 	"github.com/fatih/color"
+	`github.com/fatih/structs`
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -45,12 +47,46 @@ const (
 
 // global variables (not cool) for this file
 var (
-	cfgFile        string
-	apiDomain      string
-	downloadDomain string
-	userAPIToken   string
-	agentID        string
+	cfgFile string
 )
+
+// structToFlag add all fields of a struct to cmd as flags.
+func structToFlag(
+	cmd *cobra.Command, upperLayer []*structs.Field, currentLayer []*structs.Field, upperIdx, currentIdx int,
+) {
+	if currentLayer == nil {
+		return
+	}
+	if currentIdx == len(currentLayer) {
+		return
+	}
+	field := currentLayer[currentIdx]
+	if field.Kind() != reflect.Struct {
+		if cmd.Flag(field.Tag("flag")) == nil {
+			// handle flag type
+			switch field.Kind().String() {
+			case "string":
+				cmd.PersistentFlags().String(field.Tag("flag"), "", "")
+			case "bool":
+				cmd.PersistentFlags().Bool(field.Tag("flag"), false, "")
+			case "int":
+				cmd.PersistentFlags().Int(field.Tag("flag"), 0, "")
+			case "float":
+				cmd.PersistentFlags().Float64(field.Tag("flag"), 0, "")
+				
+			}
+		}
+		structToFlag(cmd, upperLayer, currentLayer, upperIdx, currentIdx+1)
+		
+	} else {
+		structToFlag(cmd, upperLayer, field.Fields(), currentIdx, 0)
+	}
+	
+	if upperIdx != len(upperLayer) {
+		structToFlag(cmd, upperLayer, upperLayer, upperIdx+1, upperIdx+1)
+	}
+	
+}
 
 // NewStrixeyeCommand is the highest command in the hierarchy and all commands root from it.
 //nolint:funlen
@@ -76,10 +112,6 @@ func NewStrixeyeCommand() *cobra.Command {
 				return errors.WithMessage(err, "can not read config")
 			}
 			
-			// get values from viper
-			a := viper.GetViper()
-			_ = a
-			
 			// unmarshal into config object
 			err = viper.Unmarshal(&cliConfig)
 			if err != nil {
@@ -89,29 +121,8 @@ func NewStrixeyeCommand() *cobra.Command {
 			return nil
 		},
 		RunE: ShowHelp(os.Stdout),
+		
 	}
-	
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(
-		&cfgFile, "config", "", "config file (default is $HOME/.strixeye/."+
-			defaultConfigFilename+"."+defaultConfigFileType+")",
-	)
-	rootCmd.PersistentFlags().StringVar(
-		&apiDomain, "api-domain", "", "api.strixeye.com",
-	)
-	
-	rootCmd.PersistentFlags().StringVar(
-		&downloadDomain, "download-domain", "", "downloads.strixeye.com",
-	)
-	rootCmd.PersistentFlags().StringVar(
-		&userAPIToken, "user-api-token", "", "",
-	)
-	
-	rootCmd.PersistentFlags().StringVar(
-		&agentID, "agent-id", "", "",
-	)
 	
 	// Add subcommands
 	rootCmd.AddCommand(
@@ -124,7 +135,16 @@ func NewStrixeyeCommand() *cobra.Command {
 	)
 	
 	// Add flags
+	c := &cli.Cli{}
+	structToFlag(rootCmd, structs.Fields(c), structs.Fields(c), 0, 0)
 	
+	// Here you will define your flags and configuration settings.
+	// Cobra supports persistent flags, which, if defined here,
+	// will be global for your application.
+	rootCmd.PersistentFlags().StringVar(
+		&cfgFile, "config", "", "config file (default is $HOME/.strixeye/."+
+			defaultConfigFilename+"."+defaultConfigFileType+")",
+	)
 	return rootCmd
 }
 
@@ -284,6 +304,7 @@ func getHome() (string, error) {
 	
 	return home, nil
 }
+
 func setDefaultConfig() {
 	viper.SetDefault("API_DOMAIN", consts.APIHost)
 	viper.SetDefault("DOWNLOAD_DOMAIN", consts.DownloadHost)
