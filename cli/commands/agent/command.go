@@ -3,8 +3,9 @@ package agent
 import (
 	"io"
 	"os"
-
+	
 	"github.com/spf13/cobra"
+	`github.com/usestrix/cli/domain/agent`
 )
 
 /*
@@ -29,8 +30,23 @@ func NewAgentCommand() *cobra.Command {
 		Short: "Control and manage agent on your host machine",
 		Long:  `Install, Uninstall, Reset selected agent on current host machine`,
 		RunE:  ShowHelp(os.Stdout),
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			// unfortunately, cobra doesn't support chaining persistent pre run error functions for now.
+			// So, we are going to call parent pre run as well
+			if parent := cmd.Parent(); parent != nil {
+				if parent.PersistentPreRunE != nil {
+					err := parent.PersistentPreRunE(parent, args)
+					if err != nil {
+						return err
+					}
+				}
+			}
+			
+			// And finally, the pre run function we want
+			return agent.IsCorrectUser()
+		},
 	}
-
+	
 	agentCommands.AddCommand(
 		CheckCommand(),
 		InstallCommand(),
