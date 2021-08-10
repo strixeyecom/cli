@@ -32,7 +32,7 @@ const (
 	logVerificationSuccessful = "\tVerification successfully completed. ✅"
 	
 	DockerDatabaseVolumeName = "strixeye_strixeye-database"
-	DockerBrokerVolumeName = "strixeye_strixeye-queue"
+	DockerBrokerVolumeName   = "strixeye_strixeye-queue"
 )
 
 var (
@@ -70,6 +70,7 @@ func (a AgentInformation) CheckIfHostSupports() error {
 	err := a.checkIfHostSupports()
 	if err != nil {
 		color.Red(logVerificationFailed)
+		return err
 	}
 	
 	color.Yellow(logVerificationSuccessful)
