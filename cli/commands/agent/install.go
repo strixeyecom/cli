@@ -244,21 +244,36 @@ func loginToDocker(agentConfig agent2.AgentInformation, cliConfig cli.Cli) error
 	err := cmd.Run()
 	
 	if err != nil {
-		color.Red(
-			`
+		if agentConfig.Config.Deployment == "docker"{
+			color.Red(
+				`
 Docker can not fetch test image from StrixEye registry.
 If you haven't logged in to Strixeye Docker Registry yet, you need to login to StrixEye registry at %s.
 
 Here is a direct command you can execute:
 
-$ docker login --username strixeye --password %s %s
+$ sudo docker login --username strixeye --password %s %s
 
 If you don't want to show credentials in your history, following is a custom command you can use.
 Logging in to a docker registry is a basic procedure that is documented by docker as well. https://docs.docker.com/engine/reference/commandline/login/
 
-$ strixeye agent show-token | docker login --username strixeye --password-stdin $(strixeye agent show-registry)
+$ strixeye inspect user_api_token | sudo docker login --username strixeye --password-stdin $(
+strixeye inspect docker_registry)
 `, cliConfig.DockerRegistry, agentConfig.Token, cliConfig.DockerRegistry,
-		)
+			)
+		}else if agentConfig.Config.Deployment == "kubernetes" {
+			color.Red(
+				`
+Kubernetes can not fetch test image from StrixEye registry.
+If you haven't logged in to Strixeye Container Registry yet, you need to login to StrixEye registry at %s.
+
+Here is a direct command you can execute:
+
+$ kubectl create secret docker-registry strixeye-cred --docker-server=$(strixeye inspect docker_registry) --docker-username=strixeye --docker-password=$(strixeye inspect user_api_token)
+`,
+			)
+		}
+	
 		return err
 	}
 	

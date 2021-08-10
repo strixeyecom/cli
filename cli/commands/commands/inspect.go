@@ -53,7 +53,6 @@ func inspectCmd(cmd *cobra.Command, args []string) error {
 	var (
 		cliConfig cli.Cli
 		err       error
-		// result    []interface{}
 	)
 	
 	// get cli config
@@ -63,22 +62,23 @@ func inspectCmd(cmd *cobra.Command, args []string) error {
 	}
 	
 	// show only requested fields
-	if args != nil {
+	if len(args) > 0 {
 		// iterate all wanted fields
 		for _, arg := range args {
 			str := viper.GetString(arg)
-			color.Blue(str)
+			color.Blue("%s", str)
 		}
+		return nil
 	}
 	
 	// output in requested format
-	fmtFlag,err := cmd.Flags().GetString("format")
-	if err != nil{
-		return errors.Wrap(err,"can not inspect, bad format value")
+	fmtFlag, err := cmd.Flags().GetString("format")
+	if err != nil {
+		return errors.Wrap(err, "can not inspect, bad format value")
 	}
 	conf, err := marshalToFormat(cliConfig, fmtFlag)
 	if err != nil {
-		return errors.Wrap(err,"can not marshal cli config while inspecting")
+		return errors.Wrap(err, "can not marshal cli config while inspecting")
 	}
 	fmt.Println(string(conf))
 	return nil
@@ -87,7 +87,7 @@ func inspectCmd(cmd *cobra.Command, args []string) error {
 func marshalToFormat(cliConfig cli.Cli, fmt string) ([]byte, error) {
 	switch fmt {
 	case "json":
-		return json.MarshalIndent(cliConfig,"","\t")
+		return json.MarshalIndent(cliConfig, "", "\t")
 	case "yaml":
 		return yaml.Marshal(cliConfig)
 	case "toml":

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
+	
 	"github.com/pkg/errors"
 	repository2 `github.com/usestrix/cli/domain/repository`
 	
@@ -47,10 +47,12 @@ func getAgent(apiToken, apiDomain, agentID string) (agent.AgentInformation, erro
 		err  error
 		resp *http.Response
 	)
-
+	if agentID == "" {
+		return agent.AgentInformation{}, errors.New("no agent id given")
+	}
 	url := fmt.Sprintf("/agents/%s", agentID)
 	resp, err = repository.UserAPIRequest(http.MethodGet, url, nil, apiToken, apiDomain)
-
+	
 	if err != nil {
 		return agent.AgentInformation{}, errors.Wrap(err, "failed to complete user api request to agents")
 	}
@@ -62,7 +64,7 @@ func getAgent(apiToken, apiDomain, agentID string) (agent.AgentInformation, erro
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-
+	
 	// handle reject/fail responses
 	if resp.StatusCode != http.StatusOK {
 		return agent.AgentInformation{}, fmt.Errorf(
@@ -70,7 +72,7 @@ func getAgent(apiToken, apiDomain, agentID string) (agent.AgentInformation, erro
 				"Status Code : %d, error message : %s", resp.StatusCode, body,
 		)
 	}
-
+	
 	// if status is ok, than this is possibly a api success response
 	var apiResponse agentResponse
 	err = json.Unmarshal(body, &apiResponse)
@@ -80,7 +82,7 @@ func getAgent(apiToken, apiDomain, agentID string) (agent.AgentInformation, erro
 			"api says response is okay but possibly there is a misunderstanding",
 		)
 	}
-
+	
 	return apiResponse.Data, nil
 }
 
@@ -95,11 +97,11 @@ func getVersions(apiDomain string) (repository2.Versions, error) {
 		err  error
 		resp *http.Response
 	)
-
+	
 	url := fmt.Sprintf("https://%s/versions", apiDomain)
 	// #nosec
 	resp, err = http.Get(url)
-
+	
 	if err != nil {
 		return repository2.Versions{}, errors.Wrap(err, "failed to complete request to get versions")
 	}
@@ -111,7 +113,7 @@ func getVersions(apiDomain string) (repository2.Versions, error) {
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-
+	
 	// handle reject/fail responses
 	if resp.StatusCode != http.StatusOK {
 		return repository2.Versions{}, fmt.Errorf(
@@ -119,7 +121,7 @@ func getVersions(apiDomain string) (repository2.Versions, error) {
 				"Status Code : %d, error message : %s", resp.StatusCode, body,
 		)
 	}
-
+	
 	// if status is ok, than this is possibly a api success response
 	var apiResponse repository2.APIVersionsMessage
 	err = json.Unmarshal(body, &apiResponse)
@@ -129,14 +131,14 @@ func getVersions(apiDomain string) (repository2.Versions, error) {
 			"api says response is okay but possibly there is a misunderstanding",
 		)
 	}
-
+	
 	if len(apiResponse.Data) == 0 {
 		return repository2.Versions{}, errors.Wrap(
 			err,
 			"under maintenance, please try again in a few minutes",
 		)
 	}
-
+	
 	// turn api response to usable version structure
 	versions, err := apiResponse.ToVersions()
 	if err != nil {

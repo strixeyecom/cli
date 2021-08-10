@@ -30,6 +30,9 @@ const (
 	
 	logVerificationFailed     = "\t❌❌❌Verification failed. ❌❌❌"
 	logVerificationSuccessful = "\tVerification successfully completed. ✅"
+	
+	DockerDatabaseVolumeName = "strixeye_strixeye-database"
+	DockerBrokerVolumeName = "strixeye_strixeye-queue"
 )
 
 var (
