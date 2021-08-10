@@ -89,6 +89,7 @@ func SetupAgent(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
+	
 	// if flags aren't provided, let user choose from a select list.
 	isInteractive, err := cmd.Flags().GetBool("interactive")
 	if err != nil {

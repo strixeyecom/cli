@@ -3,9 +3,9 @@ package cli
 import (
 	"encoding/json"
 	"io/ioutil"
-
+	
 	"github.com/pkg/errors"
-
+	
 	"github.com/usestrix/cli/domain/repository"
 )
 
@@ -33,20 +33,20 @@ type Cli struct {
 	// This api is open to all our customers and feel free to check out the documentation.
 	//
 	// UserAPIToken is generally sent as Authentication Bearer token over https.
-	UserAPIToken string `mapstructure:"USER_API_TOKEN" flag:"user_api_token" flag:"user_api_token"`
+	UserAPIToken string `mapstructure:"USER_API_TOKEN" flag:"user-api-token"`
 	
 	// strixeye cli is usually designed to be used for a single agent instance at once,
 	// while not necessary, this field can be use to save user preference.
 	//
 	// However, most functions are agent id dependent.
-	AgentID string `mapstructure:"AGENT_ID" flag:"agent_id" flag:"agent_id"`
+	AgentID string `mapstructure:"AGENT_ID" flag:"agent-id"`
 	
 	// DO NOT EDIT
 	// APIDomain is almost always dashboard.strixeye.com or api.strixeye.com. However,
 	// this is needed for testing purposes
-	APIDomain      string `mapstructure:"API_DOMAIN" flag:"api_domain"`
-	DownloadDomain string `mapstructure:"DOWNLOAD_DOMAIN" flag:"download_domain"`
-	DockerRegistry string `mapstructure:"DOCKER_REGISTRY" flag:"docker_registry"`
+	APIDomain      string `mapstructure:"API_DOMAIN" flag:"api-domain"`
+	DownloadDomain string `mapstructure:"DOWNLOAD_DOMAIN" flag:"download-domain"`
+	DockerRegistry string `mapstructure:"DOCKER_REGISTRY" flag:"docker-registry"`
 	
 	// 	DB can be removed in the future, however it is something user might want to override.
 	// 	I'm not sure if this will cause a vuln for now, however even I need this for myself. Because:
@@ -54,7 +54,7 @@ type Cli struct {
 	// network, but StrixEye CLI is not part of that network, and won't be.
 	repository.Database `mapstructure:"DATABASE"`
 	
-	PrettyOutput bool `json:"pretty_output" yaml:"pretty_output" mapstructure:"PRETTY_OUTPUT" flag:"pretty_output"`
+	PrettyOutput bool `json:"pretty_output" yaml:"pretty_output" mapstructure:"PRETTY_OUTPUT" flag:"pretty-output"`
 	
 	Interactive bool `json:"-" yaml:"-" mapstructure:"INTERACTIVE" flag:"interactive"`
 }
@@ -65,7 +65,7 @@ func (c *Cli) Save(filePath string) error {
 	if err != nil {
 		return errors.Wrap(err, "can not save cli config to file")
 	}
-
+	
 	// using rw|rw|rw for permission.
 	return ioutil.WriteFile(filePath, data, 0644)
 }
@@ -75,11 +75,11 @@ func (c *Cli) Validate() error {
 	var (
 	// err error
 	)
-
+	
 	// TODO add validation support
 	if c.UserAPIToken == "" || c.AgentID == "" {
 		return errors.New("cli config has empty field")
 	}
-
+	
 	return nil
 }
