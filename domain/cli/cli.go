@@ -28,35 +28,35 @@ var ()
 //
 // It's usually kept in json format.
 type Cli struct {
-
+	
 	// UserAPIToken is used for the authentication process to Strixeye User API.
 	// This api is open to all our customers and feel free to check out the documentation.
 	//
 	// UserAPIToken is generally sent as Authentication Bearer token over https.
-	UserAPIToken string `mapstructure:"USER_API_TOKEN"`
-
+	UserAPIToken string `mapstructure:"USER_API_TOKEN" flag:"user_api_token" flag:"user_api_token"`
+	
 	// strixeye cli is usually designed to be used for a single agent instance at once,
 	// while not necessary, this field can be use to save user preference.
 	//
 	// However, most functions are agent id dependent.
-	AgentID string `mapstructure:"AGENT_ID"`
-
+	AgentID string `mapstructure:"AGENT_ID" flag:"agent_id" flag:"agent_id"`
+	
 	// DO NOT EDIT
 	// APIDomain is almost always dashboard.strixeye.com or api.strixeye.com. However,
 	// this is needed for testing purposes
-	APIDomain      string `mapstructure:"API_DOMAIN"`
-	DownloadDomain string `mapstructure:"DOWNLOAD_DOMAIN"`
-	DockerRegistry string `mapstructure:"DOCKER_REGISTRY"`
-
+	APIDomain      string `mapstructure:"API_DOMAIN" flag:"api_domain"`
+	DownloadDomain string `mapstructure:"DOWNLOAD_DOMAIN" flag:"download_domain"`
+	DockerRegistry string `mapstructure:"DOCKER_REGISTRY" flag:"docker_registry"`
+	
 	// 	DB can be removed in the future, however it is something user might want to override.
 	// 	I'm not sure if this will cause a vuln for now, however even I need this for myself. Because:
 	// normally, database host is known only inside stack network like docker-compose network or kubernetes
 	// network, but StrixEye CLI is not part of that network, and won't be.
 	repository.Database `mapstructure:"DATABASE"`
-
-	PrettyOutput bool `json:"pretty_output" yaml:"pretty_output" mapstructure:"PRETTY_OUTPUT"`
-
-	Interactive bool `json:"-" yaml:"-" mapstructure:"INTERACTIVE"`
+	
+	PrettyOutput bool `json:"pretty_output" yaml:"pretty_output" mapstructure:"PRETTY_OUTPUT" flag:"pretty_output"`
+	
+	Interactive bool `json:"-" yaml:"-" mapstructure:"INTERACTIVE" flag:"interactive"`
 }
 
 // Save stores current cli config to given file in json format.

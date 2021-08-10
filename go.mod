@@ -7,6 +7,7 @@ require (
 	github.com/docker/docker v20.10.6+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/fatih/color v1.7.0
+	github.com/fatih/structs v1.1.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-yaml/yaml v2.1.0+incompatible
