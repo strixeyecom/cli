@@ -8,6 +8,8 @@ before:
     - make security
 builds:
   - main: ./cmd/strixeye/main.go
+    binary: strixeye
+    id: strixeye
     flags: -tags=production,osusergo,netgo
     env:
       - CGO_ENABLED=0
@@ -18,6 +20,8 @@ builds:
 archives:
   - replacements:
       linux: Linux
+    name_template:
+      "strixeye_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 
 checksum:
   name_template: 'checksums.txt'
@@ -54,7 +58,7 @@ release:
 
   # You can change the name of the release.
   # Default is `{{.Tag}}`
-  name_template: "{{.ProjectName}}-v{{.Version}}"
+  name_template: "strixeye-v{{.Version}}"
 
   # You can disable this pipe in order to not upload any artifacts.
   # Defaults to false.
