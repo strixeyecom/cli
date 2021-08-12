@@ -90,10 +90,10 @@ func structToFlag(
 	
 	// go to neighbor field
 	/*
-				+
-	|   |   |   |   |   |   |
-	|                       |
-	+        --->           +
+					+
+		|   |   |   |   |   |   |
+		|                       |
+		+        --->           +
 	
 	*/
 	if upperIdx != len(upperLayer) {
@@ -300,23 +300,33 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 	return nil
 }
 
+// getHome
+// Windows Support Breaker.
 func getHome() (string, error) {
-	// 	get os independent home directory
-	home, err := homedir.Dir()
-	if err != nil {
-		return "", err
+	sudoUser := os.Getenv("SUDO_USER")
+	if sudoUser != "" {
+		return fmt.Sprintf("/home/%s", sudoUser), nil
 	}
 	
-	// 	handle linux sudo fallback
-	if home == "/root" {
-		sudoHome := os.Getenv("SUDO_HOME")
-		if sudoHome != "" {
-			color.Blue("Process is running via sudo")
-			home = sudoHome
+	if os.Geteuid() == 0 {
+		// if it is root, $HOME is not usable, because not accessible by regular users.
+		return "", errors.New(
+			"can not find config path. " +
+				"Either pass it as flag --config-path or switch to a regular user",
+		)
+	}
+
+	
+	// if sudo user is empty, it is a legit user. Most importantly, it is either a regular user, or it's root.
+	// if the process owner isn't root, all is OK
+		// 	get os independent home directory
+		home, err := homedir.Dir()
+		if err != nil {
+			return "", err
 		}
-	}
+		
+		return home, nil
 	
-	return home, nil
 }
 
 func setDefaultConfig() {
