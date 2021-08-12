@@ -90,10 +90,10 @@ func structToFlag(
 	
 	// go to neighbor field
 	/*
-				+
-	|   |   |   |   |   |   |
-	|                       |
-	+        --->           +
+					+
+		|   |   |   |   |   |   |
+		|                       |
+		+        --->           +
 	
 	*/
 	if upperIdx != len(upperLayer) {
@@ -155,8 +155,8 @@ func NewStrixeyeCommand() *cobra.Command {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(
-		&cfgFile, "config", "", "config file (default is $HOME/.strixeye/."+
+	rootCmd.PersistentFlags().String(
+		"config-path", "", "config file (default is $HOME/.strixeye/."+
 			defaultConfigFilename+"."+defaultConfigFileType+")",
 	)
 	return rootCmd
@@ -217,15 +217,27 @@ func initializeConfig(cmd *cobra.Command) error {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
-		home, err := getHome()
-		cobra.CheckErr(err)
+		var configPath string
+		
+		// Flag overrides all values
+		configFlag, err := cmd.Flags().GetString("config-path")
+		if err != nil {
+			return err
+		}
 		
 		// Search config in home directory with name ".cli" (without extension).
-		configPath := home + "/.strixeye"
-		viper.AddConfigPath(configPath)
-		
-		cfgFile = filepath.Join(configPath, defaultConfigFilename, defaultConfigFileType)
+		if configFlag != "" {
+			configPath = filepath.Dir(configFlag)
+			viper.AddConfigPath(configPath)
+			viper.SetConfigFile(configFlag)
+		} else {
+			// Find home directory.
+			home, err := getHome(cmd)
+			cobra.CheckErr(err)
+			configPath = home + "/.strixeye"
+			cfgFile = filepath.Join(configPath, defaultConfigFilename, defaultConfigFileType)
+			viper.AddConfigPath(configPath)
+		}
 		
 		// create default config directory since we are going to use this anyway.
 		_, statErr := os.Stat(configPath)
@@ -300,23 +312,34 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 	return nil
 }
 
-func getHome() (string, error) {
+// getHome
+// Windows Support Breaker.
+func getHome(cmd *cobra.Command) (string, error) {
+	// SUDO related homes has precedence over user homes.
+	sudoUser := os.Getenv("SUDO_USER")
+	if sudoUser != "" {
+		return fmt.Sprintf("/home/%s", sudoUser), nil
+	}
+	
+	// root is not an allowed home
+	if os.Geteuid() == 0 {
+		// if it is root, $HOME is not usable, because not accessible by regular users.
+		return "", errors.New(
+			"can not find config path. " +
+				"Either pass it as flag --config-path or switch to a regular user",
+		)
+	}
+	
+	// if sudo user is empty, it is a legit user. Most importantly, it is either a regular user, or it's root.
+	// if the process owner isn't root, all is OK
 	// 	get os independent home directory
 	home, err := homedir.Dir()
 	if err != nil {
 		return "", err
 	}
 	
-	// 	handle linux sudo fallback
-	if home == "/root" {
-		sudoHome := os.Getenv("SUDO_HOME")
-		if sudoHome != "" {
-			color.Blue("Process is running via sudo")
-			home = sudoHome
-		}
-	}
-	
 	return home, nil
+	
 }
 
 func setDefaultConfig() {
