@@ -22,7 +22,9 @@ import (
 */
 
 // global constants for file
-const ()
+const (
+	defaultInspectFormat = "yaml"
+)
 
 // global variables (not cool) for this file
 var ()
@@ -43,7 +45,7 @@ strixeye agent inspect
 	
 	// set up flags
 	checkCmd.Flags().String(
-		"format", "json", "--format if you want to output information in a specified format like json, "+
+		"format", defaultInspectFormat, "--format if you want to output information in a specified format like json, "+
 			"yaml or toml",
 	)
 	return checkCmd
