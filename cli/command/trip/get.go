@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm/clause"
 	
 	userconfig "github.com/strixeyecom/cli/api/user/agent"
-	`github.com/strixeyecom/cli/cli/commands/repository`
+	`github.com/strixeyecom/cli/cli/command/repository`
 	`github.com/strixeyecom/cli/domain/cli`
 	models `github.com/strixeyecom/cli/domain/repository`
 )

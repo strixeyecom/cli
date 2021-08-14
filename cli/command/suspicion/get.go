@@ -10,7 +10,7 @@ import (
 	models `github.com/strixeyecom/cli/domain/repository`
 	"gorm.io/gorm"
 	
-	`github.com/strixeyecom/cli/cli/commands/repository`
+	`github.com/strixeyecom/cli/cli/command/repository`
 	`github.com/strixeyecom/cli/domain/cli`
 )
 

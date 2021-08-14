@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	`github.com/strixeyecom/cli/cli/commands/repository/ux`
+	`github.com/strixeyecom/cli/cli/command/repository/ux`
 	agent2 "github.com/strixeyecom/cli/domain/agent"
 	"github.com/strixeyecom/cli/domain/consts"
 	
