@@ -68,7 +68,7 @@ trips on your agent, without leaking any sensitive data outside of your network`
 			" timestamp with date +%s",
 	)
 	
-	getCmd.Flags().IntP(
+	getCmd.Flags().Float64P(
 		"min-score", "m", 50,
 		"Queries only suspects with scores bigger than X --min-score [0-100] Default value is 50.  ",
 	)
