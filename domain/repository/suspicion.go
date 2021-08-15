@@ -34,7 +34,7 @@ type Suspicion struct {
 	DomainId string
 	
 	// timestamp of suspicion creation in epoch milliseconds
-	CreatedAt uint64
+	CreatedAt int64
 }
 
 type Ip struct {
