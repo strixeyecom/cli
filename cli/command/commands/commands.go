@@ -15,14 +15,13 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	agent2 "github.com/strixeyecom/cli/domain/agent"
 	"github.com/strixeyecom/cli/domain/consts"
 	
-	"github.com/strixeyecom/cli/cli/commands/agent"
-	"github.com/strixeyecom/cli/cli/commands/configure"
-	"github.com/strixeyecom/cli/cli/commands/suspect"
-	"github.com/strixeyecom/cli/cli/commands/suspicion"
-	"github.com/strixeyecom/cli/cli/commands/trip"
+	"github.com/strixeyecom/cli/cli/command/agent"
+	"github.com/strixeyecom/cli/cli/command/configure"
+	"github.com/strixeyecom/cli/cli/command/suspect"
+	"github.com/strixeyecom/cli/cli/command/suspicion"
+	"github.com/strixeyecom/cli/cli/command/trip"
 	"github.com/strixeyecom/cli/domain/cli"
 )
 
@@ -50,56 +49,6 @@ var (
 	cfgFile string
 	Version string
 )
-
-// structToFlag add all fields of a struct to cmd as flags.
-func structToFlag(
-	cmd *cobra.Command, upperLayer []*structs.Field, currentLayer []*structs.Field, upperIdx, currentIdx int,
-) {
-	// stop recursion on lowest struct level
-	if currentLayer == nil {
-		return
-	}
-	
-	// if this level of struct is done, go a level up back
-	if currentIdx == len(currentLayer) {
-		return
-	}
-	field := currentLayer[currentIdx]
-	
-	// as long as the field is not a struct, create a flag for it
-	if field.Kind() != reflect.Struct {
-		if cmd.Flag(field.Tag("flag")) == nil {
-			// handle flag type
-			switch field.Kind().String() {
-			case "string":
-				cmd.PersistentFlags().String(field.Tag("flag"), "", "")
-			case "bool":
-				cmd.PersistentFlags().Bool(field.Tag("flag"), false, "")
-			case "int":
-				cmd.PersistentFlags().Int(field.Tag("flag"), 0, "")
-			case "float":
-				cmd.PersistentFlags().Float64(field.Tag("flag"), 0, "")
-				
-			}
-		}
-		structToFlag(cmd, upperLayer, currentLayer, upperIdx, currentIdx+1)
-	} else {
-		// for struct fields, recurse the struct
-		structToFlag(cmd, upperLayer, field.Fields(), currentIdx, 0)
-	}
-	
-	// go to neighbor field
-	/*
-					+
-		|   |   |   |   |   |   |
-		|                       |
-		+        --->           +
-	
-	*/
-	if upperIdx != len(upperLayer) {
-		structToFlag(cmd, upperLayer, upperLayer, upperIdx+1, upperIdx+1)
-	}
-}
 
 // NewStrixeyeCommand is the highest command in the hierarchy and all commands root from it.
 //nolint:funlen
@@ -150,7 +99,7 @@ func NewStrixeyeCommand() *cobra.Command {
 	
 	// Add flags
 	c := &cli.Cli{}
-	structToFlag(rootCmd, structs.Fields(c), structs.Fields(c), 0, 0)
+	structToFlag(rootCmd, structs.Fields(c), structs.Fields(c), 0, 0, []string{})
 	
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
@@ -159,23 +108,59 @@ func NewStrixeyeCommand() *cobra.Command {
 		"config-path", "", "config file (default is $HOME/.strixeye/."+
 			defaultConfigFilename+"."+defaultConfigFileType+")",
 	)
+	
 	return rootCmd
 }
 
-func checkUser(cmd *cobra.Command) {
-	// if this is the first time, it needs to be the root user.
-	// Because strixeye install command runs as a root and if you keep strixeye cli config in a
-	// user owned directory, like any directory under $HOME,
-	// it won't be accessible by root user by $HOME path, because for example in Linux,
-	// $HOME for root user is /root, and that means the config file is under /root/strixeye-cli.
-	//
-	// Because of this, we need to put it in a non-user based directory. However,
-	// it is totally fine to own the directory.
-	if !agent2.IsRootUser() {
-		color.Red(
-			`For now, StrixEye doesn't support non-root users for your security.`,
-		)
-		os.Exit(1)
+// structToFlag add all fields of a struct to cmd as flags.
+func structToFlag(
+	cmd *cobra.Command, upperLayer []*structs.Field, currentLayer []*structs.Field, upperIdx,
+	currentIdx int, path []string,
+) {
+	// stop recursion on lowest struct level
+	if currentLayer == nil {
+		return
+	}
+	
+	// if this level of struct is done, go a level up back
+	if currentIdx == len(currentLayer) {
+		return
+	}
+	field := currentLayer[currentIdx]
+	
+	// as long as the field is not a struct, create a flag for it
+	if field.Kind() != reflect.Struct {
+		flagName := strings.Join(append(path, field.Tag("flag")),".")
+		if cmd.Flag(flagName) == nil {
+			// handle flag type
+			switch field.Kind().String() {
+			case "string":
+				cmd.PersistentFlags().String(flagName, "", "")
+			case "bool":
+				cmd.PersistentFlags().Bool(flagName, false, "")
+			case "int":
+				cmd.PersistentFlags().Int(flagName, 0, "")
+			case "float":
+				cmd.PersistentFlags().Float64(flagName, 0, "")
+				
+			}
+		}
+		structToFlag(cmd, upperLayer, currentLayer, upperIdx, currentIdx+1, path)
+	} else {
+		// for struct fields, recurse the struct
+		structToFlag(cmd, upperLayer, field.Fields(), currentIdx, 0, append(path, field.Tag("flag")))
+	}
+	
+	// go to neighbor field
+	/*
+					+
+		|   |   |   |   |   |   |
+		|                       |
+		+        --->           +
+	
+	*/
+	if upperIdx != len(upperLayer) {
+		structToFlag(cmd, upperLayer, upperLayer, upperIdx+1, upperIdx+1, []string{})
 	}
 }
 
@@ -308,7 +293,6 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 	
 	// Bind the current command's flags to viper
 	bindFlags(cmd, viper.GetViper())
-	
 	return nil
 }
 

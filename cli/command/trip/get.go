@@ -1,17 +1,18 @@
-package suspicion
+package trip
 
 import (
-	`github.com/fatih/color`
-	`github.com/hokaccha/go-prettyjson`
+	"github.com/fatih/color"
+	"github.com/k0kubun/pp"
 	"github.com/pkg/errors"
-	`github.com/spf13/cobra`
-	`github.com/spf13/viper`
-	userconfig `github.com/strixeyecom/cli/api/user/agent`
-	models `github.com/strixeyecom/cli/domain/repository`
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	
-	`github.com/strixeyecom/cli/cli/commands/repository`
+	userconfig "github.com/strixeyecom/cli/api/user/agent"
+	`github.com/strixeyecom/cli/cli/command/repository`
 	`github.com/strixeyecom/cli/domain/cli`
+	models `github.com/strixeyecom/cli/domain/repository`
 )
 
 /*
@@ -19,7 +20,7 @@ import (
 */
 
 /*
-	get suspicions from your agent database
+	get request/response pairs from your agent database
 */
 
 // global constants for file
@@ -28,68 +29,71 @@ const ()
 // global variables (not cool) for this file
 var ()
 
-// GetCommand returns cli command to query suspicions.
-// Command to query suspicions on your agent
-// StrixEye agent logs suspicions(anomalies) of your visitors for a span of time.
+// GetCommand returns cli command to query trips.
+// Command to query trips on your agent
+// StrixEye agent logs requests/responses of your visitors for a span of time.
 // If you are our customer, then you know that StrixEye agent runs on your internal network and doesn't leak
 // any data outside of your network/its network because of privacy and security concerns.
 //
-// With this subcommand, you can inspect your logs.
-// Get is a subcommand of suspicion command where you can query
-// suspicions on your agent, without leaking any sensitive data outside of your network.
+// With this subcommand, you can inspect your logs get is a subcommand of trip command where you can query
+// trips on your agent, without leaking any sensitive data outside of your network.
 func GetCommand() *cobra.Command {
 	getCmd := &cobra.Command{
 		Use:   "get",
-		Short: "Command to query suspicions on your agent",
-		Long: `StrixEye agent logs suspicions(anomalies) of your visitors for a span of time.
+		Short: "Command to query trips on your agent",
+		Long: `Command to query trips on your agent
+StrixEye agent logs requests/responses of your visitors for a span of time.
 If you are our customer, then you know that StrixEye agent runs on your internal network and doesn't leak
 any data outside of your network/its network because of privacy and security concerns.
 
-With this subcommand, you can inspect your logs.
-Get is a subcommand of suspicion command where you can query
-suspicions on your agent, without leaking any sensitive data outside of your network.`,
-		RunE: getSuspicionCmd,
+With this subcommand, you can inspect your logs get is a subcommand of trip command where you can query
+trips on your agent, without leaking any sensitive data outside of your network`,
+		RunE: getTripCmd,
 	}
 	
-	// declaring local flags used by get suspicion commands.
+	// declaring local flags used by get trip commands.
 	getCmd.Flags().StringSliceP(
 		"suspects", "s", nil, "Comma separated values of suspect uuids. "+
 			"--suspects suspect-id,suspect-id2",
 	)
+	
+	// declaring local flags used by get trip commands.
 	getCmd.Flags().StringSliceP(
-		"suspicions", "a", nil, "Comma separated values of suspicion uuids. "+
-			"--suspicions suspicion-id,suspicion-id2",
+		"ids", "t", nil, "Comma separated values of trip uuids. "+
+			"--ids trip-id,trip-id2",
 	)
 	getCmd.Flags().StringSliceP(
-		"trips", "t", nil, "Comma separated values of trip uuids. "+
-			"--trips trip-id,trip-id2",
+		"endpoints", "e", nil,
+		"Endpoints that you want to display. Comma separated list of endpoints. "+
+			"--endpoints /login,/logout",
 	)
+	getCmd.Flags().IntP("limit", "l", 5, "Max number of trips you want to be displayed --limit 5")
 	
-	getCmd.Flags().IntP("limit", "l", 5, "Max number of suspicions you want to be displayed --limit 5")
-	
+	getCmd.Flags().BoolP(
+		"verbose", "v", true, "To hide field values like headers, say --verbose=false",
+	)
 	getCmd.Flags().IntP(
 		"since", "i", 0,
 		"Queries only suspicions after given time --since [epoch in seconds]  You can get current"+
 			" timestamp with date +%s",
 	)
-	
 	return getCmd
 }
 
-// getSuspicionCmd implements get suspicion logic.
-func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
+// getTripCmd implements GetCommand logic.
+func getTripCmd(cmd *cobra.Command, _ []string) error {
 	var (
 		cliConfig cli.Cli
 		err       error
 	)
-	
+
 	// get cli config for authentication
 	err = viper.Unmarshal(&cliConfig)
 	if err != nil {
 		return err
 	}
 	
-	queryArgs := models.SuspicionQueryArgs{Limit: 1}
+	queryArgs := models.TripQueryArgs{Limit: 1}
 	
 	// parse and set list of suspects to be queried
 	suspects, err := cmd.Flags().GetStringSlice("suspects")
@@ -99,16 +103,16 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 		queryArgs.SuspectIds = suspects
 	}
 	
-	// parse and set list of suspicions to be queried
-	suspicionIds, err := cmd.Flags().GetStringSlice("suspicions")
+	// parse and set list of endpoints to be queried
+	endpoints, err := cmd.Flags().GetStringSlice("endpoints")
 	if err != nil {
 		return err
-	} else if len(suspicionIds) > 0 {
-		queryArgs.SuspicionIds = suspicionIds
+	} else if len(endpoints) > 0 {
+		queryArgs.Endpoints = endpoints
 	}
 	
 	// parse and set list of suspicions to be queried
-	tripIds, err := cmd.Flags().GetStringSlice("trips")
+	tripIds, err := cmd.Flags().GetStringSlice("ids")
 	if err != nil {
 		return err
 	} else if len(tripIds) > 0 {
@@ -119,44 +123,53 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 	limit, err := cmd.Flags().GetInt("limit")
 	if err != nil {
 		return err
+		
 	} else if limit > 0 {
 		queryArgs.Limit = limit
 	}
 	
+	// parse verboseness flag.
+	verbose, err := cmd.Flags().GetBool("verbose")
+	if err != nil {
+		return err
+	} else if limit > 0 {
+		queryArgs.Verbose = verbose
+	}
+
 	// parse oldest timestamp to be queries
 	sinceTime, err := cmd.Flags().GetInt("since")
 	if err != nil {
 		return err
-		
+
 	} else if sinceTime > 0 {
 		queryArgs.SinceTime = int64(sinceTime)
 	}
-	
-	// get suspicions with parsed query arguments for this subcommand
-	suspicions, err := Get(cliConfig, queryArgs)
+
+	// get trips with parsed query arguments for this subcommand
+	trips, err := Get(cliConfig, queryArgs)
 	if err != nil {
 		return err
-		
 	}
-	
-	// marshal result with colors
-	data, err := prettyjson.Marshal(suspicions)
-	if err != nil {
-		return err
-		
-	}
-	
+
 	// print out query settings
 	color.Blue(queryArgs.String())
-	
+
+	if trips == nil || len(trips) == 0 {
+		color.Blue("0 result.")
+		return nil
+	}
+
 	// print out result
-	color.Blue("%s", string(data))
-	
+	_, err = pp.Print(trips)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 // Get is a temporary method to satisfy the authentication process.
-func Get(cliConfig cli.Cli, args models.SuspicionQueryArgs) ([]models.Suspicion, error) {
+func Get(cliConfig cli.Cli, args models.TripQueryArgs) ([]models.Trip, error) {
 	var (
 		dbConfig models.Database
 	)
@@ -176,15 +189,14 @@ func Get(cliConfig cli.Cli, args models.SuspicionQueryArgs) ([]models.Suspicion,
 	return get(dbConfig, args)
 }
 
-// Get retrieves all suspicions that matches given query args. Check out suspicions.
-// QueryArgs for more information about existing filters.
-func get(dbConfig models.Database, args models.SuspicionQueryArgs) ([]models.Suspicion, error) {
+// Get retrieves all trips that matches given query args. Check out trips.
+// TripQueryArgs for more information about existing filters.
+func get(dbConfig models.Database, args models.TripQueryArgs) ([]models.Trip, error) {
 	var (
 		err    error
 		db     *gorm.DB
-		result []models.Suspicion
+		result []models.Trip
 	)
-	
 	// connect to database
 	db, err = repository.ConnectToAgentDB(dbConfig)
 	if err != nil {
@@ -197,9 +209,15 @@ func get(dbConfig models.Database, args models.SuspicionQueryArgs) ([]models.Sus
 	}
 	tx := db.Limit(args.Limit)
 	
-	// filter by suspicion ids
-	if args.SuspicionIds != nil {
-		tx = tx.Where(args.SuspectIds)
+	if args.Verbose {
+		tx = tx.Preload("Request.Header")
+	}
+	// filter by endpoints
+	if args.Endpoints != nil {
+		tx = tx.Joins("Request").Where("raw_uri IN ? ", args.Endpoints)
+	} else {
+		// preload only first level for now
+		tx = tx.Preload(clause.Associations)
 	}
 	
 	// filter by suspect ids
@@ -209,7 +227,7 @@ func get(dbConfig models.Database, args models.SuspicionQueryArgs) ([]models.Sus
 	
 	// filter by suspect ids
 	if args.TripsIds != nil {
-		tx = tx.Where("trip_id IN ", args.TripsIds)
+		tx = tx.Where(args.TripsIds)
 	}
 	
 	// filter by created after

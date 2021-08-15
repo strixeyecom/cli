@@ -78,7 +78,7 @@ func ConnectToAgentDB(dbConfig repository.Database) (*gorm.DB, error) {
 	
 	// one error is that we are using stack network hostnames like "db" "database" instead of ips or
 	// resolvable domains
-	_, err = net.LookupAddr(dbConfig.DBAddr)
+	_, err = net.LookupHost(dbConfig.DBAddr)
 	if err != nil {
 		return nil, errors.Wrap(
 			err, `

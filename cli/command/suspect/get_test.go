@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"github.com/strixeyecom/cli/cli/commands/repository"
+	"github.com/strixeyecom/cli/cli/command/repository"
 	models "github.com/strixeyecom/cli/domain/repository"
 
 	"github.com/strixeyecom/cli/domain/cli"

@@ -52,7 +52,7 @@ type Cli struct {
 	// 	I'm not sure if this will cause a vuln for now, however even I need this for myself. Because:
 	// normally, database host is known only inside stack network like docker-compose network or kubernetes
 	// network, but StrixEye CLI is not part of that network, and won't be.
-	repository.Database `mapstructure:"DATABASE"`
+	repository.Database `mapstructure:"DATABASE" flag:"database"`
 	
 	PrettyOutput bool `json:"pretty_output" yaml:"pretty_output" mapstructure:"PRETTY_OUTPUT" flag:"pretty-output"`
 	
