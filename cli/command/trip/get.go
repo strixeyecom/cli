@@ -86,7 +86,7 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 		cliConfig cli.Cli
 		err       error
 	)
-	
+
 	// get cli config for authentication
 	err = viper.Unmarshal(&cliConfig)
 	if err != nil {

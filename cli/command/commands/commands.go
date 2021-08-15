@@ -50,7 +50,6 @@ var (
 	Version string
 )
 
-
 // NewStrixeyeCommand is the highest command in the hierarchy and all commands root from it.
 //nolint:funlen
 func NewStrixeyeCommand() *cobra.Command {
@@ -100,7 +99,7 @@ func NewStrixeyeCommand() *cobra.Command {
 	
 	// Add flags
 	c := &cli.Cli{}
-	structToFlag(rootCmd, structs.Fields(c), structs.Fields(c), 0, 0)
+	structToFlag(rootCmd, structs.Fields(c), structs.Fields(c), 0, 0, []string{})
 	
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
@@ -115,7 +114,8 @@ func NewStrixeyeCommand() *cobra.Command {
 
 // structToFlag add all fields of a struct to cmd as flags.
 func structToFlag(
-	cmd *cobra.Command, upperLayer []*structs.Field, currentLayer []*structs.Field, upperIdx, currentIdx int,
+	cmd *cobra.Command, upperLayer []*structs.Field, currentLayer []*structs.Field, upperIdx,
+	currentIdx int, path []string,
 ) {
 	// stop recursion on lowest struct level
 	if currentLayer == nil {
@@ -130,24 +130,25 @@ func structToFlag(
 	
 	// as long as the field is not a struct, create a flag for it
 	if field.Kind() != reflect.Struct {
-		if cmd.Flag(field.Tag("flag")) == nil {
+		flagName := strings.Join(append(path, field.Tag("flag")),".")
+		if cmd.Flag(flagName) == nil {
 			// handle flag type
 			switch field.Kind().String() {
 			case "string":
-				cmd.PersistentFlags().String(field.Tag("flag"), "", "")
+				cmd.PersistentFlags().String(flagName, "", "")
 			case "bool":
-				cmd.PersistentFlags().Bool(field.Tag("flag"), false, "")
+				cmd.PersistentFlags().Bool(flagName, false, "")
 			case "int":
-				cmd.PersistentFlags().Int(field.Tag("flag"), 0, "")
+				cmd.PersistentFlags().Int(flagName, 0, "")
 			case "float":
-				cmd.PersistentFlags().Float64(field.Tag("flag"), 0, "")
+				cmd.PersistentFlags().Float64(flagName, 0, "")
 				
 			}
 		}
-		structToFlag(cmd, upperLayer, currentLayer, upperIdx, currentIdx+1)
+		structToFlag(cmd, upperLayer, currentLayer, upperIdx, currentIdx+1, path)
 	} else {
 		// for struct fields, recurse the struct
-		structToFlag(cmd, upperLayer, field.Fields(), currentIdx, 0)
+		structToFlag(cmd, upperLayer, field.Fields(), currentIdx, 0, append(path, field.Tag("flag")))
 	}
 	
 	// go to neighbor field
@@ -159,10 +160,9 @@ func structToFlag(
 	
 	*/
 	if upperIdx != len(upperLayer) {
-		structToFlag(cmd, upperLayer, upperLayer, upperIdx+1, upperIdx+1)
+		structToFlag(cmd, upperLayer, upperLayer, upperIdx+1, upperIdx+1, []string{})
 	}
 }
-
 
 // initializeConfig tries to open config and validate it. If a bad config is given,
 // tells user possible solutions.
@@ -293,7 +293,6 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 	
 	// Bind the current command's flags to viper
 	bindFlags(cmd, viper.GetViper())
-	
 	return nil
 }
 
