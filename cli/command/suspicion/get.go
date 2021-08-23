@@ -139,6 +139,24 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 		
 	}
 	
+	// Insert extra information from StrixEye API
+	for i, suspicion := range suspicions {
+		suspicions[i].Domain, err = GetDomainInformation(cliConfig, suspicion.DomainId)
+		if err != nil {
+			return errors.Wrap(err, "can not fetch domain information")
+		}
+		
+		tmp, err := trip.GetTrips(
+			cliConfig,
+			models.TripQueryArgs{TripsIds: []string{suspicion.TripId}, Verbose: true, Limit: 1},
+		)
+		if err != nil {
+			return errors.Wrap(err, "can not extract trip information")
+		}
+		
+		suspicions[i].Trip = tmp[0]
+	}
+	
 	// marshal result with colors
 	data, err := prettyjson.Marshal(suspicions)
 	if err != nil {
@@ -223,4 +241,54 @@ func get(dbConfig models.Database, args models.SuspicionQueryArgs) ([]models.Sus
 	tx = tx.Find(&result)
 	err = tx.Error
 	return result, err
+}
+
+// GetDomainInformation returns domain information
+func GetDomainInformation(cliConfig cli.Cli, domainID string) (models.Domain, error) {
+	return getDomain(cliConfig.UserAPIToken, cliConfig.APIDomain, domainID)
+}
+
+// getDomain returns list of agents from user api, parses and validates information.
+func getDomain(apiToken, apiDomain, domainID string) (models.Domain, error) {
+	var (
+		err  error
+		resp *http.Response
+	)
+	if domainID == "" {
+		return models.Domain{}, errors.New("no domain id given")
+	}
+	url := fmt.Sprintf("/domains/%s", domainID)
+	resp, err = repository2.UserAPIRequest(http.MethodGet, url, nil, apiToken, apiDomain)
+	
+	if err != nil {
+		return models.Domain{}, errors.Wrap(err, "failed to complete user api request to agents")
+	}
+	// read response body
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return models.Domain{}, errors.Wrap(err, "bad response body")
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	
+	// handle reject/fail responses
+	if resp.StatusCode != http.StatusOK {
+		return models.Domain{}, fmt.Errorf(
+			"sorry, please double check your credentials. "+
+				"Status Code : %d, error message : %s", resp.StatusCode, body,
+		)
+	}
+	
+	// if status is ok, than this is possibly a api success response
+	var apiResponse models.DomainMessage
+	err = json.Unmarshal(body, &apiResponse)
+	if err != nil {
+		return models.Domain{}, errors.Wrap(
+			err,
+			"api says response is okay but possibly there is a misunderstanding",
+		)
+	}
+	
+	return apiResponse.Data, nil
 }
