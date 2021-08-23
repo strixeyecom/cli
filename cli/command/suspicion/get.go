@@ -297,5 +297,9 @@ func getDomain(apiToken, apiDomain, domainID string) (models.Domain, error) {
 		)
 	}
 	
+	if apiResponse.Status != "ok" {
+		return models.Domain{}, errors.New(string(body))
+	}
+	
 	return apiResponse.Data, nil
 }
