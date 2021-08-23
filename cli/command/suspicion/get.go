@@ -161,14 +161,15 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 			return errors.Wrap(err, "can not extract trip information")
 		}
 		
-		suspicions[i].Trip = tmp[0]
+		if len(tmp) > 0{
+			suspicions[i].Trip = tmp[0]
+		}
 	}
 	
 	// marshal result with colors
 	data, err := prettyjson.Marshal(suspicions)
 	if err != nil {
 		return err
-		
 	}
 	
 	// print out query settings
