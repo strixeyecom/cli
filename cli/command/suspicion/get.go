@@ -1,12 +1,19 @@
 package suspicion
 
 import (
+	`encoding/json`
+	`fmt`
+	`io/ioutil`
+	`net/http`
+	
 	`github.com/fatih/color`
 	`github.com/hokaccha/go-prettyjson`
 	"github.com/pkg/errors"
 	`github.com/spf13/cobra`
 	`github.com/spf13/viper`
 	userconfig `github.com/strixeyecom/cli/api/user/agent`
+	repository2 `github.com/strixeyecom/cli/api/user/repository`
+	`github.com/strixeyecom/cli/cli/command/trip`
 	models `github.com/strixeyecom/cli/domain/repository`
 	"gorm.io/gorm"
 	
@@ -217,7 +224,7 @@ func get(dbConfig models.Database, args models.SuspicionQueryArgs) ([]models.Sus
 	
 	// filter by suspicion ids
 	if args.SuspicionIds != nil {
-		tx = tx.Where(args.SuspectIds)
+		tx = tx.Where("id IN ?", args.SuspicionIds)
 	}
 	
 	// filter by suspect ids
@@ -227,7 +234,7 @@ func get(dbConfig models.Database, args models.SuspicionQueryArgs) ([]models.Sus
 	
 	// filter by suspect ids
 	if args.TripsIds != nil {
-		tx = tx.Where("trip_id IN ", args.TripsIds)
+		tx = tx.Where("trip_id IN ?", args.TripsIds)
 	}
 	
 	// filter by created after
