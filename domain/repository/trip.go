@@ -60,6 +60,9 @@ type Trip struct {
 	// I know. Some changes around HTTP Cookies made us put requests in another table,
 	// but for cli it's fine to embed, i guess.
 	Request Request
+	
+	// Static Features of trip
+	StaticChecks []StaticCheck
 }
 
 type IP struct {

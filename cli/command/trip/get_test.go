@@ -175,7 +175,7 @@ func TestGet(t *testing.T) {
 			tt.name, func(t *testing.T) {
 				got, err := get(tt.args.cliConfig, tt.args.args)
 				if (err != nil) != tt.wantErr {
-					t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("GetTrips() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}
 

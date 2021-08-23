@@ -146,7 +146,7 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 	}
 
 	// get trips with parsed query arguments for this subcommand
-	trips, err := Get(cliConfig, queryArgs)
+	trips, err := GetTrips(cliConfig, queryArgs)
 	if err != nil {
 		return err
 	}
@@ -168,8 +168,8 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 	return nil
 }
 
-// Get is a temporary method to satisfy the authentication process.
-func Get(cliConfig cli.Cli, args models.TripQueryArgs) ([]models.Trip, error) {
+// GetTrips is a temporary method to satisfy the authentication process.
+func GetTrips(cliConfig cli.Cli, args models.TripQueryArgs) ([]models.Trip, error) {
 	var (
 		dbConfig models.Database
 	)
@@ -189,7 +189,7 @@ func Get(cliConfig cli.Cli, args models.TripQueryArgs) ([]models.Trip, error) {
 	return get(dbConfig, args)
 }
 
-// Get retrieves all trips that matches given query args. Check out trips.
+// GetTrips retrieves all trips that matches given query args. Check out trips.
 // TripQueryArgs for more information about existing filters.
 func get(dbConfig models.Database, args models.TripQueryArgs) ([]models.Trip, error) {
 	var (
