@@ -24,11 +24,12 @@ var ()
 type Suspect struct {
 	ID         string
 	Suspicions []*Suspicion `gorm:"anomalies;foreignKey:profile_id"`
+	Trips      []*Trip      `gorm:"trips;foreignKey:profile_id"`
 	Ips        []*Ip        `gorm:"ips;foreignKey:profile_id"`
 	Score      float64
 	
 	// to be able to query for TimeSince
-	CreatedAt  int64
+	CreatedAt int64
 }
 
 // TableName as I explained in type definition, agent knows suspects as profiles.
