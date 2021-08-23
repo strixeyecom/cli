@@ -69,8 +69,8 @@ trips on your agent, without leaking any sensitive data outside of your network`
 	)
 	
 	getCmd.Flags().Float64P(
-		"min-score", "m", 50,
-		"Queries only suspects with scores bigger than X --min-score [0-100] Default value is 50.  ",
+		"min-score", "m", 0,
+		"Queries only suspects with scores bigger than X --min-score [0-100] Default value is 0.  ",
 	)
 	
 	return getCmd
@@ -196,7 +196,11 @@ func get(dbConfig models.Database, args models.SuspectQueryArgs) ([]models.Suspe
 	
 	// preload only first level for now
 	tx = tx.Preload(clause.Associations)
-	
+	tx = tx.Preload("Trips.StaticChecks")
+	tx = tx.Preload("Trips.Request")
+	tx = tx.Preload("Trips.Request.Header")
+
+
 	// filter by score
 	if args.MinScore != 0 {
 		tx = tx.Where("score > ? ", args.MinScore)
