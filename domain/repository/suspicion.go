@@ -15,6 +15,16 @@ const ()
 // global variables (not cool) for this file
 var ()
 
+type StaticCheck struct {
+	Id       string
+	TripId   string   ` protobuf:"bytes,2,opt,name=TripId"              json:"TripId,omitempty"    gorm:"trip_id;size:36"`
+	ModSecID string   ` protobuf:"bytes,3,opt,name=ModSecID"            json:"ModSecID,omitempty"  gorm:"mod_sec_id"`
+	Group    string   ` protobuf:"bytes,4,opt,name=Group"               json:"Group,omitempty"     gorm:"group"`
+	Message  string   ` protobuf:"bytes,5,opt,name=Message"             json:"Message,omitempty"   gorm:"message"`
+	Tags     []string ` protobuf:"bytes,6,rep,name=Tags"                json:"Tags,omitempty"      gorm:"-"`
+	PL       int32    ` protobuf:"varint,7,opt,name=PL"                 json:"PL,omitempty"        gorm:"pl"`
+}
+
 // Suspicion is the table we use too keep noteworthy anomalies,
 // mostly created by our ai backed security engine or request based static engine.
 type Suspicion struct {
@@ -32,9 +42,10 @@ type Suspicion struct {
 	
 	// On which domain strixeye agent found this suspicion
 	DomainId string
-	
+	Domain   Domain `gorm:"-"`
 	// timestamp of suspicion creation in epoch milliseconds
 	CreatedAt int64
+	Trip      Trip `gorm:"-"`
 }
 
 type Ip struct {
@@ -95,4 +106,15 @@ func (q SuspicionQueryArgs) String() string {
 	}
 	
 	return query
+}
+
+// Domain keeps information about a single domain
+type Domain struct {
+	ID     string `json:"id"`
+	Domain string `json:"domain"`
+}
+
+type DomainMessage struct {
+	Data   Domain `json:"data"`
+	Status string `json:"status"`
 }
