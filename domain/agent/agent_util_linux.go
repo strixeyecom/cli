@@ -3,16 +3,17 @@
 package agent
 
 import (
-	"bytes"
+	`bytes`
 	`encoding/json`
 	"fmt"
 	"io/ioutil"
 	`os`
 	"os/exec"
 	"path/filepath"
+	`syscall`
 	
 	"github.com/pkg/errors"
-	"github.com/usestrix/cli/domain/consts"
+	"github.com/strixeyecom/cli/domain/consts"
 )
 
 /*
@@ -23,14 +24,36 @@ import (
 	utility functions for StrixEye agents running on Linux.
 */
 
-// global constants for file
-const ()
+// checkIfAnotherAgentRunning tries to find a running strixeyed daemon and returns nil if **no agent is
+// running**
+//
+// Control mechanism depends on system, but in general, to avoid false positives,
+// we use a dedicated PID file to keep track of a running StrixEye daemon.
+func checkIfAnotherAgentRunning() error {
+	// A StrixEye Daemon creates a pid file to show that it is running.
+	//
+	// We should check if such file exists.
+	// There are cases where strixeyed doesn't shut down gracefully and leave a strixeyed pid behind
+	_, err := os.Stat(consts.PidFile)
+	if err == nil {
+		return ErrAnotherAgentRunning
+	}
+	
+	// If the error is a file not found/not exists error,
+	// it means that there are no strixeyed running on host machine.
+	
+	if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	
+	// no other strixeyed alive
+	return nil
+}
 
-// global variables (not cool) for this file
-var ()
-
-// CheckIfHostSupports controls whether you can install your current agent on the host machine or not.
-func (a AgentInformation) CheckIfHostSupports() error {
+// checkIfHostSupports controls whether you can install your current agent on the host machine or not.
+//
+// It handles kubernetes/docker based differentiation
+func (a AgentInformation) checkIfHostSupports() error {
 	var (
 		err error
 	)
@@ -67,22 +90,6 @@ func (a AgentInformation) CheckIfHostSupports() error {
 	}
 	
 	return errors.New("unknown deployment type. check your agent configuration again")
-}
-
-func checkIfDockerComposeExists() error {
-	cmd := exec.Command("docker-compose", "version")
-	
-	var output bytes.Buffer
-	cmd.Stdout = &output
-	
-	err := cmd.Run()
-	// if exit code != 0, it means docker-compose not found.
-	if err != nil {
-		return err
-	}
-	
-	fmt.Println(output.String())
-	return nil
 }
 
 func (a AgentInformation) CreateServiceFile() error {
@@ -260,7 +267,8 @@ func SaveAgentConfig(cfg Agent) error {
 	}
 	
 	// save data
-	err = ioutil.WriteFile(filepath.Join(consts.ConfigDir, consts.ConfigFile), data, 0600)
+	// #nosec
+	err = ioutil.WriteFile(filepath.Join(consts.ConfigDir, consts.ConfigFile), data, 0644)
 	if err != nil {
 		return err
 	}
@@ -269,13 +277,42 @@ func SaveAgentConfig(cfg Agent) error {
 }
 
 func StopDaemon() error {
+	var outbuf, errbuf bytes.Buffer
+	exitCode := 0
+	stderr := errbuf.String()
+	const defaultFailedCode = 1
+	
 	cmd := exec.Command("systemctl", "stop", "strixeyed")
+	cmd.Stdout = &outbuf
+	cmd.Stderr = &errbuf
 	
 	err := cmd.Run()
 	if err != nil {
-		return err
+		// try to get the exit code
+		if exitError, ok := err.(*exec.ExitError); ok {
+			ws := exitError.Sys().(syscall.WaitStatus)
+			exitCode = ws.ExitStatus()
+			if exitCode == 5 {
+				return nil
+			}
+			return err
+		} else {
+			// This will happen (in OSX) if `name` is not available in $PATH,
+			// in this situation, exit code could not be get, and stderr will be
+			// empty string very likely, so we use the default fail code, and format err
+			// to string and set to stderr
+			// return errors.Errorf("Could not get exit code for failed program")
+			exitCode = defaultFailedCode
+			if stderr == "" {
+				stderr = err.Error()
+			}
+			return err
+		}
+	} else {
+		// success, exitCode should be 0 if go is ok
+		ws := cmd.ProcessState.Sys().(syscall.WaitStatus)
+		exitCode = ws.ExitStatus()
 	}
-	
 	return nil
 }
 

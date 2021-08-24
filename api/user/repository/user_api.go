@@ -47,10 +47,11 @@ func UserAPIRequest(method, endpoint string, body io.Reader, apiToken, apiDomain
 	tokenHeader := fmt.Sprintf("Bearer %s", apiToken)
 	req.Header.Add(APITokenName, tokenHeader)
 	req.Header.Add("accept", "application/json")
+	req.Header.Add("accept-language", "en-US")
 	
 	// create client to do the request
 	client := http.Client{
-		Timeout: time.Second * 5,
+		Timeout: time.Second * 45,
 	}
 	
 	// fetch response

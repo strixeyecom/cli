@@ -37,7 +37,7 @@ func init() {
 			if err != nil {
 				return false
 			}
-			if my <= 1024 || my >= 65336 {
+			if my <= 0 || my >= 65336 {
 				return false
 			}
 			return true
@@ -75,13 +75,13 @@ func init() {
 
 // Database stores credentials and configurations about strixeye agent database.
 type Database struct {
-	DBAddr               string `mapstructure:"DB_ADDR" json:"db_addr" yaml:"db_addr"`
-	DBUser               string `mapstructure:"DB_USER" json:"db_user" validate:"omitempty" yaml:"db_user" `
-	DBPass               string `mapstructure:"DB_PASS" json:"db_pass" validate:"omitempty" yaml:"db_pass"`
-	DBName               string `mapstructure:"DB_NAME" json:"db_name" validate:"omitempty" yaml:"db_name"`
-	DBPort               string `mapstructure:"DB_PORT" json:"db_port" validate:"port" yaml:"db_port"`
-	OverrideRemoteConfig bool   `mapstructure:"DB_OVERRIDE" json:"override_remote_config" yaml:"override_remote_config"`
-	testContainerName    string
+	DBAddr               string `mapstructure:"DB_ADDR" json:"db_addr"  yaml:"db_addr" flag:"db-addr"`
+	DBUser               string `mapstructure:"DB_USER" json:"db_user" validate:"omitempty" yaml:"db_user" flag:"db-user"`
+	DBPass               string `mapstructure:"DB_PASS" json:"db_pass" validate:"omitempty" yaml:"db_pass" flag:"db-pass"`
+	DBName               string `mapstructure:"DB_NAME" json:"db_name" validate:"omitempty" yaml:"db_name" flag:"db-name"`
+	DBPort               string `mapstructure:"DB_PORT" json:"db_port" validate:"port" yaml:"db_port" flag:"db-port"`
+	OverrideRemoteConfig bool   `mapstructure:"DB_OVERRIDE" json:"override_remote_config" yaml:"override_remote_config" flag:"override-remote-config"`
+	testContainerName    string `flag:"test_container_name"`
 }
 
 func (d *Database) TestContainerName() string {

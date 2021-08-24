@@ -5,7 +5,7 @@ import (
 	
 	`github.com/spf13/cobra`
 	
-	"github.com/usestrix/cli/cli/commands/commands"
+	"github.com/strixeyecom/cli/cli/command/commands"
 )
 
 // This is the entrypoint for strixeye cli.

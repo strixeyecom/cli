@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 	`github.com/sirupsen/logrus`
 	
-	`github.com/usestrix/cli/domain/repository`
+	`github.com/strixeyecom/cli/domain/repository`
 )
 
 /*
@@ -35,7 +35,7 @@ func init() {
 			if err != nil {
 				return false
 			}
-			if my <= 1024 || my >= 65336 {
+			if my <= 0 || my >= 65336 {
 				return false
 			}
 			return true
