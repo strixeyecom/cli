@@ -140,38 +140,31 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 	}
 	
 	// get suspicions with parsed query arguments for this subcommand
-	suspicions, err := Get(cliConfig, queryArgs)
+	suspicions, staticChecks, err := Get(cliConfig, queryArgs)
 	if err != nil {
 		return err
 		
 	}
 	
-	// Insert extra information from StrixEye API
-	for i, suspicion := range suspicions {
-		suspicions[i].Domain, err = GetDomainInformation(cliConfig, suspicion.DomainId)
-		if err != nil {
-			return errors.Wrap(err, "can not fetch domain information")
-		}
-		
-		tmp, err := trip.GetTrips(
-			cliConfig,
-			models.TripQueryArgs{TripsIds: []string{suspicion.TripId}, Verbose: true, Limit: 1},
-		)
-		if err != nil {
-			return errors.Wrap(err, "can not extract trip information")
-		}
-		
-		if len(tmp) > 0{
-			suspicions[i].Trip = tmp[0]
-		}
-	}
-	
+	var data []byte
 	// marshal result with colors
-	data, err := prettyjson.Marshal(suspicions)
-	if err != nil {
-		return err
+	if len(suspicions) > 0 {
+		tmp, err := prettyjson.Marshal(suspicions)
+		if err != nil {
+			return err
+		}
+		data = append(data, "\n Smart Results\n"...)
+		data = append(data, tmp...)
 	}
 	
+	if len(staticChecks) > 0 {
+		tmp, err := prettyjson.Marshal(staticChecks)
+		if err != nil {
+			return err
+		}
+		data = append(data, "\n Static Results\n"...)
+		data = append(data, tmp...)
+	}
 	// print out query settings
 	color.Blue(queryArgs.String())
 	
@@ -182,7 +175,9 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 }
 
 // Get is a temporary method to satisfy the authentication process.
-func Get(cliConfig cli.Cli, args models.SuspicionQueryArgs) ([]models.Suspicion, error) {
+func Get(cliConfig cli.Cli, args models.SuspicionQueryArgs) (
+	[]models.Suspicion, []models.StaticCheck, error,
+) {
 	var (
 		dbConfig models.Database
 	)
@@ -194,12 +189,40 @@ func Get(cliConfig cli.Cli, args models.SuspicionQueryArgs) ([]models.Suspicion,
 	} else {
 		agentConfig, err := userconfig.GetAgentConfig(cliConfig)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		dbConfig = agentConfig.Config.Database
 	}
 	
-	return get(dbConfig, args)
+	suspicions, err := get(dbConfig, args)
+	if err != nil {
+		return nil, nil, err
+	}
+	// Insert extra information from StrixEye API
+	for i, suspicion := range suspicions {
+		suspicions[i].Domain, err = GetDomainInformation(cliConfig, suspicion.DomainId)
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "can not fetch domain information")
+		}
+		tmp, err := trip.GetTrips(
+			cliConfig,
+			models.TripQueryArgs{TripsIds: []string{suspicion.TripId}, Verbose: true, Limit: 1},
+		)
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "can not extract trip information")
+		}
+		
+		if len(tmp) > 0 {
+			suspicions[i].Trip = tmp[0]
+		}
+	}
+	
+	staticChecks, err := getStatics(dbConfig, args)
+	if err != nil {
+		return nil, nil, err
+	}
+	
+	return suspicions, staticChecks, nil
 }
 
 // Get retrieves all suspicions that matches given query args. Check out suspicions.
@@ -248,6 +271,61 @@ func get(dbConfig models.Database, args models.SuspicionQueryArgs) ([]models.Sus
 	// find all suspects that matches args criteria
 	tx = tx.Find(&result)
 	err = tx.Error
+	if err != nil {
+		return nil, err
+	}
+	return result, err
+}
+
+// getStatics retrieves all suspicions that matches given query args. Check out suspicions.
+// QueryArgs for more information about existing filters.
+func getStatics(dbConfig models.Database, args models.SuspicionQueryArgs) ([]models.StaticCheck, error) {
+	var (
+		err    error
+		db     *gorm.DB
+		result []models.StaticCheck
+	)
+	
+	// connect to database
+	db, err = repository.ConnectToAgentDB(dbConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "can not establish connection to agent database")
+	}
+	
+	// nobody wants to retrieve all hundreds of thousands of results.
+	if args.Limit == 0 {
+		args.Limit = 10
+	}
+	tx := db.Limit(args.Limit)
+	
+	// filter by suspicion ids
+	if args.SuspicionIds != nil {
+		tx = tx.Where("id IN ?", args.SuspicionIds)
+	}
+	
+	// filter by suspect ids
+	if args.SuspectIds != nil {
+		tx = tx.Where("profile_id IN ?", args.SuspectIds)
+	}
+	
+	// filter by suspect ids
+	if args.TripsIds != nil {
+		tx = tx.Where("trip_id IN ?", args.TripsIds)
+	}
+	
+	// filter by created after
+	if args.SinceTime != 0 {
+		// convert seconds to milliseconds
+		milliseconds := args.SinceTime * 1e3
+		tx = tx.Where("created_at > ?", milliseconds)
+	}
+	
+	// find all suspects that matches args criteria
+	tx = tx.Find(&result)
+	err = tx.Error
+	if err != nil {
+		return nil, err
+	}
 	return result, err
 }
 
