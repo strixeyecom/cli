@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/go-playground/validator"
 	"github.com/pkg/errors"
@@ -113,8 +112,8 @@ type APIErrorResponse struct {
 type StackConfig struct {
 	Addresses  Addresses           `json:"addresses"`
 	UseHTTPS   bool                `json:"use_https"`
-	CreatedAt  time.Time           `json:"created_at"`
-	UpdatedAt  time.Time           `json:"updated_at"`
+	CreatedAt  string              `json:"created_at"`
+	UpdatedAt  string              `json:"updated_at"`
 	Deployment string              `json:"deployment"`
 	Database   repository.Database `json:"database"`
 	Broker     broker              `json:"broker"`
@@ -298,7 +297,7 @@ type Domains struct {
 	CompanyID string      `json:"company_id"`
 	Domain    string      `json:"domain"`
 	DeletedAt interface{} `json:"deleted_at"`
-	CreatedAt time.Time   `json:"created_at"`
-	UpdatedAt time.Time   `json:"updated_at"`
+	CreatedAt string      `json:"created_at"`
+	UpdatedAt string      `json:"updated_at"`
 	Pivot     pivot       `json:"pivot"`
 }

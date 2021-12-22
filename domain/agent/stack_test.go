@@ -4,16 +4,15 @@ package agent
 import (
 	"encoding/json"
 	"testing"
-	"time"
-	
-	`github.com/spf13/viper`
-	`github.com/strixeyecom/cli/domain/cli`
-	`github.com/strixeyecom/cli/domain/repository`
+
+	"github.com/spf13/viper"
+	"github.com/strixeyecom/cli/domain/cli"
+	"github.com/strixeyecom/cli/domain/repository"
 )
 
 func TestStackConfig_Marshall(t *testing.T) {
 	t.Parallel()
-	
+
 	var a StackConfig
 	_, err := json.MarshalIndent(a, "", "  ")
 	if err != nil {
@@ -987,8 +986,8 @@ func Test_stackConfig_Save(t *testing.T) {
 	type fields struct {
 		Addresses  Addresses
 		UseHTTPS   bool
-		CreatedAt  time.Time
-		UpdatedAt  time.Time
+		CreatedAt  string
+		UpdatedAt  string
 		Deployment string
 		Database   repository.Database
 		Broker     broker

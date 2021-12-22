@@ -158,11 +158,11 @@ func Test_decode(t *testing.T) {
 				i: &Versions{},
 				s: APIVersionsMessage{
 					Data: []struct {
-						Key       string     `json:"key"`
-						Value     Version    `json:"value"`
-						CreatedAt *time.Time `json:"created_at"`
-						UpdatedAt *time.Time `json:"updated_at"`
-						DeletedAt *time.Time `json:"deleted_at"`
+						Key       string  `json:"key"`
+						Value     Version `json:"value"`
+						CreatedAt string  `json:"created_at"`
+						UpdatedAt string  `json:"updated_at"`
+						DeletedAt string  `json:"deleted_at"`
 					}{
 						{
 							Key: "Manager", Value: Version{
