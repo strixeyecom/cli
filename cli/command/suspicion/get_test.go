@@ -67,7 +67,7 @@ func wrapper(m *testing.M) (int, error) {
 	dbConfig = cliConfig.Database
 	dbConfig.DBPort = "12347"
 	dbConfig.SetTestContainerName("strixeye_suspicion_db")
-	
+
 	// delete all database data just in case
 	_ = repository.RemoveDatabase(dbConfig)
 

@@ -4,10 +4,10 @@ import (
 	"io"
 	"net/http"
 	"testing"
-	
+
 	"github.com/spf13/viper"
-	
-	`github.com/strixeyecom/cli/domain/cli`
+
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*
@@ -44,11 +44,11 @@ func TestUserAPIRequest(t *testing.T) {
 	}
 
 	type args struct {
-		method   string
-		endpoint string
-		body     io.Reader
-		apiToken string
-		apiDomain   string
+		method    string
+		endpoint  string
+		body      io.Reader
+		apiToken  string
+		apiDomain string
 	}
 	tests := []struct {
 		name    string
@@ -59,10 +59,10 @@ func TestUserAPIRequest(t *testing.T) {
 		{
 			name: "Get with no body",
 			args: args{
-				apiToken: cliConfig.UserAPIToken,
-				apiDomain:   cliConfig.APIDomain,
-				body:     nil,
-				endpoint: "/agents",
+				apiToken:  cliConfig.UserAPIToken,
+				apiDomain: cliConfig.APIDomain,
+				body:      nil,
+				endpoint:  "/agents",
 			},
 			wantErr: false,
 		}, {

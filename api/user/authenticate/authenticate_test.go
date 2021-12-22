@@ -2,10 +2,10 @@ package authenticate
 
 import (
 	"testing"
-	
+
 	"github.com/spf13/viper"
-	
-	`github.com/strixeyecom/cli/domain/cli`
+
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*
@@ -27,7 +27,7 @@ func TestAuthenticate(t *testing.T) {
 		err  error
 		conf cli.Cli
 	)
-	
+
 	viper.SetConfigFile("../../../.env")
 	// Try to read from file, but use env variables if non exists. it's fine
 	err = viper.ReadInConfig()
@@ -35,12 +35,12 @@ func TestAuthenticate(t *testing.T) {
 		t.Fatal(err)
 	}
 	viper.AutomaticEnv()
-	
+
 	err = viper.Unmarshal(&conf)
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+
 	type args struct {
 		cliConfig cli.Cli
 	}

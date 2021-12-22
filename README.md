@@ -229,23 +229,23 @@ Project Link: [https://github.com/strixeyecom/cli](https://github.com/strixeyeco
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/usestrix/cli.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/strixeyecom/cli.svg?style=for-the-badge
 
 [contributors-url]: https://github.com/strixeyecom/cli/graphs/contributors
 
-[forks-shield]: https://img.shields.io/github/forks/usestrix/cli.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/strixeyecom/cli.svg?style=for-the-badge
 
 [forks-url]: https://github.com/strixeyecom/clinetwork/members
 
-[stars-shield]: https://img.shields.io/github/stars/usestrix/cli?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/strixeyecom/cli?style=for-the-badge
 
 [stars-url]: https://github.com/strixeyecom/cli/stargazers
 
-[issues-shield]: https://img.shields.io/github/issues/usestrix/cli.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/strixeyecom/cli.svg?style=for-the-badge
 
 [issues-url]: https://github.com/strixeyecom/cli/issues
 
-[license-shield]: https://img.shields.io/github/license/usestrix/cli.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/strixeyecom/cli.svg?style=for-the-badge
 
 [license-url]: https://github.com/strixeyecom/cli/blob/master/LICENSE.txt
 

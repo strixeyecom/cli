@@ -31,7 +31,7 @@ func NewSuspectCommand() *cobra.Command {
 		Long:  `Query and play with suspects in the Strixeye Agent of your choice.`,
 		RunE:  ShowHelp(os.Stdout),
 	}
-	
+
 	suspectCommand.AddCommand(
 		GetCommand(),
 	)

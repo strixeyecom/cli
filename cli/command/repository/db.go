@@ -1,27 +1,27 @@
 package repository
 
 import (
-	`context`
-	`fmt`
-	`io`
+	"context"
+	"fmt"
+	"io"
 	"log"
-	`net`
+	"net"
 	"os"
-	`strings`
+	"strings"
 	"time"
-	
-	`github.com/docker/docker/api/types`
-	`github.com/docker/docker/api/types/container`
-	`github.com/docker/docker/api/types/filters`
-	`github.com/docker/docker/client`
-	`github.com/docker/docker/pkg/stdcopy`
-	`github.com/docker/go-connections/nat`
-	`github.com/pkg/errors`
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/docker/go-connections/nat"
+	"github.com/pkg/errors"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	
-	`github.com/strixeyecom/cli/domain/repository`
+
+	"github.com/strixeyecom/cli/domain/repository"
 )
 
 /*
@@ -52,7 +52,7 @@ func ConnectToAgentDB(dbConfig repository.Database) (*gorm.DB, error) {
 			Colorful:                  false,         // Disable color
 		},
 	)
-	
+
 	// establish connection
 	dsn := dbConfig.DSN()
 	db, err := gorm.Open(
@@ -69,13 +69,13 @@ func ConnectToAgentDB(dbConfig repository.Database) (*gorm.DB, error) {
 			Logger: newLogger,
 		},
 	)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// handle possible errors.
-	
+
 	// one error is that we are using stack network hostnames like "db" "database" instead of ips or
 	// resolvable domains
 	_, err = net.LookupHost(dbConfig.DBAddr)
@@ -130,7 +130,7 @@ func CreateDatabase(cliConfig repository.Database) error {
 			},
 		},
 	}
-	
+
 	resp, err := dockerClient.ContainerCreate(
 		ctx, &container.Config{
 			Healthcheck: &container.HealthConfig{
@@ -178,21 +178,21 @@ func CreateDatabase(cliConfig repository.Database) error {
 			break
 		}
 	}
-	
+
 	out, err := dockerClient.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
 	if err != nil {
 		return err
 	}
-	
+
 	_, err = stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 	if err != nil {
 		return err
 	}
-	
+
 	// although I use everything I can, like, health checks, event monitors and so on,
 	// there are still some problems while connecting immediately to database
 	time.Sleep(time.Second * 5)
-	
+
 	return nil
 }
 
@@ -204,7 +204,7 @@ func SetupDatabase(dbConfig repository.Database) error {
 		db, err = ConnectToAgentDB(dbConfig)
 		time.Sleep(time.Second * 2)
 	}
-	
+
 	err = db.AutoMigrate(repository.Suspicion{})
 	if err != nil {
 		return err
@@ -280,18 +280,18 @@ func RemoveDatabase(dbConfig repository.Database) error {
 // connection fails.
 func CreateDatabaseIFNotExists(database repository.Database) error {
 	var err error
-	
+
 	// Try to connect to existing database
 	_, err = ConnectToAgentDB(database)
 	if err == nil {
 		return nil
 	}
-	
+
 	// 	Create if non exists
 	err = CreateDatabase(database)
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }

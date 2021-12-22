@@ -158,11 +158,11 @@ func Test_decode(t *testing.T) {
 				i: &Versions{},
 				s: APIVersionsMessage{
 					Data: []struct {
-						Key       string     `json:"key"`
-						Value     Version    `json:"value"`
-						CreatedAt *time.Time `json:"created_at"`
-						UpdatedAt *time.Time `json:"updated_at"`
-						DeletedAt *time.Time `json:"deleted_at"`
+						Key       string  `json:"key"`
+						Value     Version `json:"value"`
+						CreatedAt string  `json:"created_at"`
+						UpdatedAt string  `json:"updated_at"`
+						DeletedAt string  `json:"deleted_at"`
 					}{
 						{
 							Key: "Manager", Value: Version{
@@ -192,108 +192,162 @@ func Test_decode(t *testing.T) {
 }
 
 const (
-	goldenVersionsAPIResponseGood = `{
-    "status": "ok",
-    "data": [
-        {
-            "key": "dashboard_version",
-            "value": {
-                "version": "staging",
-                "checksum": "hash",
-                "size": 123456
-            },
-            "created_at": "2021-06-14T17:07:02.000000Z",
-            "updated_at": "2021-06-14T17:07:02.000000Z",
-            "deleted_at": null
-        },
-        {
-            "key": "installer_version",
-            "value": {
-                "version": "v0.2.5-rc1.1-2505350",
-                "checksum": "hash",
-                "size": 123456
-            },
-            "created_at": "2021-06-14T17:07:02.000000Z",
-            "updated_at": "2021-06-14T17:07:02.000000Z",
-            "deleted_at": null
-        },
-        {
-            "key": "scheduler_version",
-            "value": {
-                "version": "staging",
-                "checksum": "hash",
-                "size": 123456
-            },
-            "created_at": "2021-06-14T17:07:02.000000Z",
-            "updated_at": "2021-06-14T17:07:02.000000Z",
-            "deleted_at": null
-        },
-        {
-            "key": "queue_version",
-            "value": {
-                "version": "staging",
-                "checksum": "hash",
-                "size": 123456
-            },
-            "created_at": "2021-06-14T17:07:02.000000Z",
-            "updated_at": "2021-06-14T17:07:02.000000Z",
-            "deleted_at": null
-        },
-        {
-            "key": "profiler_version",
-            "value": {
-                "version": "staging",
-                "checksum": "hash",
-                "size": 123456
-            },
-            "created_at": "2021-06-14T17:07:02.000000Z",
-            "updated_at": "2021-06-14T17:07:02.000000Z",
-            "deleted_at": null
-        },
-        {
-            "key": "database_version",
-            "value": {
-                "version": "staging",
-                "checksum": "hash",
-                "size": 123456
-            },
-            "created_at": "2021-06-14T17:07:02.000000Z",
-            "updated_at": "2021-06-14T17:07:02.000000Z",
-            "deleted_at": null
-        },
-        {
-            "key": "sensor_version",
-            "value": {
-                "version": "staging",
-                "checksum": "hash",
-                "size": 123456
-            },
-            "created_at": "2021-06-14T17:07:02.000000Z",
-            "updated_at": "2021-06-14T17:07:02.000000Z",
-            "deleted_at": null
-        },
-        {
-            "key": "engine_version",
-            "value": {
-                "version": "staging",
-                "checksum": "hash",
-                "size": 111
-            },
-            "created_at": "2021-06-14T17:07:02.000000Z",
-            "updated_at": "2021-06-14T17:07:02.000000Z",
-            "deleted_at": null
-        },
-        {
-            "key": "manager_version",
-            "value": {
-                "version": "v0.2.5-rc1.1-f2c7578",
-                "size": 111,
-                "hash": "111"
-            },
-            "created_at": "2021-06-14T17:07:02.000000Z",
-            "updated_at": "2021-06-15T18:15:57.000000Z",
-            "deleted_at": null
-        }
-    ]
+	goldenVersionsAPIResponseGood = `
+{
+   "status":"ok",
+   "data":[
+      {
+         "key":"installer_version",
+         "value":{
+            "version":"1.2.3",
+            "checksum":"hash",
+            "size":123456
+         },
+         "created_at":"2021-06-14 20:07:02 (Europe\/Istanbul)",
+         "updated_at":"2021-07-04 18:58:54 (Europe\/Istanbul)",
+         "deleted_at":null
+      },
+      {
+         "key":"dashboard_version",
+         "value":{
+            "version":"1.2.3",
+            "checksum":"hash",
+            "size":123456
+         },
+         "created_at":"2021-06-14 20:07:02 (Europe\/Istanbul)",
+         "updated_at":"2021-07-04 18:58:54 (Europe\/Istanbul)",
+         "deleted_at":null
+      },
+      {
+         "key":"static_engine_version",
+         "value":{
+            "version":"v1.5.66-emptytrip-66a9622",
+            "size":17476080,
+            "checksum":"4c1561ae2f3f705d7533ea22e94f4445"
+         },
+         "created_at":"2021-11-17 12:17:20 (Europe\/Istanbul)",
+         "updated_at":"2021-11-30 20:48:33 (Europe\/Istanbul)",
+         "deleted_at":null
+      },
+      {
+         "key":"database_version",
+         "value":{
+            "version":"v0.0.82-pipeline-3c436cb",
+            "size":1,
+            "checksum":"4d1191fc8b7f56e836509133cbe5bb04"
+         },
+         "created_at":"2021-06-14 20:07:02 (Europe\/Istanbul)",
+         "updated_at":"2021-11-13 11:11:41 (Europe\/Istanbul)",
+         "deleted_at":null
+      },
+      {
+         "key":"queue_version",
+         "value":{
+            "version":"v0.0.6-rc1-fbeb9f0",
+            "size":60071104,
+            "checksum":"d41d8cd98f00b204e9800998ecf8427e"
+         },
+         "created_at":"2021-06-14 20:07:02 (Europe\/Istanbul)",
+         "updated_at":"2021-08-11 19:09:11 (Europe\/Istanbul)",
+         "deleted_at":null
+      },
+      {
+         "key":"profiling_database_version",
+         "value":{
+            "version":"v0.1.0",
+            "size":24254216,
+            "checksum":"b73a81f5c248cc857abb163060831220"
+         },
+         "created_at":"2021-06-14 20:07:02 (Europe\/Istanbul)",
+         "updated_at":"2021-09-24 09:52:19 (Europe\/Istanbul)",
+         "deleted_at":null
+      },
+      {
+         "key":"scheduler_version",
+         "value":{
+            "version":"v0.2.63-dep-bc5c6a4",
+            "size":11952128,
+            "checksum":"e86358fa69fc7b0f2b639e0c0045327a"
+         },
+         "created_at":"2021-06-14 20:07:02 (Europe\/Istanbul)",
+         "updated_at":"2021-11-10 12:24:46 (Europe\/Istanbul)",
+         "deleted_at":null
+      },
+      {
+         "key":"sensor_version",
+         "value":{
+            "version":"v0.2.98-alpha3-9a28f10",
+            "size":15646984,
+            "checksum":"1d5b4857ceafc222fa66d39fdef92c88"
+         },
+         "created_at":"2021-06-14 20:07:02 (Europe\/Istanbul)",
+         "updated_at":"2021-12-01 09:49:31 (Europe\/Istanbul)",
+         "deleted_at":null
+      },
+      {
+         "key":"profiler_version",
+         "value":{
+            "version":"v0.3.92-alpha11-c277e55",
+            "size":24981256,
+            "checksum":"404339fad11175a69939a3c409c9475b"
+         },
+         "created_at":"2021-06-14 20:07:02 (Europe\/Istanbul)",
+         "updated_at":"2021-11-25 08:35:29 (Europe\/Istanbul)",
+         "deleted_at":null
+      },
+      {
+         "key":"manager_version",
+         "value":{
+            "version":"v0.3.9625-sniff-5115b21",
+            "size":40674360,
+            "checksum":"385a46c20cb88a41edec7c845ebf7ea4"
+         },
+         "created_at":"2021-06-14 20:07:02 (Europe\/Istanbul)",
+         "updated_at":"2021-12-03 12:48:45 (Europe\/Istanbul)",
+         "deleted_at":null
+      },
+      {
+         "key":"cache_version",
+         "value":{
+            "version":"latest",
+            "size":1111111,
+            "checksum":"b959bf146d2ec0ba2ebfa06c8bf42107"
+         },
+         "created_at":"2021-11-17 13:08:09 (Europe\/Istanbul)",
+         "updated_at":"2021-11-17 13:08:09 (Europe\/Istanbul)",
+         "deleted_at":null
+      },
+      {
+         "key":"engine_version",
+         "value":{
+            "version":"v1.5.883-alpha11-b8acd81",
+            "size":23692456,
+            "checksum":"85285180299596f666e2db92b488097a"
+         },
+         "created_at":"2021-06-14 20:07:02 (Europe\/Istanbul)",
+         "updated_at":"2021-11-27 08:14:58 (Europe\/Istanbul)",
+         "deleted_at":null
+      }
+   ]
 }`
 )
+
+func TestUnmarshal(t *testing.T) {
+	var s string
+	const layout = "2006-01-2 15:04:05 (MST)"
+
+	x, err := time.Parse(layout, `2021-06-14 20:07:02 (CST)`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = x
+	err = json.Unmarshal([]byte(`{"time":"2021-06-14 20:07:02 (Europe\/Istanbul)`), &s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var mes APIVersionsMessage
+	err = json.Unmarshal([]byte(goldenVersionsAPIResponseGood), &mes)
+	if err != nil {
+		t.Fatal(err)
+	}
+}

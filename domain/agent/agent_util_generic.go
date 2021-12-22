@@ -1,15 +1,15 @@
 package agent
 
 import (
-	`bytes`
-	`context`
-	`os/exec`
-	
-	`github.com/docker/docker/api/types`
+	"bytes"
+	"context"
+	"os/exec"
+
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	`github.com/fatih/color`
-	`github.com/pkg/errors`
-	`github.com/strixeyecom/cli/domain/consts`
+	"github.com/fatih/color"
+	"github.com/pkg/errors"
+	"github.com/strixeyecom/cli/domain/consts"
 )
 
 /*
@@ -24,13 +24,13 @@ import (
 const (
 	// LogCheckPID verbose message to say checking for running strixeyed
 	LogCheckPID = "Controlling strixeyed pid file at " + consts.PidFile
-	
+
 	logCheckSupport = "Verifying that host machine supports running StrixEye Agent depending on your agent" +
 		" configuration"
-	
+
 	logVerificationFailed     = "\t❌❌❌Verification failed. ❌❌❌"
 	logVerificationSuccessful = "\tVerification successfully completed. ✅"
-	
+
 	DockerDatabaseVolumeName = "strixeye_strixeye-database"
 	DockerBrokerVolumeName   = "strixeye_strixeye-queue"
 )
@@ -52,7 +52,7 @@ func CheckIfAnotherAgentRunning() error {
 		color.Red("\tVerification failed.")
 		return err
 	}
-	
+
 	color.Yellow("\tVerification successful")
 	return nil
 }
@@ -65,14 +65,14 @@ func CheckIfHostSupports(a AgentInformation) error {
 // CheckIfHostSupports controls whether you can install your current agent on the host machine or not.
 func (a AgentInformation) CheckIfHostSupports() error {
 	color.Blue(logCheckSupport)
-	
+
 	// 	following code depends on the host machine setup (os/arch)
 	err := a.checkIfHostSupports()
 	if err != nil {
 		color.Red(logVerificationFailed)
 		return err
 	}
-	
+
 	color.Yellow(logVerificationSuccessful)
 	return nil
 }
@@ -83,35 +83,35 @@ func checkDockerRunning() error {
 		err error
 		ctx = context.Background()
 	)
-	
+
 	// create a client
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return err
 	}
-	
+
 	// try to list containers
 	_, err = cli.ContainerList(ctx, types.ContainerListOptions{})
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
 func checkIfDockerComposeExists() error {
-	cmd := exec.Command("docker-compose", "version")
-	
+	cmd := exec.CommandContext(context.Background(), "docker-compose", "version")
+
 	var output bytes.Buffer
 	cmd.Stdout = &output
-	
+
 	err := cmd.Run()
-	
+
 	// if exit code != 0, it means docker-compose not found.
 	if err != nil {
 		return err
 	}
-	
+
 	color.Green(output.String())
 	return nil
 }

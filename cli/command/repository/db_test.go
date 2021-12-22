@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 	}
 
 	dbConfig = cliConfig.Database
-	dbConfig.SetTestContainerName( "strixeye_test_db")
+	dbConfig.SetTestContainerName("strixeye_test_db")
 
 	// Create a temporary database container for testing
 	err = CreateDatabase(cliConfig.Database)

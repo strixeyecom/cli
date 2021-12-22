@@ -2,7 +2,7 @@ package agent
 
 import (
 	"fmt"
-	
+
 	"github.com/strixeyecom/cli/domain/repository"
 )
 

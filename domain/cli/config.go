@@ -33,7 +33,7 @@ func init() {
 			if err != nil {
 				return false
 			}
-			if my <= 0 || my >= 65336 {
+			if my <= 0 || my >= (2 << 15) {
 				return false
 			}
 			return true

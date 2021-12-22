@@ -10,10 +10,9 @@ package consts
 
 // global constants for package
 const (
-	DockerDeployment = "docker"
+	DockerDeployment     = "docker"
 	KubernetesDeployment = "kubernetes"
-	
-	
+
 	KubernetesNamespace = "strixeye-agent"
 )
 

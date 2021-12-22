@@ -1,10 +1,10 @@
 package agent
 
 import (
-	`context`
-	
-	`github.com/docker/docker/api/types/filters`
-	`github.com/docker/docker/client`
+	"context"
+
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/client"
 )
 
 /*
@@ -27,7 +27,7 @@ func RemoveDockerVolumeByName(name string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	vList, err := dockerClient.VolumeList(ctx, filters.Args{})
 	if err != nil {
 		return err
@@ -36,13 +36,13 @@ func RemoveDockerVolumeByName(name string) error {
 		if volume.Name != name {
 			continue
 		}
-		
+
 		// remove given docker volume
 		err = dockerClient.VolumeRemove(ctx, volume.Name, true)
 		if err != nil {
 			return err
 		}
 	}
-	
+
 	return nil
 }

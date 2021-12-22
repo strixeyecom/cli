@@ -164,7 +164,7 @@ func TestGet(t *testing.T) {
 			args: args{
 				dbConfig: dbConfig,
 				args: models.SuspectQueryArgs{
-					SinceTime: time.Now().UnixNano() - 5*time.Second.Nanoseconds(),
+					SinceTime: time.Now().UnixMilli() - 5*time.Second.Milliseconds(),
 				},
 			},
 			wantErr: false,

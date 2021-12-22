@@ -2,9 +2,9 @@ package main
 
 import (
 	"os"
-	
-	`github.com/spf13/cobra`
-	
+
+	"github.com/spf13/cobra"
+
 	"github.com/strixeyecom/cli/cli/command/commands"
 )
 

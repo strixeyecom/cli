@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	
+
 	"github.com/pkg/errors"
-	
+
 	"github.com/strixeyecom/cli/api/user/repository"
-	`github.com/strixeyecom/cli/domain/agent`
-	`github.com/strixeyecom/cli/domain/cli`
+	"github.com/strixeyecom/cli/domain/agent"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*

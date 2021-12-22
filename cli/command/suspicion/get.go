@@ -1,24 +1,24 @@
 package suspicion
 
 import (
-	`encoding/json`
-	`fmt`
-	`io/ioutil`
-	`net/http`
-	
-	`github.com/fatih/color`
-	`github.com/hokaccha/go-prettyjson`
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+
+	"github.com/fatih/color"
+	"github.com/hokaccha/go-prettyjson"
 	"github.com/pkg/errors"
-	`github.com/spf13/cobra`
-	`github.com/spf13/viper`
-	userconfig `github.com/strixeyecom/cli/api/user/agent`
-	repository2 `github.com/strixeyecom/cli/api/user/repository`
-	`github.com/strixeyecom/cli/cli/command/trip`
-	models `github.com/strixeyecom/cli/domain/repository`
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	userconfig "github.com/strixeyecom/cli/api/user/agent"
+	repository2 "github.com/strixeyecom/cli/api/user/repository"
+	"github.com/strixeyecom/cli/cli/command/trip"
+	models "github.com/strixeyecom/cli/domain/repository"
 	"gorm.io/gorm"
-	
-	`github.com/strixeyecom/cli/cli/command/repository`
-	`github.com/strixeyecom/cli/domain/cli`
+
+	"github.com/strixeyecom/cli/cli/command/repository"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*
@@ -57,7 +57,7 @@ Get is a subcommand of suspicion command where you can query
 suspicions on your agent, without leaking any sensitive data outside of your network.`,
 		RunE: getSuspicionCmd,
 	}
-	
+
 	// declaring local flags used by get suspicion commands.
 	getCmd.Flags().StringSliceP(
 		"suspects", "s", nil, "Comma separated values of suspect uuids. "+
@@ -71,15 +71,15 @@ suspicions on your agent, without leaking any sensitive data outside of your net
 		"trips", "t", nil, "Comma separated values of trip uuids. "+
 			"--trips trip-id,trip-id2",
 	)
-	
+
 	getCmd.Flags().IntP("limit", "l", 5, "Max number of suspicions you want to be displayed --limit 5")
-	
+
 	getCmd.Flags().IntP(
 		"since", "i", 0,
 		"Queries only suspicions after given time --since [epoch in seconds]  You can get current"+
 			" timestamp with date +%s",
 	)
-	
+
 	return getCmd
 }
 
@@ -89,15 +89,15 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 		cliConfig cli.Cli
 		err       error
 	)
-	
+
 	// get cli config for authentication
 	err = viper.Unmarshal(&cliConfig)
 	if err != nil {
 		return err
 	}
-	
+
 	queryArgs := models.SuspicionQueryArgs{Limit: 1}
-	
+
 	// parse and set list of suspects to be queried
 	suspects, err := cmd.Flags().GetStringSlice("suspects")
 	if err != nil {
@@ -105,7 +105,7 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 	} else if len(suspects) > 0 {
 		queryArgs.SuspectIds = suspects
 	}
-	
+
 	// parse and set list of suspicions to be queried
 	suspicionIds, err := cmd.Flags().GetStringSlice("suspicions")
 	if err != nil {
@@ -113,7 +113,7 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 	} else if len(suspicionIds) > 0 {
 		queryArgs.SuspicionIds = suspicionIds
 	}
-	
+
 	// parse and set list of suspicions to be queried
 	tripIds, err := cmd.Flags().GetStringSlice("trips")
 	if err != nil {
@@ -121,7 +121,7 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 	} else if len(tripIds) > 0 {
 		queryArgs.TripsIds = tripIds
 	}
-	
+
 	// parse max limit of rows displayed.
 	limit, err := cmd.Flags().GetInt("limit")
 	if err != nil {
@@ -129,23 +129,23 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 	} else if limit > 0 {
 		queryArgs.Limit = limit
 	}
-	
+
 	// parse oldest timestamp to be queries
 	sinceTime, err := cmd.Flags().GetInt("since")
 	if err != nil {
 		return err
-		
+
 	} else if sinceTime > 0 {
 		queryArgs.SinceTime = int64(sinceTime)
 	}
-	
+
 	// get suspicions with parsed query arguments for this subcommand
 	suspicions, staticChecks, err := Get(cliConfig, queryArgs)
 	if err != nil {
 		return err
-		
+
 	}
-	
+
 	var data []byte
 	// marshal result with colors
 	if len(suspicions) > 0 {
@@ -156,7 +156,7 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 		data = append(data, "\n Smart Results\n"...)
 		data = append(data, tmp...)
 	}
-	
+
 	if len(staticChecks) > 0 {
 		tmp, err := prettyjson.Marshal(staticChecks)
 		if err != nil {
@@ -167,10 +167,10 @@ func getSuspicionCmd(cmd *cobra.Command, _ []string) error {
 	}
 	// print out query settings
 	color.Blue(queryArgs.String())
-	
+
 	// print out result
 	color.Blue("%s", string(data))
-	
+
 	return nil
 }
 
@@ -181,7 +181,7 @@ func Get(cliConfig cli.Cli, args models.SuspicionQueryArgs) (
 	var (
 		dbConfig models.Database
 	)
-	
+
 	// If user wants to override db config with local information, use that.
 	if cliConfig.Database.Validate() == nil && cliConfig.Database.OverrideRemoteConfig {
 		color.Blue("Using local database config.")
@@ -193,7 +193,7 @@ func Get(cliConfig cli.Cli, args models.SuspicionQueryArgs) (
 		}
 		dbConfig = agentConfig.Config.Database
 	}
-	
+
 	suspicions, err := get(dbConfig, args)
 	if err != nil {
 		return nil, nil, err
@@ -211,17 +211,17 @@ func Get(cliConfig cli.Cli, args models.SuspicionQueryArgs) (
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "can not extract trip information")
 		}
-		
+
 		if len(tmp) > 0 {
 			suspicions[i].Trip = tmp[0]
 		}
 	}
-	
+
 	staticChecks, err := getStatics(dbConfig, args)
 	if err != nil {
 		return nil, nil, err
 	}
-	
+
 	return suspicions, staticChecks, nil
 }
 
@@ -233,41 +233,41 @@ func get(dbConfig models.Database, args models.SuspicionQueryArgs) ([]models.Sus
 		db     *gorm.DB
 		result []models.Suspicion
 	)
-	
+
 	// connect to database
 	db, err = repository.ConnectToAgentDB(dbConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "can not establish connection to agent database")
 	}
-	
+
 	// nobody wants to retrieve all hundreds of thousands of results.
 	if args.Limit == 0 {
 		args.Limit = 10
 	}
 	tx := db.Limit(args.Limit)
-	
+
 	// filter by suspicion ids
 	if args.SuspicionIds != nil {
 		tx = tx.Where("id IN ?", args.SuspicionIds)
 	}
-	
+
 	// filter by suspect ids
 	if args.SuspectIds != nil {
 		tx = tx.Where("profile_id IN ?", args.SuspectIds)
 	}
-	
+
 	// filter by suspect ids
 	if args.TripsIds != nil {
 		tx = tx.Where("trip_id IN ?", args.TripsIds)
 	}
-	
+
 	// filter by created after
 	if args.SinceTime != 0 {
 		// convert seconds to milliseconds
 		milliseconds := args.SinceTime * 1e3
 		tx = tx.Where("created_at > ?", milliseconds)
 	}
-	
+
 	// find all suspects that matches args criteria
 	tx = tx.Find(&result)
 	err = tx.Error
@@ -285,41 +285,41 @@ func getStatics(dbConfig models.Database, args models.SuspicionQueryArgs) ([]mod
 		db     *gorm.DB
 		result []models.StaticCheck
 	)
-	
+
 	// connect to database
 	db, err = repository.ConnectToAgentDB(dbConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "can not establish connection to agent database")
 	}
-	
+
 	// nobody wants to retrieve all hundreds of thousands of results.
 	if args.Limit == 0 {
 		args.Limit = 10
 	}
 	tx := db.Limit(args.Limit)
-	
+
 	// filter by suspicion ids
 	if args.SuspicionIds != nil {
 		tx = tx.Where("id IN ?", args.SuspicionIds)
 	}
-	
+
 	// filter by suspect ids
 	if args.SuspectIds != nil {
 		tx = tx.Where("profile_id IN ?", args.SuspectIds)
 	}
-	
+
 	// filter by suspect ids
 	if args.TripsIds != nil {
 		tx = tx.Where("trip_id IN ?", args.TripsIds)
 	}
-	
+
 	// filter by created after
 	if args.SinceTime != 0 {
 		// convert seconds to milliseconds
 		milliseconds := args.SinceTime * 1e3
 		tx = tx.Where("created_at > ?", milliseconds)
 	}
-	
+
 	// find all suspects that matches args criteria
 	tx = tx.Find(&result)
 	err = tx.Error
@@ -345,7 +345,7 @@ func getDomain(apiToken, apiDomain, domainID string) (models.Domain, error) {
 	}
 	url := fmt.Sprintf("/domains/%s", domainID)
 	resp, err = repository2.UserAPIRequest(http.MethodGet, url, nil, apiToken, apiDomain)
-	
+
 	if err != nil {
 		return models.Domain{}, errors.Wrap(err, "failed to complete user api request to agents")
 	}
@@ -357,7 +357,7 @@ func getDomain(apiToken, apiDomain, domainID string) (models.Domain, error) {
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	
+
 	// handle reject/fail responses
 	if resp.StatusCode != http.StatusOK {
 		return models.Domain{}, fmt.Errorf(
@@ -365,7 +365,7 @@ func getDomain(apiToken, apiDomain, domainID string) (models.Domain, error) {
 				"Status Code : %d, error message : %s", resp.StatusCode, body,
 		)
 	}
-	
+
 	// if status is ok, than this is possibly a api success response
 	var apiResponse models.DomainMessage
 	err = json.Unmarshal(body, &apiResponse)
@@ -375,10 +375,10 @@ func getDomain(apiToken, apiDomain, domainID string) (models.Domain, error) {
 			"api says response is okay but possibly there is a misunderstanding",
 		)
 	}
-	
+
 	if apiResponse.Status != "ok" {
 		return models.Domain{}, errors.New(string(body))
 	}
-	
+
 	return apiResponse.Data, nil
 }

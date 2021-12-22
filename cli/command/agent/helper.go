@@ -56,7 +56,7 @@ func extractTarGz(version repository2.Version) error {
 	tarReader := tar.NewReader(gzf)
 
 	strixeyedPath := filepath.Join(consts.DaemonDir, consts.DaemonName)
-	strixeyedTmpPath := fmt.Sprintf("%s-%d", strixeyedPath, time.Now().UnixNano())
+	strixeyedTmpPath := fmt.Sprintf("%s-%d", strixeyedPath, time.Now().UnixMilli())
 
 	// os package doesn't work well when you simply try to create with root access, instead
 	// it is easier to create in a temporary path and move to permissible location.

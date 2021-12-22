@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/spf13/viper"
-	`github.com/strixeyecom/cli/domain/repository`
-	
+	"github.com/strixeyecom/cli/domain/repository"
+
 	"github.com/strixeyecom/cli/domain/agent"
 	"github.com/strixeyecom/cli/domain/cli"
 )
@@ -40,7 +40,7 @@ func TestGetAgent(t *testing.T) {
 	type args struct {
 		userAPIToken string
 		agentID      string
-		apiDomain       string
+		apiDomain    string
 	}
 	tests := []struct {
 		name    string
@@ -53,7 +53,7 @@ func TestGetAgent(t *testing.T) {
 			args: args{
 				userAPIToken: cliConfig.UserAPIToken,
 				agentID:      cliConfig.AgentID,
-				apiDomain:       cliConfig.APIDomain,
+				apiDomain:    cliConfig.APIDomain,
 			},
 			wantErr: false,
 		}, {
@@ -61,7 +61,7 @@ func TestGetAgent(t *testing.T) {
 			args: args{
 				userAPIToken: "fake-token",
 				agentID:      cliConfig.AgentID,
-				apiDomain:       cliConfig.APIDomain,
+				apiDomain:    cliConfig.APIDomain,
 			},
 			wantErr: true,
 		},
@@ -70,7 +70,7 @@ func TestGetAgent(t *testing.T) {
 			args: args{
 				userAPIToken: cliConfig.UserAPIToken,
 				agentID:      "fake-agent",
-				apiDomain:       cliConfig.APIDomain,
+				apiDomain:    cliConfig.APIDomain,
 			},
 			wantErr: true,
 		},

@@ -1,9 +1,10 @@
+//go:build windows
 // +build windows
 
 package agent
 
 import (
-	`github.com/pkg/errors`
+	"github.com/pkg/errors"
 )
 
 /*
@@ -13,7 +14,6 @@ import (
 /*
 	utility functions for StrixEye agents running on Linux.
 */
-
 
 // checkIfAnotherAgentRunning tries to find a running strixeyed daemon and returns nil if **no agent is
 // running**
@@ -29,27 +29,26 @@ func checkIfAnotherAgentRunning() error {
 	if err == nil {
 		return ErrAnotherAgentRunning
 	}
-	
+
 	// If the error is a file not found/not exists error,
 	// it means that there are no strixeyed running on host machine.
-	
+
 	if !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
-	
+
 	// no other strixeyed alive
 	return nil
 }
-
 
 // checkIfHostSupports controls whether you can install your current agent on the host machine or not.
 func (a AgentInformation) checkIfHostSupports() error {
 	var (
 		err error
 	)
-	
+
 	// Run generic checks
-	
+
 	// 	control according to deployment type
 	// check for docker/docker-compose deployment.
 	if a.Config.Deployment == "docker" {
@@ -61,7 +60,7 @@ func (a AgentInformation) checkIfHostSupports() error {
 					"are you sure you have installed both docker and its tool docker compose?",
 			)
 		}
-		
+
 		// check whether there is a running docker daemon.
 		err = checkDockerRunning()
 		if err != nil {
@@ -70,14 +69,14 @@ func (a AgentInformation) checkIfHostSupports() error {
 					"Check your docker configuration",
 			)
 		}
-		
+
 		return nil
 	}
-	
+
 	// check for kubectl api
 	if a.Config.Deployment == "kubernetes" {
 		return nil
 	}
-	
+
 	return errors.New("unknown deployment type. check your configuration again")
 }

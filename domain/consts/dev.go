@@ -1,3 +1,4 @@
+//go:build develop
 // +build develop
 
 package consts
@@ -19,17 +20,16 @@ const (
 
 	ConfigDir = "./test/strixeye/config"
 
-	DownloadHost = "downloads.strixeye.com"
+	DownloadHost   = "downloads.strixeye.com"
 	DockerRegistry = "docker.strixeye.com"
-	APIHost      = "api.strixeye.com"
+	APIHost        = "api.strixeye.com"
 
 	DockerComposeFileName = "docker-compose.yml"
 
-	LogFile = "/var/log/strixeyed"
-	PidFile = "/var/run/strixeyed.pid"
+	LogFile     = "/var/log/strixeyed"
+	PidFile     = "/var/run/strixeyed.pid"
 	ServiceDir  = "./test"
 	ServiceFile = "strixeyed.service"
-	
 
 	DownloadZipName = "manager.tar.gz"
 )

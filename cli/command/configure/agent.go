@@ -2,7 +2,7 @@ package configure
 
 import (
 	"github.com/spf13/cobra"
-	`github.com/strixeyecom/cli/cli/command/repository/ux`
+	"github.com/strixeyecom/cli/cli/command/repository/ux"
 )
 
 /*

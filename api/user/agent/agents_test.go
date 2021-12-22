@@ -3,11 +3,11 @@ package agent
 import (
 	"fmt"
 	"testing"
-	
+
 	"github.com/spf13/viper"
-	
-	`github.com/strixeyecom/cli/domain/agent`
-	`github.com/strixeyecom/cli/domain/cli`
+
+	"github.com/strixeyecom/cli/domain/agent"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*

@@ -5,18 +5,18 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	`reflect`
+	"reflect"
 	"strings"
-	
+
 	"github.com/fatih/color"
-	`github.com/fatih/structs`
+	"github.com/fatih/structs"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/strixeyecom/cli/domain/consts"
-	
+
 	"github.com/strixeyecom/cli/cli/command/agent"
 	"github.com/strixeyecom/cli/cli/command/configure"
 	"github.com/strixeyecom/cli/cli/command/suspect"
@@ -38,7 +38,7 @@ const (
 	// The name of our config file, without the file extension because viper supports many different config file languages.
 	defaultConfigFilename = "cli"
 	defaultConfigFileType = "yaml"
-	
+
 	// The environment variable prefix of all environment variables bound to our command line flags.
 	// For example, --number is bound to STING_NUMBER.
 	envPrefix = "STRIXEYE"
@@ -64,28 +64,27 @@ func NewStrixeyeCommand() *cobra.Command {
 				cliConfig cli.Cli
 				err       error
 			)
-			
+
 			// don't allow non strixeye or non-root users to run StrixEye CLI
 			// checkUser(cmd)
-			
+
 			// You can bind cobra and viper in a few locations, but PersistencePreRunE on the root command works well
 			err = handleConfig(cmd)
 			if err != nil {
 				return errors.WithMessage(err, "can not read config")
 			}
-			
+
 			// unmarshal into config object
 			err = viper.Unmarshal(&cliConfig)
 			if err != nil {
 				return err
 			}
-			
+
 			return nil
 		},
 		RunE: ShowHelp(os.Stdout),
-		
 	}
-	
+
 	// Add subcommands
 	rootCmd.AddCommand(
 		InspectCommand(),
@@ -96,11 +95,11 @@ func NewStrixeyeCommand() *cobra.Command {
 		suspect.NewSuspectCommand(),
 		agent.NewAgentCommand(),
 	)
-	
+
 	// Add flags
 	c := &cli.Cli{}
 	structToFlag(rootCmd, structs.Fields(c), structs.Fields(c), 0, 0, []string{})
-	
+
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
@@ -108,7 +107,7 @@ func NewStrixeyeCommand() *cobra.Command {
 		"config-path", "", "config file (default is $HOME/.strixeye/."+
 			defaultConfigFilename+"."+defaultConfigFileType+")",
 	)
-	
+
 	return rootCmd
 }
 
@@ -121,16 +120,16 @@ func structToFlag(
 	if currentLayer == nil {
 		return
 	}
-	
+
 	// if this level of struct is done, go a level up back
 	if currentIdx == len(currentLayer) {
 		return
 	}
 	field := currentLayer[currentIdx]
-	
+
 	// as long as the field is not a struct, create a flag for it
 	if field.Kind() != reflect.Struct {
-		flagName := strings.Join(append(path, field.Tag("flag")),".")
+		flagName := strings.Join(append(path, field.Tag("flag")), ".")
 		if cmd.Flag(flagName) == nil {
 			// handle flag type
 			switch field.Kind().String() {
@@ -142,7 +141,7 @@ func structToFlag(
 				cmd.PersistentFlags().Int(flagName, 0, "")
 			case "float":
 				cmd.PersistentFlags().Float64(flagName, 0, "")
-				
+
 			}
 		}
 		structToFlag(cmd, upperLayer, currentLayer, upperIdx, currentIdx+1, path)
@@ -150,14 +149,14 @@ func structToFlag(
 		// for struct fields, recurse the struct
 		structToFlag(cmd, upperLayer, field.Fields(), currentIdx, 0, append(path, field.Tag("flag")))
 	}
-	
+
 	// go to neighbor field
 	/*
 					+
 		|   |   |   |   |   |   |
 		|                       |
 		+        --->           +
-	
+
 	*/
 	if upperIdx != len(upperLayer) {
 		structToFlag(cmd, upperLayer, upperLayer, upperIdx+1, upperIdx+1, []string{})
@@ -180,7 +179,7 @@ func handleConfig(cmd *cobra.Command) error {
 		// 	cli config not found or no permission to read.
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -189,13 +188,13 @@ func initializeConfig(cmd *cobra.Command) error {
 	var (
 		err error
 	)
-	
+
 	// Set the base name of the config file, without the file extension.
 	viper.SetConfigName(defaultConfigFilename)
 	viper.SetConfigType(defaultConfigFileType)
-	
+
 	setDefaultConfig()
-	
+
 	// Set as many paths as you like where viper should look for the
 	// config file. We are only looking in the current working directory.
 	if cfgFile != "" {
@@ -203,13 +202,13 @@ func initializeConfig(cmd *cobra.Command) error {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		var configPath string
-		
+
 		// Flag overrides all values
 		configFlag, err := cmd.Flags().GetString("config-path")
 		if err != nil {
 			return err
 		}
-		
+
 		// Search config in home directory with name ".cli" (without extension).
 		if configFlag != "" {
 			configPath = filepath.Dir(configFlag)
@@ -223,7 +222,7 @@ func initializeConfig(cmd *cobra.Command) error {
 			cfgFile = filepath.Join(configPath, defaultConfigFilename, defaultConfigFileType)
 			viper.AddConfigPath(configPath)
 		}
-		
+
 		// create default config directory since we are going to use this anyway.
 		_, statErr := os.Stat(configPath)
 		if os.IsNotExist(statErr) {
@@ -240,7 +239,7 @@ $ chown -R $USER %s   `, consts.CLIConfigDir,
 				}
 				return err
 			}
-			
+
 			// If you are here, then the configuration directories are created and owned by the current process owner
 			color.Blue(
 				"Successfully set up strixeye cli. "+
@@ -253,9 +252,9 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 			)
 		}
 	}
-	
+
 	// after creating file, we can start using default config file.
-	
+
 	// and store it as default
 	err = viper.SafeWriteConfig()
 	if err != nil {
@@ -268,7 +267,7 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 			return err
 		}
 	}
-	
+
 	// Attempt to read the config file, gracefully ignoring errors
 	// caused by a config file not being found. Return an error
 	// if we cannot parse the config file.
@@ -279,18 +278,18 @@ $ chown -R $USER %s`, consts.CLIConfigDir,
 			return err
 		}
 	}
-	
+
 	// When we bind flags to environment variables expect that the
 	// environment variables are prefixed, e.g. a flag like --number
 	// binds to an environment variable STING_NUMBER. This helps
 	// avoid conflicts.
 	viper.SetEnvPrefix(envPrefix)
-	
+
 	// Bind to environment variables
 	// Works great for simple config names, but needs help for names
 	// like --favorite-color which we fix in the bindFlags function
 	viper.AutomaticEnv()
-	
+
 	// Bind the current command's flags to viper
 	bindFlags(cmd, viper.GetViper())
 	return nil
@@ -304,7 +303,7 @@ func getHome(cmd *cobra.Command) (string, error) {
 	if sudoUser != "" {
 		return fmt.Sprintf("/home/%s", sudoUser), nil
 	}
-	
+
 	// root is not an allowed home
 	if os.Geteuid() == 0 {
 		// if it is root, $HOME is not usable, because not accessible by regular users.
@@ -313,7 +312,7 @@ func getHome(cmd *cobra.Command) (string, error) {
 				"Either pass it as flag --config-path or switch to a regular user",
 		)
 	}
-	
+
 	// if sudo user is empty, it is a legit user. Most importantly, it is either a regular user, or it's root.
 	// if the process owner isn't root, all is OK
 	// 	get os independent home directory
@@ -321,21 +320,21 @@ func getHome(cmd *cobra.Command) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	
+
 	return home, nil
-	
+
 }
 
 func setDefaultConfig() {
 	viper.SetDefault("API_DOMAIN", consts.APIHost)
 	viper.SetDefault("DOWNLOAD_DOMAIN", consts.DownloadHost)
 	viper.SetDefault("DOCKER_REGISTRY", consts.DockerRegistry)
-	
+
 	viper.SetDefault("AGENT_ID", "")
 	viper.SetDefault("USER_API_TOKEN", "")
-	
+
 	viper.SetDefault("PRETTY_OUTPUT", false)
-	
+
 	viper.SetDefault("DATABASE.DB_ADDR", "127.0.0.1")
 	viper.SetDefault("DATABASE.DB_USER", "")
 	viper.SetDefault("DATABASE.DB_PASS", "")
@@ -355,12 +354,12 @@ func bindFlags(cmd *cobra.Command, v *viper.Viper) {
 				err := v.BindEnv(f.Name, fmt.Sprintf("%s_%s", envPrefix, envVarSuffix))
 				cobra.CheckErr(err)
 			}
-			
+
 			if f.Changed {
 				envVarSuffix := strings.ToUpper(strings.ReplaceAll(f.Name, "-", "_"))
 				v.Set(envVarSuffix, f.Value)
 			}
-			
+
 			// Apply the viper config value to the flag when the flag is not set and viper has a value
 			if !f.Changed && v.IsSet(f.Name) {
 				val := v.Get(f.Name)

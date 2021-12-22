@@ -1,6 +1,6 @@
 package repository
 
-import `testing`
+import "testing"
 
 /*
 	Created by aomerk at 5/23/21 for project cli
@@ -29,8 +29,7 @@ func TestQueryArgs_String(t *testing.T) {
 		name   string
 		fields fields
 		want   string
-	}{
-	}
+	}{}
 	for _, tt := range tests {
 		t.Run(
 			tt.name, func(t *testing.T) {

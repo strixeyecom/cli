@@ -1,7 +1,7 @@
 package repository
 
 import (
-	`fmt`
+	"fmt"
 )
 
 /*
@@ -27,7 +27,7 @@ type Suspect struct {
 	Trips      []*Trip      `gorm:"trips;foreignKey:profile_id"`
 	Ips        []*Ip        `gorm:"ips;foreignKey:profile_id"`
 	Score      float64
-	
+
 	// to be able to query for TimeSince
 	CreatedAt int64
 }
@@ -42,25 +42,25 @@ func (suspect Suspect) TableName() string {
 type SuspectQueryArgs struct {
 	Limit      int
 	SuspectIds []string
-	
+
 	// Minimum risk score of queried suspects. Higher means they are more likely to attack.
 	MinScore float64
-	
+
 	// get only profiles who has detected since given epoch "millisecond" timestamp
 	SinceTime int64
-	
+
 	// 	most fields are kept in different tables, bound via foreign keys and have nested relations
 	// 	to get which fields you want to load other than the default, set it via fields argument
 	Fields []string
-	
+
 	Verbose bool
 }
 
 func (q SuspectQueryArgs) String() string {
 	var query string
-	
+
 	query = fmt.Sprintf("%s\nDisplaying maximum %d rows", query, q.Limit)
-	
+
 	if q.SuspectIds != nil && len(q.SuspectIds) != 0 {
 		query = fmt.Sprintf(
 			"%s\nQuerying %d suspects with ids: %s", query, len(q.SuspectIds), q.SuspectIds,
@@ -69,10 +69,10 @@ func (q SuspectQueryArgs) String() string {
 	if q.SinceTime > 0 {
 		query = fmt.Sprintf("%s\nQuerying only suspects that came after: %d", query, q.SinceTime)
 	}
-	
+
 	if q.MinScore > 0 {
 		query = fmt.Sprintf("%s\nQuerying only suspects with score higher than: %f", query, q.MinScore)
 	}
-	
+
 	return query
 }

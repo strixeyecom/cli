@@ -1,15 +1,15 @@
 package configure
 
 import (
-	`encoding/json`
-	
-	`github.com/k0kubun/pp`
+	"encoding/json"
+
+	"github.com/k0kubun/pp"
 	"github.com/spf13/cobra"
-	`github.com/spf13/viper`
-	
-	`github.com/strixeyecom/cli/api/user/agent`
-	agent2 `github.com/strixeyecom/cli/domain/agent`
-	`github.com/strixeyecom/cli/domain/cli`
+	"github.com/spf13/viper"
+
+	"github.com/strixeyecom/cli/api/user/agent"
+	agent2 "github.com/strixeyecom/cli/domain/agent"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*
@@ -58,13 +58,13 @@ func inspectCmd(cmd *cobra.Command, args []string) error {
 		AgentInformations = make([]agent2.AgentInformation, len(args))
 		cliConfig         cli.Cli
 	)
-	
+
 	// get cli config
 	err = viper.Unmarshal(&cliConfig)
 	if err != nil {
 		return err
 	}
-	
+
 	// if no args, show cli config
 	if len(args) == 0 {
 		_, err = pp.Print(cliConfig)
@@ -85,9 +85,9 @@ func inspectCmd(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		
+
 		cmd.Println(string(data))
 	}
-	
+
 	return nil
 }
