@@ -2,12 +2,12 @@ package cli
 
 import (
 	"encoding/json"
-	`strings`
+	"strings"
 	"testing"
-	
-	`github.com/spf13/viper`
-	
-	`github.com/strixeyecom/cli/domain/repository`
+
+	"github.com/spf13/viper"
+
+	"github.com/strixeyecom/cli/domain/repository"
 )
 
 /*
@@ -29,11 +29,11 @@ func TestCli_Load(t *testing.T) {
 		cliConfig2 Cli
 		err        error
 	)
-	
+
 	// get good keys
 	viper.SetConfigFile("../../.env")
 	viper.AutomaticEnv()
-	
+
 	// Try to read from file, but use env variables if non exists. it's fine
 	err = viper.ReadInConfig()
 	if err != nil {
@@ -43,7 +43,7 @@ func TestCli_Load(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
-	
+
 	err = cliConfig2.Validate()
 	if err != nil {
 		t.Fatalf("test failed while validating cli config %s", err)
@@ -91,7 +91,7 @@ func TestCli_UnmarshalJSON(t *testing.T) {
 	}
 	for i := range tests {
 		tt := tests[i]
-		
+
 		t.Run(
 			tt.name, func(t *testing.T) {
 				c := &Cli{}
@@ -122,11 +122,11 @@ func TestCli_MarshalJSON(t *testing.T) {
 	_ = viper.ReadConfig(strings.NewReader(testConfig))
 	a := Cli{}
 	err := viper.Unmarshal(&a)
-	if err != nil{
+	if err != nil {
 		t.Error(err)
 		return
 	}
-	
+
 }
 
 func TestCli_Validate(t *testing.T) {
@@ -156,7 +156,7 @@ func TestCli_Validate(t *testing.T) {
 	}
 	for i := range tests {
 		tt := tests[i]
-		
+
 		t.Run(
 			tt.name, func(t *testing.T) {
 				c := &Cli{
@@ -197,7 +197,7 @@ func TestCli_Save(t *testing.T) {
 	}
 	for i := range tests {
 		tt := tests[i]
-		
+
 		t.Run(
 			tt.name, func(t *testing.T) {
 				c := &Cli{

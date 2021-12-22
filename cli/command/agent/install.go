@@ -1,19 +1,20 @@
 package agent
 
 import (
-	`bytes`
+	"bytes"
+	"context"
 	"fmt"
 	"os"
-	`os/exec`
-	
-	`github.com/fatih/color`
+	"os/exec"
+
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	`github.com/strixeyecom/cli/cli/command/repository/ux`
+	"github.com/strixeyecom/cli/cli/command/repository/ux"
 	agent2 "github.com/strixeyecom/cli/domain/agent"
 	"github.com/strixeyecom/cli/domain/consts"
-	
+
 	"github.com/strixeyecom/cli/api/user/agent"
 	"github.com/strixeyecom/cli/domain/cli"
 )
@@ -47,11 +48,11 @@ strixeye configure agent
 `,
 		RunE: installAgentCmd,
 	}
-	
+
 	checkCmd.Flags().Bool(
 		"interactive", false, "--interactive if you want to configure StrixEye CLI during installation",
 	)
-	
+
 	return checkCmd
 }
 
@@ -60,28 +61,28 @@ func getCredentials(cmd *cobra.Command) (cli.Cli, error) {
 		cliConfig cli.Cli
 		err       error
 	)
-	
+
 	isInteractive, err := cmd.Flags().GetBool("interactive")
 	if err != nil {
 		return cli.Cli{}, err
 	}
-	
+
 	if !isInteractive {
 		// get cli config for authentication
 		err = viper.Unmarshal(&cliConfig)
 		if err != nil {
 			return cliConfig, err
 		}
-		
+
 		return cliConfig, nil
 	}
-	
+
 	// if interactive install,
 	err = ux.SetupUser(cmd, nil)
 	if err != nil {
 		return cli.Cli{}, err
 	}
-	
+
 	// if successfully setup user, than we can set up the agent
 	err = ux.SetupAgent(cmd, nil)
 	if err != nil {
@@ -92,7 +93,7 @@ func getCredentials(cmd *cobra.Command) (cli.Cli, error) {
 	if err != nil {
 		return cliConfig, err
 	}
-	
+
 	return cliConfig, nil
 }
 
@@ -102,18 +103,18 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 		cliConfig cli.Cli
 		err       error
 	)
-	
+
 	// Installing a new agent while one is still running is a bad practice in our current system
 	err = agent2.CheckIfAnotherAgentRunning()
 	if err != nil {
 		return err
 	}
-	
+
 	cliConfig, err = getCredentials(cmd)
 	if err != nil {
 		return err
 	}
-	
+
 	// early cut if bad credentials
 	if cliConfig.UserAPIToken == "" {
 		return errors.Errorf(
@@ -134,30 +135,30 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 `,
 		)
 	}
-	
+
 	// get agent config from remote.
 	agentConfig, err := agent.GetAgentConfig(cliConfig)
 	if err != nil {
 		return err
 	}
-	
+
 	// check if this host machine supports installing selected agent
 	err = agentConfig.CheckIfHostSupports()
 	if err != nil {
 		return err
 	}
-	
+
 	// get latest versions
 	versions, err := agent.GetLatestVersions(cliConfig)
 	if err != nil {
 		return err
 	}
-	
+
 	err = loginToDocker(agentConfig, cliConfig)
 	if err != nil {
 		return err
 	}
-	
+
 	// create necessary directories and files.
 	err = createPaths(agentConfig)
 	if errors.Is(err, os.ErrExist) {
@@ -165,13 +166,13 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 	} else if err != nil {
 		return err
 	}
-	
+
 	// create service file depending on os/arch and deployment type
 	err = agentConfig.CreateServiceFile()
 	if err != nil {
 		return err
 	}
-	
+
 	// Save agent config file
 	a := agent2.Agent{
 		Versions: versions, Auth: agent2.Auth{
@@ -184,15 +185,15 @@ func installAgentCmd(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	fmt.Println("Starting download process.")
-	
+
 	// download tarball, decompress and place the binary
 	err = DownloadDaemonBinary(
 		cliConfig.UserAPIToken, agentConfig.Token, versions.Manager,
 		cliConfig.DownloadDomain,
 	)
-	
+
 	if err != nil {
 		return err
 	}
@@ -208,43 +209,43 @@ func createPaths(agentInformation agent2.AgentInformation) error {
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
-	
+
 	if errors.Is(err, os.ErrNotExist) {
 		err = os.Mkdir(consts.WorkingDir, 0600)
 		if err != nil {
 			return err
 		}
 	}
-	
+
 	// 	create config directory
 	_, err = os.Stat(consts.ConfigDir)
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
-	
+
 	if os.IsNotExist(err) {
 		err = os.Mkdir(consts.ConfigDir, 0644)
 		if err != nil {
 			return err
 		}
 	}
-	
+
 	return nil
 }
 
 // loginToDocker is necessary because StrixEye images are kept in a secure registry.
 func loginToDocker(agentConfig agent2.AgentInformation, cliConfig cli.Cli) error {
 	testRefStr := fmt.Sprintf("%s/%s", cliConfig.DockerRegistry, "hello-world")
-	
-	cmd := exec.Command("docker", "pull", testRefStr)
-	
+
+	cmd := exec.CommandContext(context.Background(), "docker", "pull", testRefStr)
+
 	var outBuffer bytes.Buffer
 	cmd.Stdout = &outBuffer
-	
+
 	err := cmd.Run()
-	
+
 	if err != nil {
-		if agentConfig.Config.Deployment == "docker"{
+		if agentConfig.Config.Deployment == "docker" {
 			color.Red(
 				`
 Docker can not fetch test image from StrixEye registry.
@@ -261,7 +262,7 @@ $ strixeye inspect user_api_token | sudo docker login --username strixeye --pass
 strixeye inspect docker_registry)
 `, cliConfig.DockerRegistry, agentConfig.Token, cliConfig.DockerRegistry,
 			)
-		}else if agentConfig.Config.Deployment == "kubernetes" {
+		} else if agentConfig.Config.Deployment == "kubernetes" {
 			color.Red(
 				`
 Kubernetes can not fetch test image from StrixEye registry.
@@ -273,9 +274,9 @@ $ kubectl create secret docker-registry strixeye-cred --docker-server=$(strixeye
 `,
 			)
 		}
-	
+
 		return err
 	}
-	
+
 	return nil
 }

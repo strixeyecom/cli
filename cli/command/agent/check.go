@@ -1,11 +1,11 @@
 package agent
 
 import (
-	`github.com/spf13/cobra`
-	`github.com/spf13/viper`
-	
-	`github.com/strixeyecom/cli/api/user/agent`
-	`github.com/strixeyecom/cli/domain/cli`
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	"github.com/strixeyecom/cli/api/user/agent"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*
@@ -38,9 +38,9 @@ strixeye configure agent
 `,
 		RunE: checkHostCmd,
 	}
-	
+
 	// declaring local flags used by get trip commands.
-	
+
 	return checkCmd
 }
 
@@ -50,25 +50,25 @@ func checkHostCmd(cmd *cobra.Command, _ []string) error {
 		cliConfig cli.Cli
 		err       error
 	)
-	
+
 	// get cli config for authentication
 	err = viper.Unmarshal(&cliConfig)
 	if err != nil {
 		return err
 	}
-	
+
 	// get agent config from remote.
 	agentConfig, err := agent.GetAgentConfig(cliConfig)
 	if err != nil {
 		return err
-		
+
 	}
-	
+
 	// check if this host machine supports installing selected agent
 	err = agentConfig.CheckIfHostSupports()
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }

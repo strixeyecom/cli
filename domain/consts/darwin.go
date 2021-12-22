@@ -1,3 +1,4 @@
+//go:build !develop && darwin
 // +build !develop,darwin
 
 package consts
@@ -20,9 +21,9 @@ const (
 	ConfigDir  = "/etc/strixeye/config"
 	ConfigFile = "config.json"
 
-	DownloadHost = "downloads.strixeye.com"
+	DownloadHost   = "downloads.strixeye.com"
 	DockerRegistry = "docker.strixeye.com"
-	APIHost      = "api.strixeye.com"
+	APIHost        = "api.strixeye.com"
 
 	DockerComposeFileName = "docker-compose.yml"
 

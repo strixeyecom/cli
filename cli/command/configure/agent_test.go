@@ -1,9 +1,9 @@
 package configure
 
 import (
-	`testing`
-	
-	`github.com/strixeyecom/cli/domain/agent`
+	"testing"
+
+	"github.com/strixeyecom/cli/domain/agent"
 )
 
 /*
@@ -40,7 +40,6 @@ func Test_selectAgent(t *testing.T) {
 				},
 			},
 			wantErr: false,
-			
 		},
 	}
 	for _, tt := range tests {

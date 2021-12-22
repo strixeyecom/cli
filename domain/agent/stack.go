@@ -3,16 +3,16 @@ package agent
 import (
 	"encoding/json"
 	"io/ioutil"
-	`regexp`
-	`strconv`
-	`strings`
+	"regexp"
+	"strconv"
+	"strings"
 	"time"
-	
-	`github.com/go-playground/validator`
+
+	"github.com/go-playground/validator"
 	"github.com/pkg/errors"
-	`github.com/sirupsen/logrus`
-	
-	`github.com/strixeyecom/cli/domain/repository`
+	"github.com/sirupsen/logrus"
+
+	"github.com/strixeyecom/cli/domain/repository"
 )
 
 /*
@@ -25,6 +25,7 @@ import (
 var (
 	validate = validator.New()
 )
+
 // Adding custom validator operators for our usecase
 func init() {
 	// register custom validation: rfe(Required if Field is Equal to some value).
@@ -35,7 +36,7 @@ func init() {
 			if err != nil {
 				return false
 			}
-			if my <= 0 || my >= 65336 {
+			if my <= 0 || my >= (2<<15) {
 				return false
 			}
 			return true
@@ -44,7 +45,7 @@ func init() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	
+
 	// register custom validation: semantic version
 	err = validate.RegisterValidation(
 		`semver`, func(fl validator.FieldLevel) bool {
@@ -53,16 +54,16 @@ func init() {
 			if err != nil {
 				logrus.Fatal(err)
 			}
-			
+
 			// temporary edge case handling
 			if version == "staging" || version == "latest" {
 				return true
 			}
-			
+
 			// return true if field is a semantic version
 			version = strings.TrimPrefix(version, "v")
 			pass := rex.MatchString(version)
-			
+
 			return pass
 		},
 	)
@@ -71,11 +72,11 @@ func init() {
 	}
 }
 
-
 // global constants for file
 const (
 	semVerRegExp = `^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`
 )
+
 // APIStackResponse is what we usually get from user api as response when we try to retrieve an agent's
 // stack config.
 // there are two main cases. We get stack information,
@@ -88,7 +89,7 @@ const (
 type APIStackResponse struct {
 	// Status is usually "ok" or "failed"
 	Status string `json:"status"`
-	
+
 	// Data is usually keeps the error message or out stack config
 	Stack AgentInformation `json:"data"`
 }
@@ -100,7 +101,7 @@ type APIStackResponse struct {
 type APIErrorResponse struct {
 	// Status is usually "ok" or "failed"
 	Status string `json:"status"`
-	
+
 	// Data is usually keeps the error message or out stack config
 	Stack map[string]interface{} `json:"data"`
 }
@@ -121,8 +122,8 @@ type StackConfig struct {
 	Engine     engine              `json:"engine"`
 	Sensor     sensor              `json:"sensor"`
 	Profiler   profiler            `json:"profiler"`
-	Intervals  intervals `json:"intervals"`
-	Paths      paths     `json:"paths"`
+	Intervals  intervals           `json:"intervals"`
+	Paths      paths               `json:"paths"`
 }
 
 // Save stores stackConfig as json to a given path.
@@ -131,13 +132,13 @@ func (config StackConfig) Save(filePath string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	// using default file permission and writing to path
 	err = ioutil.WriteFile(filePath, data, 0600)
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -148,42 +149,42 @@ func (config StackConfig) Validate() error {
 	if err != nil {
 		return err
 	}
-	
+
 	err = config.Intervals.validate()
 	if err != nil {
 		return err
 	}
-	
+
 	err = config.Scheduler.validate()
 	if err != nil {
 		return err
 	}
-	
+
 	err = config.Profiler.validate()
 	if err != nil {
 		return err
 	}
-	
+
 	err = config.Engine.validate()
 	if err != nil {
 		return err
 	}
-	
+
 	err = config.Sensor.validate()
 	if err != nil {
 		return err
 	}
-	
+
 	err = config.Addresses.validate()
 	if err != nil {
 		return err
 	}
-	
+
 	err = config.Database.Validate()
 	if err != nil {
 		return err
 	}
-	
+
 	return err
 }
 
@@ -192,12 +193,12 @@ type Addresses struct {
 	// Scheme means here that whether it is a websocket connection, and therefore "ws" or "wss"
 	// or a normal http connection, "http" or "https"
 	ConnectorScheme string `json:"connector_scheme"`
-	
+
 	// ConnectorAddress keeps connector's location.
 	// This is usually fixed since strixeye has a cloud management panel and it is on a predefined domain.
 	// But still, it has a hostname validation
 	ConnectorAddress string `json:"connector_address"`
-	
+
 	// ConnectorPort has same explanation with ConnectorAddress field of the same struct.
 	ConnectorPort string `json:"connector_port" validate:"port"`
 }
@@ -208,7 +209,7 @@ func (a Addresses) validate() error {
 	if a.ConnectorScheme != "wss" && a.ConnectorScheme != "ws" {
 		return errors.New("bad connector scheme")
 	}
-	
+
 	return validate.Struct(a)
 }
 
@@ -256,9 +257,6 @@ type sensor struct {
 // validate checks for the fields of given instance.
 // check for struct type definition for more documentation about fields and their validation functions.
 func (s sensor) validate() error {
-	if s.IntegrationName != "nginx" && s.IntegrationName != "apache" {
-		return errors.New("bad integration name in configuration")
-	}
 	return validate.Struct(s)
 }
 

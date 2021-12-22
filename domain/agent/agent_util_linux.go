@@ -1,17 +1,19 @@
+//go:build linux
 // +build linux
 
 package agent
 
 import (
-	`bytes`
-	`encoding/json`
+	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	`os`
+	"os"
 	"os/exec"
 	"path/filepath"
-	`syscall`
-	
+	"syscall"
+
 	"github.com/pkg/errors"
 	"github.com/strixeyecom/cli/domain/consts"
 )
@@ -38,14 +40,14 @@ func checkIfAnotherAgentRunning() error {
 	if err == nil {
 		return ErrAnotherAgentRunning
 	}
-	
+
 	// If the error is a file not found/not exists error,
 	// it means that there are no strixeyed running on host machine.
-	
+
 	if !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
-	
+
 	// no other strixeyed alive
 	return nil
 }
@@ -57,9 +59,9 @@ func (a AgentInformation) checkIfHostSupports() error {
 	var (
 		err error
 	)
-	
+
 	// Run generic checks
-	
+
 	// 	control according to deployment type
 	// check for docker/docker-compose deployment.
 	if a.Config.Deployment == "docker" {
@@ -71,7 +73,7 @@ func (a AgentInformation) checkIfHostSupports() error {
 					"are you sure you have installed both docker and its tool docker compose?",
 			)
 		}
-		
+
 		// check whether there is a running docker daemon.
 		err = checkDockerRunning()
 		if err != nil {
@@ -80,15 +82,15 @@ func (a AgentInformation) checkIfHostSupports() error {
 					"Check your docker configuration",
 			)
 		}
-		
+
 		return nil
 	}
-	
+
 	// check for kubectl api
 	if a.Config.Deployment == "kubernetes" {
 		return nil
 	}
-	
+
 	return errors.New("unknown deployment type. check your agent configuration again")
 }
 
@@ -110,14 +112,14 @@ func createServiceFile(agentInformation AgentInformation) error {
 	case "kubernetes":
 		serviceFile, err = createKubernetesServiceFile()
 	}
-	
+
 	// 	save service file
 	servicePath := filepath.Join(consts.ServiceDir, consts.ServiceFile)
 	err = ioutil.WriteFile(servicePath, []byte(serviceFile), 0600)
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -126,20 +128,19 @@ func createServiceFile(agentInformation AgentInformation) error {
 //
 // Although silly, it also controls required tools like mkdir,chown or docker compose and uses given paths.
 func createDockerServiceFile() (string, error) {
-	
+
 	var (
 		err                                 error
 		dockerComposePath, mkdir, chmodPath string
 		composeFilePath                     string
 	)
-	
+
 	// systemd service file
 	serviceFile := `[Unit]
 Description=StrixEye Agent Service Daemon
 
 [Service]
 User=root
-GroupID=root
 Type=simple
 Requires=docker.service
 
@@ -163,26 +164,26 @@ SyslogIdentifier=%s
 WantedBy=multi-user.target
 `
 	execPath := filepath.Join(consts.DaemonDir, consts.DaemonName)
-	
+
 	// get docker compose path
 	dockerComposePath, err = exec.LookPath("docker-compose")
 	if err != nil {
 		return "", err
 	}
-	
+
 	// get chown and chmod path
 	chmodPath, err = exec.LookPath("chmod")
 	if err != nil {
 		return "", err
 	}
-	
+
 	mkdir, err = exec.LookPath("mkdir")
 	if err != nil {
 		return "", err
 	}
-	
+
 	composeFilePath = filepath.Join(consts.WorkingDir, consts.DockerComposeFileName)
-	
+
 	return fmt.Sprintf(
 		serviceFile,
 		execPath, dockerComposePath, composeFilePath, consts.WorkingDir, mkdir,
@@ -195,7 +196,7 @@ func createKubernetesServiceFile() (string, error) {
 		err              error
 		mkdir, chmodPath string
 	)
-	
+
 	// systemd service file
 	serviceFile := `[Unit]
 Description=StrixEye Agent Service Daemon
@@ -224,18 +225,18 @@ SyslogIdentifier=%s
 WantedBy=multi-user.target
 `
 	execPath := filepath.Join(consts.DaemonDir, consts.DaemonName)
-	
+
 	// get chown and chmod path
 	chmodPath, err = exec.LookPath("chmod")
 	if err != nil {
 		return "", err
 	}
-	
+
 	mkdir, err = exec.LookPath("mkdir")
 	if err != nil {
 		return "", err
 	}
-	
+
 	return fmt.Sprintf(
 		serviceFile,
 		execPath, consts.WorkingDir, mkdir,
@@ -265,14 +266,14 @@ func SaveAgentConfig(cfg Agent) error {
 	if err != nil {
 		return err
 	}
-	
+
 	// save data
 	// #nosec
 	err = ioutil.WriteFile(filepath.Join(consts.ConfigDir, consts.ConfigFile), data, 0644)
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -281,11 +282,11 @@ func StopDaemon() error {
 	exitCode := 0
 	stderr := errbuf.String()
 	const defaultFailedCode = 1
-	
-	cmd := exec.Command("systemctl", "stop", "strixeyed")
+
+	cmd := exec.CommandContext(context.Background(), "systemctl", "stop", "strixeyed")
 	cmd.Stdout = &outbuf
 	cmd.Stderr = &errbuf
-	
+
 	err := cmd.Run()
 	if err != nil {
 		// try to get the exit code

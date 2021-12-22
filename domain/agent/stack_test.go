@@ -23,20 +23,20 @@ func TestStackConfig_Marshall(t *testing.T) {
 
 func TestStackConfig_UnMarshall(t *testing.T) {
 	t.Parallel()
-	
+
 	var (
 		a APIStackResponse
-		
+
 		b APIErrorResponse
 	)
-	
+
 	err := json.Unmarshal(
 		[]byte(_goldenStackConfig), &a,
 	)
 	if err != nil {
 		t.Error(err)
 	}
-	
+
 	err = json.Unmarshal(
 		[]byte(`{
     "status": "error",
@@ -65,13 +65,13 @@ func Test_addresses_Validate(t *testing.T) {
 		t.Fatal(err)
 	}
 	viper.AutomaticEnv()
-	
+
 	err = viper.Unmarshal(&cliConfig)
-	
+
 	if err != nil {
 		t.Fatalf("unable to decode into map, %v", err)
 	}
-	
+
 	t.Parallel()
 	type fields struct {
 		ConnectorScheme  string
@@ -79,7 +79,7 @@ func Test_addresses_Validate(t *testing.T) {
 		ConnectorPort    string
 		SchedulerAddr    string
 	}
-	
+
 	tests := []struct {
 		name    string
 		fields  fields
@@ -97,11 +97,11 @@ func Test_addresses_Validate(t *testing.T) {
 	}
 	for i := range tests {
 		tt := tests[i]
-		
+
 		t.Run(
 			tt.name, func(t *testing.T) {
 				t.Parallel()
-				
+
 				a := Addresses{
 					ConnectorScheme:  tt.fields.ConnectorScheme,
 					ConnectorAddress: tt.fields.ConnectorAddress,
@@ -120,7 +120,7 @@ func Test_stackConfig_Validate(t *testing.T) {
 	type fields struct {
 		data []byte
 	}
-	
+
 	tests := []struct {
 		name    string
 		wantErr bool
@@ -182,18 +182,18 @@ func Test_stackConfig_Validate(t *testing.T) {
 			},
 		},
 	}
-	
+
 	for i := range tests {
 		tt := tests[i]
 		t.Run(
 			tt.name, func(t *testing.T) {
 				t.Parallel()
 				var stackResponse APIStackResponse
-				
+
 				if err := json.Unmarshal(tt.fields.data, &stackResponse); err != nil {
 					t.Error(err)
 				}
-				
+
 				config := stackResponse.Stack.Config
 				if err := config.Validate(); (err != nil) != tt.wantErr {
 					t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
@@ -999,11 +999,11 @@ func Test_stackConfig_Save(t *testing.T) {
 		Intervals  intervals
 		Paths      paths
 	}
-	
+
 	type args struct {
 		filePath string
 	}
-	
+
 	tests := []struct {
 		name    string
 		fields  fields
@@ -1020,14 +1020,14 @@ func Test_stackConfig_Save(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	
+
 	for i := range tests {
 		tt := tests[i]
-		
+
 		t.Run(
 			tt.name, func(t *testing.T) {
 				t.Parallel()
-				
+
 				config := StackConfig{
 					Addresses:  tt.fields.Addresses,
 					UseHTTPS:   tt.fields.UseHTTPS,

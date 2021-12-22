@@ -1,9 +1,9 @@
 package commands
 
 import (
-	`testing`
-	
-	`github.com/spf13/viper`
+	"testing"
+
+	"github.com/spf13/viper"
 )
 
 /*

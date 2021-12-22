@@ -8,11 +8,11 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	
+
 	userconfig "github.com/strixeyecom/cli/api/user/agent"
-	`github.com/strixeyecom/cli/cli/command/repository`
-	`github.com/strixeyecom/cli/domain/cli`
-	models `github.com/strixeyecom/cli/domain/repository`
+	"github.com/strixeyecom/cli/cli/command/repository"
+	"github.com/strixeyecom/cli/domain/cli"
+	models "github.com/strixeyecom/cli/domain/repository"
 )
 
 /*
@@ -50,13 +50,13 @@ With this subcommand, you can inspect your logs get is a subcommand of trip comm
 trips on your agent, without leaking any sensitive data outside of your network`,
 		RunE: getTripCmd,
 	}
-	
+
 	// declaring local flags used by get trip commands.
 	getCmd.Flags().StringSliceP(
 		"suspects", "s", nil, "Comma separated values of suspect uuids. "+
 			"--suspects suspect-id,suspect-id2",
 	)
-	
+
 	// declaring local flags used by get trip commands.
 	getCmd.Flags().StringSliceP(
 		"ids", "t", nil, "Comma separated values of trip uuids. "+
@@ -68,7 +68,7 @@ trips on your agent, without leaking any sensitive data outside of your network`
 			"--endpoints /login,/logout",
 	)
 	getCmd.Flags().IntP("limit", "l", 5, "Max number of trips you want to be displayed --limit 5")
-	
+
 	getCmd.Flags().BoolP(
 		"verbose", "v", true, "To hide field values like headers, say --verbose=false",
 	)
@@ -92,9 +92,9 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	queryArgs := models.TripQueryArgs{Limit: 1}
-	
+
 	// parse and set list of suspects to be queried
 	suspects, err := cmd.Flags().GetStringSlice("suspects")
 	if err != nil {
@@ -102,7 +102,7 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 	} else if len(suspects) > 0 {
 		queryArgs.SuspectIds = suspects
 	}
-	
+
 	// parse and set list of endpoints to be queried
 	endpoints, err := cmd.Flags().GetStringSlice("endpoints")
 	if err != nil {
@@ -110,7 +110,7 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 	} else if len(endpoints) > 0 {
 		queryArgs.Endpoints = endpoints
 	}
-	
+
 	// parse and set list of suspicions to be queried
 	tripIds, err := cmd.Flags().GetStringSlice("ids")
 	if err != nil {
@@ -118,16 +118,16 @@ func getTripCmd(cmd *cobra.Command, _ []string) error {
 	} else if len(tripIds) > 0 {
 		queryArgs.TripsIds = tripIds
 	}
-	
+
 	// parse max limit of rows displayed.
 	limit, err := cmd.Flags().GetInt("limit")
 	if err != nil {
 		return err
-		
+
 	} else if limit > 0 {
 		queryArgs.Limit = limit
 	}
-	
+
 	// parse verboseness flag.
 	verbose, err := cmd.Flags().GetBool("verbose")
 	if err != nil {
@@ -173,7 +173,7 @@ func GetTrips(cliConfig cli.Cli, args models.TripQueryArgs) ([]models.Trip, erro
 	var (
 		dbConfig models.Database
 	)
-	
+
 	// If user wants to override db config with local information, use that.
 	if cliConfig.Database.Validate() == nil && cliConfig.Database.OverrideRemoteConfig {
 		color.Blue("Using local database config.")
@@ -185,7 +185,7 @@ func GetTrips(cliConfig cli.Cli, args models.TripQueryArgs) ([]models.Trip, erro
 		}
 		dbConfig = agentConfig.Config.Database
 	}
-	
+
 	return get(dbConfig, args)
 }
 
@@ -202,13 +202,13 @@ func get(dbConfig models.Database, args models.TripQueryArgs) ([]models.Trip, er
 	if err != nil {
 		return nil, errors.Wrap(err, "can not establish connection to agent database")
 	}
-	
+
 	// nobody wants to retrieve all hundreds of thousands of results.
 	if args.Limit == 0 {
 		args.Limit = 10
 	}
 	tx := db.Limit(args.Limit)
-	
+
 	if args.Verbose {
 		tx = tx.Preload("Request.Header")
 	}
@@ -219,24 +219,24 @@ func get(dbConfig models.Database, args models.TripQueryArgs) ([]models.Trip, er
 		// preload only first level for now
 		tx = tx.Preload(clause.Associations)
 	}
-	
+
 	// filter by suspect ids
 	if args.SuspectIds != nil {
 		tx = tx.Where("profile_id IN ?", args.SuspectIds)
 	}
-	
+
 	// filter by suspect ids
 	if args.TripsIds != nil {
 		tx = tx.Where(args.TripsIds)
 	}
-	
+
 	// filter by created after
 	if args.SinceTime != 0 {
 		// convert seconds to milliseconds
 		milliseconds := args.SinceTime * 1e3
 		tx = tx.Where("created_at > ?", milliseconds)
 	}
-	
+
 	// find all suspects that matches args criteria
 	tx = tx.Find(&result)
 	err = tx.Error

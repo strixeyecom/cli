@@ -3,9 +3,9 @@ package agent
 import (
 	"io"
 	"os"
-	
+
 	"github.com/spf13/cobra"
-	`github.com/strixeyecom/cli/domain/agent`
+	"github.com/strixeyecom/cli/domain/agent"
 )
 
 /*
@@ -41,12 +41,12 @@ func NewAgentCommand() *cobra.Command {
 					}
 				}
 			}
-			
+
 			// And finally, the pre run function we want
 			return agent.IsCorrectUser()
 		},
 	}
-	
+
 	agentCommands.AddCommand(
 		CheckCommand(),
 		InstallCommand(),

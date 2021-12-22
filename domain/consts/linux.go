@@ -1,3 +1,4 @@
+//go:build !develop && linux
 // +build !develop,linux
 
 package consts
@@ -14,24 +15,24 @@ package consts
 const (
 	DaemonDir  = "/usr/bin"
 	DaemonName = "strixeyed"
-	
+
 	CLIConfigDir = "/etc/strixeye-cli"
 	WorkingDir   = "/etc/strixeye"
-	
+
 	ConfigDir  = "/etc/strixeye/config"
 	ConfigFile = "config.json"
-	
+
 	DownloadHost   = "downloads.strixeye.com"
 	DockerRegistry = "docker.strixeye.com"
 	APIHost        = "api.strixeye.com"
-	
+
 	DockerComposeFileName = "docker-compose.yml"
-	
-	LogFile = "/var/log/strixeyed"
-	PidFile = "/var/run/strixeyed.pid"
+
+	LogFile     = "/var/log/strixeyed"
+	PidFile     = "/var/run/strixeyed.pid"
 	ServiceDir  = "/lib/systemd/system"
 	ServiceFile = "strixeyed.service"
-	
+
 	DownloadZipName = "manager.tar.gz"
 )
 

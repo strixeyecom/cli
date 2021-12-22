@@ -1,16 +1,16 @@
 package commands
 
 import (
-	`encoding/json`
-	`fmt`
-	
-	`github.com/fatih/color`
-	`github.com/go-yaml/yaml`
-	`github.com/pelletier/go-toml`
-	`github.com/pkg/errors`
-	`github.com/spf13/cobra`
-	`github.com/spf13/viper`
-	`github.com/strixeyecom/cli/domain/cli`
+	"encoding/json"
+	"fmt"
+
+	"github.com/fatih/color"
+	"github.com/go-yaml/yaml"
+	"github.com/pelletier/go-toml"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/strixeyecom/cli/domain/cli"
 )
 
 /*
@@ -42,7 +42,7 @@ strixeye agent inspect
 `,
 		RunE: inspectCmd,
 	}
-	
+
 	// set up flags
 	checkCmd.Flags().String(
 		"format", defaultInspectFormat, "--format if you want to output information in a specified format like json, "+
@@ -56,13 +56,13 @@ func inspectCmd(cmd *cobra.Command, args []string) error {
 		cliConfig cli.Cli
 		err       error
 	)
-	
+
 	// get cli config
 	err = viper.Unmarshal(&cliConfig)
 	if err != nil {
 		return err
 	}
-	
+
 	// show only requested fields
 	if len(args) > 0 {
 		// iterate all wanted fields
@@ -72,7 +72,7 @@ func inspectCmd(cmd *cobra.Command, args []string) error {
 		}
 		return nil
 	}
-	
+
 	// output in requested format
 	fmtFlag, err := cmd.Flags().GetString("format")
 	if err != nil {
